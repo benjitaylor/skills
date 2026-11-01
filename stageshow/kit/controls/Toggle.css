@@ -19,7 +19,7 @@
   .ss-toggle__knob {
     position: absolute;
     top: 2px;
-    left: 2px;
+    inset-inline-start: 2px;
     width: 14px;
     height: 14px;
     border-radius: 50%;
@@ -31,7 +31,7 @@
   }
 
   .ss-toggle[data-on] .ss-toggle__knob {
-    transform: translateX(12px);
+    transform: translateX(calc(12px * var(--ss-x, 1))); /* toward the end: right in ltr, left in rtl */
   }
 
   .ss-stage[data-palette="mono"][data-theme="dark"] .ss-toggle[data-on] .ss-toggle__knob {

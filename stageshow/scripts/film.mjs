@@ -4,7 +4,7 @@
 //   node scripts/film.mjs <url> [--out shots/film.png] [--every 500] [--count 36]
 //        [--delay 0] [--at <mark>] [--select "#example .ss-fit"] [--width 1280]
 //        [--cols auto] [--zoom x,y,w,h] [--scale auto] [--pad 16]
-//        [--reduced] [--dark] [--still] [--slow 1]
+//        [--reduced] [--dark] [--rtl] [--still] [--slow 1]
 //        [--hover] [--hover-for 4000] [--leave-for 1600]
 //        [--gate] [--states] [--states-for 20000]
 //        [--report findings.json] [--strict] [--help]
@@ -57,6 +57,7 @@
 //                ('left 0.80s') while the stage settles.
 //   --reduced    emulate prefers-reduced-motion: reduce (shows the poster)
 //   --dark       emulate prefers-color-scheme: dark
+//   --rtl        film every stage mirrored (dir="rtl", Arabic, Eastern digits), to check a scene holds in both directions
 //   --slow N     run the stage's clock and every CSS animation and transition
 //                N times slower, so a landing or a press gets every frame.
 //                Timestamps stay in scene time. Pair with a short --every
@@ -152,7 +153,7 @@ if (!process.env.FILM_CHILD) {
 }
 
 const args = process.argv.slice(2)
-const FLAGS = new Set(['reduced', 'dark', 'still', 'hover', 'strict', 'help', 'gate', 'states'])
+const FLAGS = new Set(['reduced', 'dark', 'rtl', 'still', 'hover', 'strict', 'help', 'gate', 'states'])
 const url = args.find((a, i) => !a.startsWith('--') && (i === 0 || !args[i - 1].startsWith('--') || FLAGS.has(args[i - 1].slice(2))))
 const opt = (name, fallback) => {
   const i = args.indexOf(`--${name}`)
@@ -265,10 +266,10 @@ const page = await browser.newPage({
 // times slower, so fast beats (a landing, a press) get every frame. Sheet
 // timestamps stay in scene time. --dark films the stage in its dark theme.
 const slow = Math.max(1, Number(opt('slow', 1)))
-await page.addInitScript(([slow, dark, stillRun]) => {
-  window.__stageshow = { slow, ...(dark ? { theme: 'dark' } : {}) }
+await page.addInitScript(([slow, dark, stillRun, rtl]) => {
+  window.__stageshow = { slow, ...(dark ? { theme: 'dark' } : {}), ...(rtl ? { dir: 'rtl' } : {}) }
   window.__ssStill = stillRun
-}, [slow, has('dark'), still])
+}, [slow, has('dark'), still, has('rtl')])
 await page.addInitScript({ content: instrumentationSource(record, select) })
 // The per-shot checks (film-checks.mjs), installed the same way
 await page.addInitScript({ content: filmChecksSource() })

@@ -25,7 +25,7 @@
 
   .ss-toast__icon { display: grid; opacity: 0.8; }
 
-  .ss-toast__action { margin-left: 6px; color: rgba(255, 255, 255, 0.6); font-weight: 500; }
+  .ss-toast__action { margin-inline-start: 6px; color: rgba(255, 255, 255, 0.6); font-weight: 500; }
 
   [data-theme='dark'] .ss-toast,
   .ss-stage[data-theme='dark'] .ss-toast {

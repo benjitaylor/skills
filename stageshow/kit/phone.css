@@ -109,7 +109,9 @@
   /* Every iPhone frame lays the status bar out exactly as Apple's iOS 27 UI
      kit does (Status bar, iPhone, in points): the time centered in the first
      138.5, its 22pt line from y 21.5; signal, wifi and battery from x 285.25,
-     8 apart, their tops at 26.33, 25.33 and 25.67 */
+     8 apart, their tops at 26.33, 25.33 and 25.67. In an rtl scene iOS mirrors
+     the bar: the time on the right, the glyphs on the left, the battery
+     facing the other way (references/rtl.md) */
   .ss-phone:not([data-frame="android"], [data-frame="soft"]) .ss-phone__status {
     height: 62px;
     padding: 0;
@@ -118,7 +120,7 @@
   .ss-phone:not([data-frame="android"], [data-frame="soft"]) .ss-phone__time {
     position: absolute;
     top: 21.5px;
-    left: 0;
+    inset-inline-start: 0;
     width: 138.5px;
     line-height: 22px;
     text-align: center;
@@ -127,7 +129,7 @@
   .ss-phone:not([data-frame="android"], [data-frame="soft"]) .ss-phone__glyphs {
     position: absolute;
     top: 25.33px;
-    left: 285.25px;
+    inset-inline-start: 285.25px;
     align-items: flex-start;
     gap: 8px;
   }
@@ -138,6 +140,10 @@
 
   .ss-phone:not([data-frame="android"], [data-frame="soft"]) .ss-phone__battery {
     margin-top: 0.33px;
+  }
+
+  .ss-phone__battery:dir(rtl) {
+    scale: -1 1;
   }
 
   /* Photo: Apple's iPhone 18 Pro product bezel, silver, black on dark stages.
@@ -222,7 +228,7 @@
     --pt: 1px;
     position: absolute;
     top: 0;
-    left: 0;
+    left: 0; /* physical: scaled into the frame from its top left */
     display: flex;
     flex-direction: column;
     overflow: hidden;
@@ -236,6 +242,12 @@
     -webkit-font-smoothing: antialiased;
   }
 
+  /* An Arabic scene on a phone: iOS's Arabic face first (SF Arabic), then the
+     stage's Arabic stack, so the screen's own font never takes the Arabic */
+  .ss-phone__screen:lang(ar) {
+    font-family: "SF Arabic", var(--ss-font-arabic), -apple-system, system-ui, sans-serif;
+  }
+
   .ss-phone[data-dark] .ss-phone__screen {
     background: #000;
     color: #fff;
@@ -244,14 +256,15 @@
   .ss-phone__status {
     position: absolute;
     top: 0;
-    right: 0;
-    left: 0;
+    inset-inline-end: 0;
+    inset-inline-start: 0;
     z-index: 2;
     display: flex;
     align-items: center;
     justify-content: space-between;
     height: 54px;
-    padding: 0 34px 0 52px;
+    padding-block: 0;
+    padding-inline: 52px 34px; /* the time's side takes the wider inset, and the time leads: right in rtl */
     /* Light to dark content fades, never cuts, when an app opens over a dark
        screen or closes back to it */
     transition: color 0.3s ease;
@@ -313,8 +326,8 @@
   /* With no frame, the screen's edge is the object's edge, and iOS's 20pt
      margins read as cramped against it. Bare screens get a wider margin */
   .ss-phone[data-frame="bare"] .ss-phone__content {
-    padding-right: 8px;
-    padding-left: 8px;
+    padding-inline-end: 8px;
+    padding-inline-start: 8px;
   }
 
   .ss-phone__home {
@@ -362,13 +375,13 @@
 
   .ss-lock__stack {
     position: absolute;
-    right: 0;
+    inset-inline-end: 0;
     bottom: 118px;
-    left: 0;
+    inset-inline-start: 0;
     display: flex;
     flex-direction: column;
     gap: 8px;
-    text-align: left;
+    text-align: start;
   }
 
   /* Under the clock instead, for a phone cropped by the stage's bottom edge */
@@ -379,9 +392,9 @@
 
   .ss-lock__controls {
     position: absolute;
-    right: 46px;
+    inset-inline-end: 46px;
     bottom: 48px;
-    left: 46px;
+    inset-inline-start: 46px;
     display: flex;
     justify-content: space-between;
   }
@@ -411,13 +424,14 @@
        banner measures the cut and insets from the visible edge instead, so
        a phone drawn past the sides at true size keeps its banner whole */
     margin: 0 18px;
-    padding: 14px 17px 14px 14px;
+    padding-block: 14px;
+    padding-inline: 14px 17px;
     border-radius: 23px;
     background: rgba(252, 252, 253, 0.76);
     backdrop-filter: blur(30px) saturate(1.25);
     box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
     color: #000;
-    text-align: left;
+    text-align: start;
   }
 
   /* Unlocked: the banner drops in at the top, just under the island, over
@@ -425,8 +439,8 @@
   .ss-notification[data-banner] {
     position: absolute;
     top: 56px;
-    right: 0;
-    left: 0;
+    inset-inline-end: 0;
+    inset-inline-start: 0;
     /* Over the status bar (the same layer, later in the page) and under the
        island, which is the hardware cutout: a banner slides in beneath it */
     z-index: 2;

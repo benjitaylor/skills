@@ -23,7 +23,7 @@
   .ss-tabs__bar {
     position: absolute;
     bottom: -1px;
-    left: 0;
+    left: 0; /* physical: slid by a translate from the tab's offsetLeft */
     width: 1px;
     height: 2px;
     background: var(--ss-text-strong);

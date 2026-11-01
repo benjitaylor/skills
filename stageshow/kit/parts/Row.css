@@ -58,7 +58,7 @@
     grid-column: 1 / 2;
     z-index: 1;
     /* 7px clear of the lead, whatever size the dot is */
-    left: calc(-7px - var(--ss-row-dot));
+    inset-inline-start: calc(-7px - var(--ss-row-dot));
     top: calc(50% - 3px);
     width: var(--ss-row-dot);
     height: var(--ss-row-dot);

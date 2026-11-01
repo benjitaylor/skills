@@ -10,6 +10,12 @@ function showFailure(error: unknown) {
   document.getElementById('root')!.replaceChildren(message)
 }
 
+// ?dir=rtl previews every stage mirrored, as film.mjs --rtl films it
+if (params.get('dir') === 'rtl') {
+  const w = window as unknown as { __stageshow?: Record<string, unknown> }
+  w.__stageshow = { ...w.__stageshow, dir: 'rtl' }
+}
+
 async function boot() {
   if (params.has('capture')) {
     // Film/jump tools control their own pacing and instrumentation. This

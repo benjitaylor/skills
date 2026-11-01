@@ -10,7 +10,7 @@ import './Segmented.css'
 export function Segmented({ items, value, targets, cursor, className, style, ...rest }: { items: ReactNode[]; value: number; targets?: (string | undefined)[]; cursor?: CursorKind; className?: string; style?: CSSProperties } & Record<`data-${string}`, unknown>) {
   return (
     <div {...rest} className={`ss-seg${className ? ` ${className}` : ''}`} style={{ ['--n' as string]: items.length, ...style }}>
-      <span className="ss-seg__thumb" style={{ transform: `translateX(${value * 100}%)` }} />
+      <span className="ss-seg__thumb" style={{ transform: `translateX(calc(${value * 100}% * var(--ss-x, 1)))` }} />
       {items.map((o, i) => (
         <span key={i} className="ss-seg__option" data-on={i === value || undefined} data-target={targets?.[i]} data-cursor={cursor}>
           {o}

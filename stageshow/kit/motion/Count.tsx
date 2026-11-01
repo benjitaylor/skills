@@ -1,10 +1,12 @@
 import { useLayoutEffect, useEffect, useRef, useState, type HTMLAttributes } from 'react'
 import { useReducedMotion } from '../reduced-motion'
+import { useLook } from '../looks'
+import { toDigits, toLatin } from '../dir'
 import './Count.css'
 
 export interface CountProps extends HTMLAttributes<HTMLSpanElement> {
   value: number
-  /** How a number is written, e.g. n => `$${n.toFixed(2)}` */
+  /** How a number is written, e.g. n => `$${n.toFixed(2)}`. Write it with Western digits (or formatNumber): the stage's `digits` decides which glyphs draw. */
   format?: (n: number) => string
   /** ms for a digit to roll from the old figure to the new one. */
   duration?: number
@@ -51,7 +53,10 @@ const digitsFromRight = (text: string) => {
 export function Count({ value, format = (n) => Math.round(n).toLocaleString('en-US'), duration = 700, stagger = 45, className, style, ...rest }: CountProps) {
   const reduced = useReducedMotion()
   const el = useRef<HTMLSpanElement>(null)
-  const text = format(value)
+  // Parsed in Western digits whatever the format wrote; drawn in the stage's
+  const { digits: system, dir } = useLook()
+  const text = toLatin(format(value))
+  const glyph = (c: string) => toDigits(c, system)
   const { head, space, unit } = unitOf(text)
   const chars = head.split('')
   const digits = digitsFromRight(text)
@@ -119,9 +124,14 @@ export function Count({ value, format = (n) => Math.round(n).toLocaleString('en-
   // digits it already had rolling in place and only the new leading one appears
   let fromRight = digits.length
   return (
-    <span {...rest} ref={el} className={`ss-count${className ? ` ${className}` : ''}`} style={style} aria-label={text}>
+    <span {...rest} ref={el} className={`ss-count${className ? ` ${className}` : ''}`} style={style} aria-label={toDigits(text, system)}>
+      {/* A number reads left to right in any direction (most significant digit
+          first), so the count is laid out ltr. A unit after the figure follows
+          the paragraph: in an rtl scene it sits on the figure's left, so it is
+          drawn first there */}
+      {unit && dir === 'rtl' && <span className="ss-count__unit" data-lead data-space={space || undefined} aria-hidden>{unit}</span>}
       {chars.map((c, i) => {
-        if (c < '0' || c > '9') return <span key={`s${i}-${c}`} className="ss-count__char" aria-hidden>{c}</span>
+        if (c < '0' || c > '9') return <span key={`s${i}-${c}`} className="ss-count__char" aria-hidden>{system === 'arab' ? c === '.' ? '٫' : c === ',' ? '٬' : c : c}</span>
         const column = --fromRight
         const at = idx[column] ?? MIDDLE + Number(c)
         return (
@@ -130,12 +140,12 @@ export function Count({ value, format = (n) => Math.round(n).toLocaleString('en-
               className="ss-count__strip"
               style={{ transform: `translateY(${-at}em)`, transitionDuration: `${duration}ms`, transitionDelay: `${column * stagger}ms` }}
             >
-              {STRIP.map((n, k) => <span key={k}>{n}</span>)}
+              {STRIP.map((n, k) => <span key={k}>{glyph(n)}</span>)}
             </span>
           </span>
         )
       })}
-      {unit && <span className="ss-count__unit" data-space={space || undefined} aria-hidden>{unit}</span>}
+      {unit && dir !== 'rtl' && <span className="ss-count__unit" data-space={space || undefined} aria-hidden>{unit}</span>}
     </span>
   )
 }

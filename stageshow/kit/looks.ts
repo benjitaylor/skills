@@ -1,7 +1,9 @@
 import { createContext, useContext } from 'react'
+import type { Dir, Digits } from './dir'
 
 // The look a stage sets for everything inside it: theme, palette, fidelity,
-// and which of its designs (wide or compact) is showing. <Stage> provides it;
+// which of its designs (wide or compact) is showing, and its direction and
+// digits (dir.ts). <Stage> provides it;
 // parts read it with useLook().
 
 /** glass: frosted, translucent surfaces over a soft color field. */
@@ -12,12 +14,14 @@ export type Fidelity = 'minimal' | 'standard' | 'realistic'
 /** wide: the design size. compact: the smaller design used below `compact.below`. */
 export type Layout = 'wide' | 'compact'
 
-export type Look = { theme: Theme; palette: Palette; fidelity: Fidelity; layout: Layout }
+export type Look = { theme: Theme; palette: Palette; fidelity: Fidelity; layout: Layout; dir: Dir; digits: Digits }
 
 export const LookContext = createContext<Look>({
   theme: 'light',
   palette: 'accent',
   fidelity: 'standard',
   layout: 'wide',
+  dir: 'ltr',
+  digits: 'latn',
 })
 export const useLook = () => useContext(LookContext)

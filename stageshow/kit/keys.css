@@ -26,13 +26,13 @@
 
   .ss-keys[data-at="bottom-left"],
   .ss-keys[data-at="bottom-right"] {
-    left: auto;
+    inset-inline-start: auto;
     transform: translateY(6px) scale(0.96);
   }
 
-  .ss-keys[data-at="bottom-left"] { left: 16px; }
+  .ss-keys[data-at="bottom-left"] { inset-inline-start: 16px; }
 
-  .ss-keys[data-at="bottom-right"] { right: 16px; }
+  .ss-keys[data-at="bottom-right"] { inset-inline-end: 16px; }
 
   .ss-keys[data-at="bottom-left"][data-show="true"],
   .ss-keys[data-at="bottom-right"][data-show="true"] {

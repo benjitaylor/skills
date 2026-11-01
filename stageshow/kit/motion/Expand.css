@@ -57,7 +57,7 @@
   .ss-expand__face {
     position: absolute;
     top: 0;
-    left: 0;
+    left: 0; /* physical: clipped from a measured rect */
     transform-origin: 0 0;
     pointer-events: none;
     transition: opacity calc(var(--ss-expand-ms) * 0.3) ease calc(var(--ss-expand-ms) * 0.65);

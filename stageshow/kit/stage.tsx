@@ -8,6 +8,7 @@ import { EMPTY, nameOf, rectOf, sameRects, stageSpace, targetRectOf, thumb, type
 import { StillContext, useReducedMotion } from './reduced-motion'
 import { clock } from './clock'
 import { clamp, easeInOutCubic, isDev, warn } from './util'
+import { watchDigits, type Dir, type Digits } from './dir'
 
 // The stage: fits a design-size scene into its container, runs the script
 // while it is on screen, and draws the cursor and keycaps over the scene.
@@ -75,6 +76,19 @@ export interface StageProps<S> {
    * lift off it. Pass two or three colors to choose them (lavender and
    * orange by default). Leave it out for the plain ground. */
   ground?: 'orbs' | [string, string] | [string, string, string]
+  /**
+   * Reading direction. rtl mirrors the scene: the kit's logical CSS flips,
+   * a box fraction ({ at, x: 0.8 }) is read from the box's start edge (its
+   * right in rtl), and the stage gets lang (Arabic by default). Named targets
+   * need nothing: they are wherever the layout put them. Raw points stay
+   * physical, like rect(): write them with fromStart() or mirror() (dir.ts)
+   * so they follow the direction. See references/rtl.md.
+   */
+  dir?: Dir
+  /** The scene's language, set as lang on the stage. Defaults to 'ar' when the scene is written rtl, unset otherwise. */
+  lang?: string
+  /** Which digits text shows: 'arab' (Eastern Arabic ٠١٢٣, the default for a scene written rtl) or 'latn' (0123). Applies to every text node; mark text data-digits="latn" to keep it Western. film --rtl mirrors layout only and leaves digits alone. */
+  digits?: Digits
   /** Plays the script faster (above 1) or slower (below 1). Waits and tweens divide by it. */
   speed?: number
   className?: string
@@ -82,8 +96,8 @@ export interface StageProps<S> {
   specimen?: boolean
   /** No framing, when the developer asks for it: no ground, and the product sits whole with room around it, floating on their page. Film's bleed and floating checks stand down; everything else still applies. */
   unframed?: boolean
-  /** `layout` is 'wide' or 'compact' (see `compact`); useLook() also has it, but only in components rendered inside the stage. */
-  children: (s: S, rect: (name: string) => Rect, layout: Layout) => ReactNode
+  /** `layout` is 'wide' or 'compact' (see `compact`); useLook() also has it, but only in components rendered inside the stage. `dir` is the stage's direction, for a scene that mixes measured rects (physical) with its own layout (mirrored): fromStart() and mirror() take it. */
+  children: (s: S, rect: (name: string) => Rect, layout: Layout, dir: Dir) => ReactNode
 }
 
 const NONE = {}
@@ -110,6 +124,9 @@ export function Stage<S extends object>({
   ground,
   fill: fillProp = false,
   theme: themeProp = 'light',
+  dir: dirProp = 'ltr',
+  lang: langProp,
+  digits: digitsProp,
   className,
   children,
 }: StageProps<S>) {
@@ -141,9 +158,18 @@ export function Stage<S extends object>({
   const scaleRef = useRef(1)
   scaleRef.current = scale
   // film.mjs can slow every stage down (--slow) and film any stage dark (--dark)
-  const film = typeof window === 'undefined' ? {} : ((window as unknown as { __stageshow?: { slow?: number; theme?: Theme } }).__stageshow ?? {})
+  // and film any stage mirrored (--rtl)
+  const film = typeof window === 'undefined' ? {} : ((window as unknown as { __stageshow?: { slow?: number; theme?: Theme; dir?: Dir } }).__stageshow ?? {})
   const speed = speedProp / (film.slow ?? 1)
   const theme = film.theme ?? themeProp
+  const dir: Dir = film.dir ?? dirProp
+  const dirRef = useRef(dir)
+  dirRef.current = dir
+  // Digits and language follow what the scene was written in, not a filmed
+  // mirror: film --rtl flips an English scene's layout to test it, and an
+  // English sentence never takes Eastern digits
+  const digits: Digits = digitsProp ?? (dirProp === 'rtl' ? 'arab' : 'latn')
+  const lang = langProp ?? (dirProp === 'rtl' ? 'ar' : undefined)
   const [kind, setKind] = useState<CursorKind>(cursor?.kind ?? 'pointer')
   // A ring that spreads from the click point and fades, drawn under the cursor
   const ripple = (at: Point) => {
@@ -306,6 +332,9 @@ export function Stage<S extends object>({
     // One target per layout, as cursor.at takes it
     if (typeof t === 'object' && t !== null && 'wide' in t) t = (layoutRef.current === 'compact' ? t.compact : t.wide)
     const name = nameOf(t)
+    const rtl = dirRef.current === 'rtl'
+    // A point is physical stage pixels in either direction, like rect(); a
+    // scene that mirrors writes its points with fromStart() or mirror() (dir.ts)
     if (name === null) return t as Point
     const root = rootRef.current
     const el = root?.querySelector<HTMLElement>(`[data-target="${name}"]`)
@@ -315,7 +344,9 @@ export function Stage<S extends object>({
     }
     const r = rectOf(root, el, scaleRef.current)
     const f = typeof t === 'string' ? { x: 0.5, y: 0.5 } : (t as { x: number; y: number })
-    return { x: r.x + r.width * f.x, y: r.y + r.height * f.y }
+    // A fraction of a box is a fraction from its start edge, so it mirrors with the scene
+    const fx = rtl ? 1 - f.x : f.x
+    return { x: r.x + r.width * fx, y: r.y + r.height * f.y }
   }, [])
 
   // Stills have no script to hover things, so mark them here.
@@ -400,9 +431,9 @@ export function Stage<S extends object>({
     () => (signal: AbortSignal) =>
       createAct<S>(signal, {
         rootRef, cursorRef, pos, hovered, kindRef, keysRef, dragging, autoUsed, autoRef, scaleRef,
-        speed, layout, cursor, resolve, place, remeasure, ripple, setState, setKind, setKeys, setLastKeys,
+        speed, layout, dir, cursor, resolve, place, remeasure, ripple, setState, setKind, setKeys, setLastKeys,
       }),
-    [resolve, place, speed, layout], // eslint-disable-line react-hooks/exhaustive-deps
+    [resolve, place, speed, layout, dir], // eslint-disable-line react-hooks/exhaustive-deps
   )
 
   // Run the loop only while the stage is on screen and the tab is visible.
@@ -563,7 +594,13 @@ export function Stage<S extends object>({
     if (cursor && !still && !dragging.current) autoRef.current?.(pos.current)
   }, [state]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  const look = useMemo(() => ({ theme, palette, fidelity, layout }), [theme, palette, fidelity, layout])
+  // Digits: converted on every text node as the scene changes (dir.ts)
+  useLayoutEffect(() => {
+    const root = rootRef.current
+    return root ? watchDigits(root, digits) : undefined
+  }, [digits])
+
+  const look = useMemo(() => ({ theme, palette, fidelity, layout, dir, digits }), [theme, palette, fidelity, layout, dir, digits])
   const showCursor = cursor && (!script || !still || cursor.still)
 
   return (
@@ -580,6 +617,9 @@ export function Stage<S extends object>({
         data-greys={greys === 'cool' ? 'cool' : undefined}
         data-fidelity={fidelity}
         data-layout={layout}
+        dir={dir}
+        lang={lang}
+        data-digits={digits}
         style={{
           width: designW,
           height: designH,
@@ -601,7 +641,7 @@ export function Stage<S extends object>({
           />
         )}
         <StillContext.Provider value={still}>
-          <LookContext.Provider value={look}>{children(state, rectFor, layout)}</LookContext.Provider>
+          <LookContext.Provider value={look}>{children(state, rectFor, layout, dir)}</LookContext.Provider>
         </StillContext.Provider>
         {script && <Keycaps rows={[lastKeys, keys]} at={typeof keysAt === 'string' ? keysAt : keysAt[layout]} />}
         {showCursor && <Cursor cursorRef={cursorRef} style={cursor!.style} kind={kind} />}

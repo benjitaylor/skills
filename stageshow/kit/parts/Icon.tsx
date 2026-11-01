@@ -16,6 +16,10 @@ const DRAWN = {
   contactless: 'M6.8 6.2a2.5 2.5 0 0 1 0 3.6M8.5 4.5a5 5 0 0 1 0 7M10.3 2.7a7.5 7.5 0 0 1 0 10.6',
 } as const
 type LucideName = keyof typeof LUCIDE
+// Glyphs that point along the line of reading mirror in an rtl scene: a
+// chevron or arrow that means "next" or "go" points left there. Media
+// controls (play), clocks, checks and logos never mirror (references/rtl.md)
+const DIRECTIONAL = new Set<string>(['chevron-right', 'arrow', 'send'])
 export type IconName = LucideName | keyof typeof DRAWN
 
 // Solid versions, for small marks and tinted tiles where a thin outline goes
@@ -51,10 +55,10 @@ export function Icon({ name, size = 16, stroke = 1.5, filled, className, style }
   const cls = `ss-icon${className ? ` ${className}` : ''}`
   if (!solid && name in LUCIDE) {
     const Glyph = LUCIDE[name as LucideName]
-    return <Glyph size={size} strokeWidth={stroke} absoluteStrokeWidth className={cls} style={style} aria-hidden />
+    return <Glyph size={size} strokeWidth={stroke} absoluteStrokeWidth className={cls} style={style} data-flip={DIRECTIONAL.has(name) || undefined} aria-hidden />
   }
   return (
-    <svg viewBox="0 0 16 16" width={size} height={size} className={cls} style={style} aria-hidden>
+    <svg viewBox="0 0 16 16" width={size} height={size} className={cls} style={style} data-flip={(!solid && DIRECTIONAL.has(name)) || (solid && name === 'send') || undefined} aria-hidden>
       {solid ? (
         <path d={solid} fill="currentColor" fillRule="evenodd" />
       ) : (

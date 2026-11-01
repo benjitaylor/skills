@@ -33,6 +33,7 @@
 @import './parts/Facepile.css';
 @import './parts/Chip.css';
 @import './parts/BrandMark.css';
+@import './parts/Money.css';
 @import './controls/Field.css';
 @import './controls/Segmented.css';
 @import './controls/Toggle.css';

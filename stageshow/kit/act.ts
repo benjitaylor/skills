@@ -6,6 +6,7 @@ import type { Layout } from './looks'
 import { EMPTY, drawnScale, nameOf, layoutRectOf, rectOf, thumb, type Point, type Rect, type Target } from './measure'
 import { bezier } from './ease'
 import { clamp, easeInOutCubic, hash, warn } from './util'
+import { isRtl, type Dir } from './dir'
 
 // The touch dot lingers a beat after a lift, then goes
 const fingerGone = (el: HTMLElement | null | undefined) => { if (!el) return; window.setTimeout(() => el.removeAttribute('data-touching'), 240) }
@@ -101,6 +102,8 @@ export interface Act<S> {
   readonly signal: AbortSignal
   /** 'wide' or 'compact': which design is showing, so a script can aim or pace per layout. */
   readonly layout: Layout
+  /** The stage's direction: pass it to fromStart(), mirror() or sign() (dir.ts) for points that hold in rtl. */
+  readonly dir: Dir
 }
 
 export type Script<S> = (act: Act<S>) => Promise<void>
@@ -123,6 +126,7 @@ export interface ActEnv<S> {
   scaleRef: Ref<number>
   speed: number
   layout: Layout
+  dir: Dir
   cursor?: { ripple?: boolean; style?: string }
   resolve: (t: Target) => Point
   place: (p: Point) => void
@@ -137,7 +141,7 @@ export interface ActEnv<S> {
 // Each run gets its own act, bound to its own signal, so a canceled run can
 // never pick up the next run's signal and keep going.
 export function createAct<S>(signal: AbortSignal, env: ActEnv<S>): Act<S> {
-  const { rootRef, cursorRef, pos, hovered, kindRef, keysRef, dragging, autoUsed, autoRef, scaleRef, speed, layout, cursor, resolve, place, remeasure, ripple, setState, setKind, setKeys, setLastKeys } = env
+  const { rootRef, cursorRef, pos, hovered, kindRef, keysRef, dragging, autoUsed, autoRef, scaleRef, speed, layout, dir, cursor, resolve, place, remeasure, ripple, setState, setKind, setKeys, setLastKeys } = env
   const entering = bezier('enter')
   const check = () => {
     if (signal.aborted) throw new Stopped()
@@ -345,7 +349,9 @@ export function createAct<S>(signal: AbortSignal, env: ActEnv<S>): Act<S> {
       let line = chars[0]
       for (const ch of chars) if (Math.abs((ch.top + ch.bottom) / 2 - y) < Math.abs((line.top + line.bottom) / 2 - y)) line = ch
       const row = chars.filter((ch) => Math.abs(ch.top - line.top) < (line.bottom - line.top) / 2)
-      const next = row.find((ch) => ch.mid > x)
+      // Characters come in reading order: rightward in ltr text, leftward in rtl
+      const rtl = isRtl(el)
+      const next = row.find((ch) => (rtl ? ch.mid < x : ch.mid > x))
       return next ? next.at : row[row.length - 1].at + 1
     },
     async move(to, opts) {
@@ -427,7 +433,7 @@ export function createAct<S>(signal: AbortSignal, env: ActEnv<S>): Act<S> {
         const p = pos.current
         const inside = p.x >= box.x + 8 && p.x <= box.x + box.width - 8 && p.y >= box.y + 8 && p.y <= box.y + box.height - 8
         if (!inside) {
-          await this.move({ x: box.x + box.width * 0.6, y: box.y + box.height * 0.55 })
+          await this.move({ x: box.x + box.width * (dir === 'rtl' ? 0.4 : 0.6), y: box.y + box.height * 0.55 })
           await this.wait(120)
         }
       }
@@ -605,9 +611,11 @@ export function createAct<S>(signal: AbortSignal, env: ActEnv<S>): Act<S> {
         // the anchor on the first line (selecting nothing, or backwards) and
         // then fills everything at once as it crosses into the next.
         const lines = selects && Math.abs(end.y - from.y) > 6
-        // Ending left of where it started, no path reads right: the beam runs
-        // back along the first line or past the end on the last
-        if (lines && end.y > from.y && end.x < from.x - 2) warn('a text selection that ends left of where it starts overshoots and shrinks back; select text that starts a line, or fits on one')
+        // Ending behind where it started (left of it in ltr text, right of it in
+        // rtl), no path reads right: the beam runs back along the first line
+        // or past the end on the last
+        const backwards = isRtl(targetEl(to)) ? end.x > from.x + 2 : end.x < from.x - 2
+        if (lines && end.y > from.y && backwards) warn('a text selection that ends behind where it starts overshoots and shrinks back; select text that starts a line, or fits on one')
         const caretsBefore = carets
         // A flick is brief, about a quarter second; the throw does the rest
         await tween(finger ? (opts?.duration ?? clamp(180 + dist * 0.5, 240, 300)) : (opts?.duration ?? clamp(360 + dist * 1.1, 450, 900)), (t) => {
@@ -639,6 +647,7 @@ export function createAct<S>(signal: AbortSignal, env: ActEnv<S>): Act<S> {
       autoRef.current?.(end)
     },
     layout,
+    dir,
   }
   // A beat started without await (a move alongside other beats) rejects
   // with Stopped when the stage stops; that is expected, so it must not

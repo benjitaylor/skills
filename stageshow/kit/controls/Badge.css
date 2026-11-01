@@ -28,7 +28,7 @@
      its side is 2px tighter: the dot and the last letter then sit the same
      distance from their ends */
   .ss-badge[data-lead] {
-    padding-left: 7px;
+    padding-inline-start: 7px;
   }
 
   .ss-badge[data-tone="accent"] { background: var(--ss-accent-soft); color: var(--ss-accent-text); }

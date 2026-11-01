@@ -35,6 +35,7 @@ const curated = [
   { id: 'phone-touch', name: 'Card expansion', kind: 'Scene', note: 'A card opens into its screen as one object, and the loop folds back.' },
   { id: 'dynamic-island', name: 'Dynamic Island', kind: 'Scene', note: 'One black shape, its content a separate layer.' },
   { id: 'messages', name: 'Messages', kind: 'Scene', note: 'Composer, typing, receipts, a bubble\'s lifetime.' },
+  { id: 'checkout-ar', name: 'Arabic checkout', kind: 'Scene', note: 'An Arabic checkout written rtl: the kit mirrors the chrome, the status bar and the chevron, Eastern digits, the riyal sign left of the amount; a sheet closed as the loop\'s cause.' },
   { id: 'cursors', name: 'Cursor kinds', kind: 'Specimen', note: 'Cursor kinds and direct feedback across common interactions.' },
   { id: 'cursor-morph', name: 'Cursor morph', kind: 'Morph', note: 'One outline becomes four cursor styles. Position, press feedback, and shape share the same stage.' },
   { id: 'cursor-resize', name: 'Resize cursors', kind: 'Scene', note: 'Resize edges and corners, the cursor changing kind as it crosses them.' },

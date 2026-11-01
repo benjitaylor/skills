@@ -10,7 +10,7 @@ export function Meter({ value, tone = 'accent', className, style, ...rest }: { v
   return (
     <span {...rest} className={`ss-meter${className ? ` ${className}` : ''}`} data-tone={tone} style={style}>
       {/* Revealed with clip-path rather than width, so nothing re-lays out and the end stays round */}
-      <span className="ss-meter__fill" style={{ clipPath: `inset(0 ${(1 - Math.max(0, Math.min(1, value))) * 100}% 0 0 round 3px)` }} />
+      <span className="ss-meter__fill" style={{ ['--ss-meter-rest' as string]: `${(1 - Math.max(0, Math.min(1, value))) * 100}%` }} />
     </span>
   )
 }

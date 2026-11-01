@@ -12,6 +12,6 @@
   }
 
   .ss-facepile__face + .ss-facepile__face {
-    margin-left: var(--ss-overlap);
+    margin-inline-start: var(--ss-overlap);
   }
 }

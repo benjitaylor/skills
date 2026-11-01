@@ -4,7 +4,7 @@
   .ss-follow {
     position: absolute;
     top: 0;
-    left: 0;
+    left: 0; /* physical: moved by a translate from a measured rect */
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.18s ease;

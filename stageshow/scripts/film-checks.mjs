@@ -594,7 +594,14 @@ function detectNearAligned({ root, specimen }) {
     const cs = getComputedStyle(n)
     if (!/flex|grid|block/.test(cs.display) || (cs.display.includes('flex') && cs.flexDirection !== 'column')) continue
     if (n.getAnimations({ subtree: true }).some((x) => x.playState === 'running' && !(x.effect?.getTiming?.().iterations === Infinity))) continue
-    const firstWords = (k) => { for (const e of [k, ...k.querySelectorAll('*')]) { if (e.closest('svg, .ss-avatar, .ss-bar') || getComputedStyle(e).display === 'none') continue; if ([...e.childNodes].some((t) => t.nodeType === 3 && t.textContent.trim().length > 1)) { const r = e.getBoundingClientRect(); if (r.width > 8 && getComputedStyle(e).textAlign !== 'center' && getComputedStyle(e).textAlign !== 'right') return { e, r } } } return null }
+    // Edges are compared from the line's start: in an rtl card the rects are
+    // reflected, so left means the start edge (the right) throughout
+    const rtl = cs.direction === 'rtl'
+    const S = (r) => (rtl ? { left: -r.right, right: -r.left, top: r.top, bottom: r.bottom, width: r.width, height: r.height } : r)
+    // End-aligned text (a value on the right in ltr) is not a line start;
+    // 'end' is that side in either direction, as logical CSS writes it
+    const endAlign = rtl ? 'left' : 'right'
+    const firstWords = (k) => { for (const e of [k, ...k.querySelectorAll('*')]) { if (e.closest('svg, .ss-avatar, .ss-bar') || getComputedStyle(e).display === 'none') continue; if ([...e.childNodes].some((t) => t.nodeType === 3 && t.textContent.trim().length > 1)) { const r = S(e.getBoundingClientRect()); const ta = getComputedStyle(e).textAlign; if (r.width > 8 && ta !== 'center' && ta !== 'end' && ta !== endAlign) return { e, r } } } return null }
     // Only a small card (a comment, a note): a head line over a body line on one surface
     if (!visible(n) || n.children.length > 4) continue
     const kids = [...n.children].filter((k) => painted(k, root) && k.getBoundingClientRect().height >= 10)
@@ -605,12 +612,12 @@ function detectNearAligned({ root, specimen }) {
       // A head line with an avatar, and a body starting under the avatar instead of under the name
       const av = kids[i - 1].querySelector('.ss-avatar, [class*="avatar"]')
       if (av && d > 14 && b.r.left < a.r.left) {
-        const ar = av.getBoundingClientRect()
+        const ar = S(av.getBoundingClientRect())
         if (Math.abs(b.r.left - ar.left) <= 4 && ar.right <= a.r.left + 2) { out.push(`avatar alignment: ${labelOf(b.e)} starts under the avatar in ${labelOf(n).split(' "')[0]}, not under ${labelOf(a.e)}; a body under an avatar row starts at the name's edge`); i = kids.length; continue }
       }
       if (d < 3 || d > 14) continue
       // Both start in the container's left half and overlap horizontally
-      const nr = n.getBoundingClientRect()
+      const nr = S(n.getBoundingClientRect())
       if (a.r.left > nr.left + nr.width / 2 || b.r.left > nr.left + nr.width / 2) continue
       if (Math.min(a.r.right, b.r.right) - Math.max(a.r.left, b.r.left) < 20) continue
       out.push(`near aligned: ${labelOf(a.e)} and ${labelOf(b.e)} start ${d.toFixed(1)}px apart in ${labelOf(n).split(' "')[0]}; lines in a card share one left edge, or one is indented on purpose by a column (an avatar's width and gap), never by a few pixels`)
@@ -862,7 +869,9 @@ function detectUnevenPadding({ root, S, specimen }) {
       const c = a.getBoundingClientRect(); vis.top = Math.max(vis.top, c.top); vis.bottom = Math.min(vis.bottom, c.bottom)
     }
     const topHidden = vis.top > r.top + 1, bottomHidden = vis.bottom < r.bottom - 1
-    const L = u.l - r.left, T = u.t - r.top, B = r.bottom - u.b
+    // The side inset is read at the content's start edge: the left in ltr,
+    // the right in an rtl card, where the words begin
+    const L = getComputedStyle(n).direction === 'rtl' ? r.right - u.r : u.l - r.left, T = u.t - r.top, B = r.bottom - u.b
     if (L < 8) continue
     const tight = []
     // A gap a quarter short of the side and at least 3px off reads as a
@@ -1306,18 +1315,23 @@ function detectHeroFraming({ root, V, busy, hero, zoomView }) {
     const m = { left: r.left - V.left, top: r.top - V.top, right: V.right - r.right, bottom: V.bottom - r.bottom }
     const bled = Object.keys(m).filter((k) => m[k] < -1)
     const name = tagOf(hero)
-    let wrong = bled.filter((k) => k === 'left' || k === 'top')
+    // The chrome that says what this is sits in the top start corner: the
+    // top left in ltr, the top right in rtl, where a window bleeds off the
+    // left and bottom instead
+    const rtlStage = getComputedStyle(root).direction === 'rtl'
+    const startSide = rtlStage ? 'right' : 'left', endSide = rtlStage ? 'left' : 'right'
+    let wrong = bled.filter((k) => k === startSide || k === 'top')
     // A phone may run off the top when the crop falls in its content: its
     // status bar is gone with it (framing.md, Phones)
     if (hero.classList?.contains('ss-phone') && wrong.includes('top')) {
       const status = hero.querySelector('.ss-phone__status, .ss-phone__time, .ss-island, .ss-phone__island')
       if (!status || status.getBoundingClientRect().bottom <= V.top + 1) wrong = wrong.filter((k) => k !== 'top')
     }
-    if (wrong.length) out.push(`framing: ${name} is cut on the ${wrong.join(' and ')} (${wrong.map((k) => `${px(-m[k])}px`).join(', ')}); the top-left holds the chrome that says what this is, so a window bleeds off the right and bottom only`)
+    if (wrong.length) out.push(`framing: ${name} is cut on the ${wrong.join(' and ')} (${wrong.map((k) => `${px(-m[k])}px`).join(', ')}); the top ${startSide === 'left' ? 'left' : 'right (this stage is rtl)'} holds the chrome that says what this is, so a window bleeds off the ${endSide} and bottom only`)
     // Near misses and slivers: an edge just short of the crop, or just past
     // it, reads as a mistake. Pull it in to a full gutter, or run it well past.
     const g0 = Math.max(m.top, 16)
-    for (const k of ['right', 'bottom']) {
+    for (const k of [endSide, 'bottom']) {
       if (m[k] >= 0.5 && m[k] < g0 * 0.75) out.push(`framing: ${name} ends ${px(m[k])}px short of the ${k} edge; give it a full gutter (${px(g0)}px) or run it well past the edge so it is clearly masked`)
       if (m[k] < -1 && m[k] > -24) out.push(`framing: ${name} runs only ${px(-m[k])}px past the ${k} edge, which reads as a mistake, not a bleed; pull it inside or run it well past`)
     }
@@ -1331,13 +1345,13 @@ function detectHeroFraming({ root, V, busy, hero, zoomView }) {
       if ((whole && vw / vh < 1.25) || (!whole && vw / vh < 1)) out.push(`framing: ${name} shows ${px(vw)}x${px(vh)}, ${whole ? 'nearly square' : 'narrower than tall'} for a desktop window; change the crop (bleed it) or the layout rather than squash the app`)
     }
     if (!bled.length) {
-      gutter = Math.min(m.left, m.top)
+      gutter = Math.min(m[startSide], m.top)
       // A hero's window carries the frame: it bleeds off an edge or fills
       // the stage. Whole, centered, with air on four sides, it floats
       const stageW = V.right - V.left, stageH = V.bottom - V.top
       if (!root.querySelector('[data-specimen], [data-unframed]') && !root.closest('[data-specimen], [data-unframed]') && stageW >= 560 && Math.min(m.left, m.right, m.top, m.bottom) >= 12 && (r.right - r.left) * (r.bottom - r.top) < stageW * stageH * 0.82) out.push(`framing: ${name} floats whole in the stage with ${px(m.left)}/${px(m.right)}/${px(m.top)}/${px(m.bottom)}px of air around it; a hero's window bleeds off one or two edges with one gutter, or fills the stage, so the product carries the frame (see examples/hero-demo, examples/chat-diff)`)
       if (Math.abs(m.left - m.right) > 2 || Math.abs(m.top - m.bottom) > 2) out.push(`framing: ${name} is whole but off center (left ${px(m.left)}, right ${px(m.right)}, top ${px(m.top)}, bottom ${px(m.bottom)}px in the visible crop); a whole window gets even margins`)
-    } else if (!wrong.length && bled.includes('right')) {
+    } else if (!wrong.length && bled.includes(endSide)) {
       gutter = m.top
       // A satellite living in the left column (straddling the window's
       // left edge, at any point in the loop) is why that column is wider:
@@ -1346,14 +1360,16 @@ function detectHeroFraming({ root, V, busy, hero, zoomView }) {
         if (hero.contains(n) || n.contains(hero) || n.closest('.ss-cursor, .ss-keys, .ss-kb, svg')) return false
         if (!satellite(n, root)) return false
         const b = n.getBoundingClientRect()
-        return b.left < r.left - 4 && b.right > r.left + 4 && b.bottom > r.top && b.top < V.bottom
+        // The window's start edge: its left in ltr, its right in rtl
+        const e = rtlStage ? r.right : r.left
+        return b.left < e - 4 && b.right > e + 4 && b.bottom > r.top && b.top < V.bottom
       })
       if (straddles) out.push('SAT_SIDE')
-      twinSatellites(r.left)
+      twinSatellites(rtlStage ? r.right : r.left)
       // A hero inside one cell of a grid (a bento tile among tiles) takes the tile's own padding, not the stage's gutter
       const cell = hero.closest('[data-crop]')
       const inTile = !!cell && cell !== root && !!cell.parentElement && [...cell.parentElement.children].filter((c) => c.hasAttribute('data-crop')).length >= 2
-      if (!inTile && Math.abs(m.top - m.left) > 2) out.push(`framing: corner bleed with a ${px(m.top)}px gutter above ${name} but ${px(m.left)}px to its left, as seen in the final crop; one gutter, the same on both (check any wrapper that trims the stage)`)
+      if (!inTile && Math.abs(m.top - m[startSide]) > 2) out.push(`framing: corner bleed with a ${px(m.top)}px gutter above ${name} but ${px(m[startSide])}px to its ${startSide}, as seen in the final crop; one gutter, the same on both (check any wrapper that trims the stage)`)
     } else if (!wrong.length) {
       gutter = m.top
       // The same waiver for a satellite on either side of a window bled off
@@ -1890,9 +1906,12 @@ export function detectSpills(root) {
       return { L, R, k }
     }
     const xs = kids.map(extent)
+    // An rtl row lays its children out right to left: the gap runs from the
+    // next child's right edge to this one's left
+    const rowRtl = cs.direction === 'rtl'
     for (let i = 0; i + 1 < xs.length; i++) {
       const a = xs[i], b = xs[i + 1]
-      const g = b.L - a.R
+      const g = rowRtl ? a.L - b.R : b.L - a.R
       if (g > gap - 3 || [...flagged].some((f) => a.k.contains(f) || b.k.contains(f))) continue
       if (!control(a.k) && !a.k.querySelector('*')) continue
       out.push(`spills its slot: ${name(a.k)} comes ${Math.round(g)}px from ${name(b.k)} in ${name(row)}, which sets a ${Math.round(gap)}px gap; something inside it outgrew its slot and closed the gap`)

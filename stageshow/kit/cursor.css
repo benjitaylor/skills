@@ -4,7 +4,7 @@
   .ss-cursor {
     position: absolute;
     top: 0;
-    left: 0;
+    left: 0; /* physical: placed by a translate from measured x */
     z-index: 100;
     pointer-events: none;
     will-change: transform;
@@ -90,7 +90,7 @@
     display: block;
     width: 22px;
     height: 22px;
-    margin: -11px 0 0 -11px;
+    margin: -11px 0 0 -11px; /* physical: the hotspot of a glyph that never mirrors */
     /* Glass, like the iPadOS pointer: no outline, a translucent tint that
        blurs and lifts what's under it, a soft top highlight and a faint shadow.
        The blur goes while pressed (below): the dot then sits on the thing
@@ -114,7 +114,7 @@
   .ss-cursor[data-style="circle"][data-kind="ibeam"] .ss-cursor__dot {
     width: 4px;
     height: 20px;
-    margin: -10px 0 0 -2px;
+    margin: -10px 0 0 -2px; /* physical: the hotspot of a glyph that never mirrors */
     border-radius: 2px;
     background: rgba(60, 60, 67, 0.55);
   }
@@ -149,7 +149,7 @@
   .ss-cursor[data-style="touch"] .ss-cursor__dot {
     width: 34px;
     height: 34px;
-    margin: -17px 0 0 -17px;
+    margin: -17px 0 0 -17px; /* physical: the hotspot of a glyph that never mirrors */
     background: rgba(118, 118, 128, 0.14);
     /* A finger, not glass: no backdrop blur, which smears the checkbox or
        row it presses */
@@ -166,7 +166,7 @@
      script sizes and turns it each frame; it fades once the finger lifts */
   .ss-cursor__streak {
     position: absolute;
-    left: 0;
+    left: 0; /* physical: placed from measured x */
     top: -13px;
     width: 0;
     height: 26px;
@@ -232,7 +232,7 @@
     z-index: 99;
     width: 36px;
     height: 36px;
-    margin: -18px 0 0 -18px;
+    margin: -18px 0 0 -18px; /* physical: the hotspot of a glyph that never mirrors */
     border-radius: 50%;
     border: 1.5px solid var(--ss-accent);
     background: color-mix(in srgb, var(--ss-accent) 10%, transparent);

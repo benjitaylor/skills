@@ -35,7 +35,7 @@
      up its left padding to the chip's own, at the same pace, so the text
      inside never moves while the chip opens around it */
   .ss-field__box:has(.ss-field__value[data-chip]) {
-    padding-left: calc((var(--ss-control) - 24px) / 2);
+    padding-inline-start: calc((var(--ss-control) - 24px) / 2);
   }
 
   .ss-field[data-focused] .ss-field__box {
@@ -61,7 +61,7 @@
   .ss-field__placeholder {
     position: absolute;
     top: 50%;
-    left: 0;
+    inset-inline-start: 0;
     color: var(--ss-text-faint);
     translate: 0 -50%;
     transition: opacity 0.2s ease;
@@ -116,7 +116,7 @@
   }
 
   .ss-field__value[data-chip][data-removable] {
-    padding-right: 4px;
+    padding-inline-end: 4px;
   }
 
   .ss-field__value[data-leaving] {
@@ -138,7 +138,7 @@
        icon is never sliced while the chip opens */
     width: 16px;
     height: 16px;
-    margin-left: -16px;
+    margin-inline-start: -16px;
     border-radius: 50%;
     color: inherit;
     opacity: 0;
@@ -146,7 +146,7 @@
   }
 
   .ss-field__value[data-chip] .ss-field__x {
-    margin-left: 4px;
+    margin-inline-start: 4px;
     opacity: 0.75;
     transition:
       margin 0.35s cubic-bezier(0.45, 0, 0.1, 1),
@@ -161,7 +161,7 @@
   }
 
   .ss-field__value[data-chip] + .ss-field__caret {
-    margin-left: 6px;
+    margin-inline-start: 6px;
   }
 
   /* Solid while typing (each keystroke remounts it), blinking once it rests */
@@ -170,7 +170,7 @@
     transition: margin 0.35s cubic-bezier(0.45, 0, 0.1, 1);
     width: 1.5px;
     height: 16px;
-    margin-left: 1px;
+    margin-inline-start: 1px;
     border-radius: 1px;
     background: var(--ss-accent);
     animation: ss-caret 1.06s steps(1) 0.5s infinite;

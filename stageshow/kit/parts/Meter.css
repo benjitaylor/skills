@@ -14,7 +14,14 @@
     width: 100%;
     height: 100%;
     background: linear-gradient(90deg, var(--ss-accent), var(--ss-accent-2, var(--ss-accent)));
+    /* Revealed from its start edge: the left in ltr, the right in rtl, where progress runs the other way */
+    clip-path: inset(0 var(--ss-meter-rest, 0%) 0 0 round 3px);
     transition: clip-path 0.8s cubic-bezier(0.45, 0, 0.2, 1);
+  }
+
+  .ss-meter__fill:dir(rtl) {
+    background: linear-gradient(270deg, var(--ss-accent), var(--ss-accent-2, var(--ss-accent)));
+    clip-path: inset(0 0 0 var(--ss-meter-rest, 0%) round 3px);
   }
 
   /* Tones are a layer over the accent gradient that fades in and out: a

@@ -74,7 +74,7 @@
     max-width: 75%;
     padding: 0.42em 0.76em;
     top: 0;
-    left: 0;
+    inset-inline-start: 0;
     border-radius: 1.06em;
     isolation: isolate;
     color: var(--t);
@@ -104,7 +104,7 @@
   .ss-bubble__avatar {
     display: inline-flex;
     flex: none;
-    margin-right: 8px;
+    margin-inline-end: 8px;
     transition: margin-bottom 0.45s cubic-bezier(0.22, 1, 0.36, 1);
   }
 
@@ -137,7 +137,7 @@
   .ss-tapback {
     position: absolute;
     bottom: -17px;
-    left: 8px;
+    inset-inline-start: 8px;
     z-index: 1;
     display: flex;
     align-items: center;
@@ -157,8 +157,8 @@
   }
 
   .ss-bubble-row[data-from="me"] .ss-tapback {
-    left: auto;
-    right: 8px;
+    inset-inline-start: auto;
+    inset-inline-end: 8px;
   }
 
   .ss-stage[data-theme="dark"] .ss-tapback {
@@ -275,13 +275,46 @@
   }
 
   [data-from="me"] > .ss-bubble > .ss-bubble__tail {
-    right: -0.36em;
+    inset-inline-end: -0.36em;
     transform-origin: 15% 85%;
   }
 
   [data-from="them"] > .ss-bubble > .ss-bubble__tail {
-    left: -0.36em;
+    inset-inline-start: -0.36em;
     transform-origin: 85% 85%;
+  }
+
+  /* Right to left, a thread mirrors: mine on the left with the tail on its
+     left corner, theirs on the right. Each bubble grows from its own tail
+     corner and the tail glyph mirrors in place (references/rtl.md) */
+  [data-from="me"] > .ss-bubble:dir(rtl) {
+    transform-origin: 0 100%;
+  }
+
+  [data-from="them"] > .ss-bubble:dir(rtl) {
+    transform-origin: 100% 100%;
+  }
+
+  [data-from="them"] > .ss-bubble[style*="width"]:dir(rtl) {
+    clip-path: inset(0 -1em -1em 0);
+  }
+
+  [data-from="me"] > .ss-bubble[style*="width"]:dir(rtl) {
+    clip-path: inset(0 0 -1em -1em);
+  }
+
+  [data-from="me"] > .ss-bubble > .ss-bubble__tail:dir(rtl) {
+    transform-origin: 85% 85%;
+  }
+
+  [data-from="them"] > .ss-bubble > .ss-bubble__tail:dir(rtl) {
+    transform-origin: 15% 85%;
+  }
+
+  .ss-bubble__tail:dir(rtl) > * {
+    transform-box: fill-box;
+    transform-origin: center;
+    scale: -1 1;
   }
 
   /* An arriving bubble's tail grows out once the bubble has nearly landed.
@@ -399,7 +432,7 @@
   .ss-receipt > span {
     min-height: 0;
     overflow: hidden;
-    padding-right: 0.3em;
+    padding-inline-end: 0.3em;
   }
 
   .ss-receipt[data-show] {

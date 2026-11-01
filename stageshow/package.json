@@ -12,7 +12,8 @@
     "dev": "node scripts/dev.mjs",
     "typecheck": "tsc --noEmit -p playground",
     "build": "vite build playground --config playground/vite.config.ts",
-    "check:css": "node scripts/class-clash.mjs --bundle teaching --bundle examples/looks examples teaching"
+    "check:css": "node scripts/class-clash.mjs --bundle teaching --bundle examples/looks examples teaching",
+    "check:rtl": "node scripts/rtl-lint.mjs"
   },
   "dependencies": {
     "react": "^18.3.1",

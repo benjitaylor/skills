@@ -16,6 +16,13 @@ export interface KeyboardProps {
   typed?: string
   /** Force shift on or off instead of following the text. */
   shift?: boolean
+  /**
+   * The three letter rows, left to right as they sit on the screen (QWERTY by
+   * default). The rows keep this physical order in an rtl scene: a keyboard
+   * is a fixed object, not a line of text. Take another layout (Arabic,
+   * AZERTY) from a screenshot of the system you are showing.
+   */
+  rows?: [string, string, string]
   /** The three words in the predictive bar. */
   suggestions?: [string, string, string]
   /** A key held down: a letter, or 'shift', 'delete', 'return', 'space', '123'. */
@@ -72,7 +79,7 @@ function Glyph({ name }: { name: 'shift' | 'shift-on' | 'delete' | 'return' | 'e
  * The iOS keyboard. Put it at the bottom of a Phone's screen, under the
  * composer; pass `typed` and it pops each key as the text grows.
  */
-export function Keyboard({ typed = '', shift, suggestions = ['I', 'The', 'I’m'], pressed, dark, className, style }: KeyboardProps) {
+export function Keyboard({ typed = '', shift, rows = ROWS as [string, string, string], suggestions = ['I', 'The', 'I’m'], pressed, dark, className, style }: KeyboardProps) {
   // The key that just landed, shown in its callout for a moment
   const [pop, setPop] = useState<{ ch: string; n: number } | null>(null)
   const last = useRef(typed)
@@ -95,7 +102,7 @@ export function Keyboard({ typed = '', shift, suggestions = ['I', 'The', 'I’m'
           <span key={i}>{w}</span>
         ))}
       </div>
-      {ROWS.map((row, r) => (
+      {rows.map((row, r) => (
         <div key={r} className="ss-kb__row" data-row={r}>
           {r === 2 && (
             <span className="ss-kb__key ss-kb__key--wide" data-down={down('shift') || undefined}>

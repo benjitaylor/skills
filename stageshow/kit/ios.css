@@ -44,7 +44,14 @@
   }
 
   .ss-kb__suggest span + span {
-    border-left: 1px solid color-mix(in srgb, var(--ss-kb-faint) 22%, transparent);
+    border-inline-start: 1px solid color-mix(in srgb, var(--ss-kb-faint) 22%, transparent);
+  }
+
+  /* A keyboard is a fixed object: its keys and the buttons below them keep
+     their places in an rtl scene (a layout's own order comes from rows) */
+  .ss-kb__row,
+  .ss-kb__below {
+    direction: ltr;
   }
 
   .ss-kb__row {
@@ -89,11 +96,11 @@
   }
 
   .ss-kb__row[data-row="2"] > .ss-kb__key--wide:first-child {
-    margin-right: 7.2px;
+    margin-inline-end: 7.2px;
   }
 
   .ss-kb__row[data-row="2"] > .ss-kb__key--wide:last-child {
-    margin-left: 7.2px;
+    margin-inline-start: 7.2px;
   }
 
   .ss-kb__key--mode {
@@ -141,24 +148,24 @@
 
   .ss-kb__row:first-of-type .ss-kb__key:first-child .ss-kb__callout,
   .ss-kb__row[data-row="0"] .ss-kb__key:first-child .ss-kb__callout {
-    left: 0;
+    inset-inline-start: 0;
     transform: none;
   }
 
   .ss-kb__row[data-row="0"] .ss-kb__key:first-child .ss-kb__callout::after {
-    left: 0;
+    inset-inline-start: 0;
     transform: none;
   }
 
   .ss-kb__row[data-row="0"] .ss-kb__key:last-child .ss-kb__callout {
-    left: auto;
-    right: 0;
+    inset-inline-start: auto;
+    inset-inline-end: 0;
     transform: none;
   }
 
   .ss-kb__row[data-row="0"] .ss-kb__key:last-child .ss-kb__callout::after {
-    left: auto;
-    right: 0;
+    inset-inline-start: auto;
+    inset-inline-end: 0;
     transform: none;
   }
 

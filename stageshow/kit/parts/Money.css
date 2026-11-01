@@ -1,0 +1,24 @@
+/* Money */
+
+@layer stageshow {
+  /* The sign sits on the figure's baseline at its cap height, a word space
+     from it, so "⃁ 187.50" reads as one figure at any size */
+  .ss-money {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.22em;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+    unicode-bidi: isolate;
+  }
+
+  .ss-riyal {
+    display: inline-block;
+    flex-shrink: 0;
+    width: 0.86em;
+    height: 0.86em;
+    /* The glyph's grid runs a touch below its ink; this sets its foot on the baseline */
+    transform: translateY(0.09em);
+    overflow: visible;
+  }
+}

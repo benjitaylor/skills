@@ -6,6 +6,10 @@
     align-items: baseline;
     font-variant-numeric: tabular-nums;
     white-space: nowrap;
+    /* A number is most significant digit first in every language: its
+       columns never mirror, so the count is ltr inside an rtl scene too */
+    direction: ltr;
+    unicode-bidi: isolate;
   }
 
   .ss-count__char {
@@ -18,11 +22,21 @@
      here (a smaller, lighter degree sign); widen the hair with the token */
   .ss-count__unit {
     display: inline-block;
-    margin-left: var(--ss-count-unit-gap, 0.08em);
+    margin-inline-start: var(--ss-count-unit-gap, 0.08em);
   }
 
   .ss-count__unit[data-space] {
-    margin-left: 0.28em;
+    margin-inline-start: 0.28em;
+  }
+
+  /* In an rtl scene the unit is drawn before the figure, on its left: the
+     hair goes on its other side */
+  .ss-count__unit[data-lead] {
+    margin-inline: 0 var(--ss-count-unit-gap, 0.08em);
+  }
+
+  .ss-count__unit[data-lead][data-space] {
+    margin-inline: 0 0.28em;
   }
 
   /* One digit: a window one line tall over a strip of 0 to 9. The strip
@@ -53,7 +67,7 @@
     display: block;
     height: 1em;
     line-height: 1;
-    text-align: left; /* a digit sits on its cell's left like set type; centered, a leading 1 drifts off the column */
+    text-align: left; /* physical: the figure is always ltr. A digit sits on its cell's left like set type; centered, a leading 1 drifts off the column */
   }
 
   .ss-count[data-snap] .ss-count__strip {

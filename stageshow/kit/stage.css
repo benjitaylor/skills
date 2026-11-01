@@ -87,6 +87,13 @@
     --ss-shadow-ground: 0 0 0 1px rgba(50, 50, 93, 0.06), 0 24px 48px -24px rgba(50, 50, 93, 0.18);
 
     --ss-font: system-ui, -apple-system, sans-serif;
+    /* Arabic faces with no Latin letters, put ahead of the look's font in an
+       Arabic scene: Arabic comes from them, Latin falls through to --ss-font.
+       Nothing is bundled; a look or host page sets its own (references/rtl.md) */
+    --ss-font-arabic: "SF Arabic", "Noto Sans Arabic";
+    /* The sign of "toward the end" on x: 1 in ltr, -1 in rtl. A hand-written
+       slide multiplies by it: translateX(calc(12px * var(--ss-x))) */
+    --ss-x: 1;
     --ss-mono: "SF Mono", "SFMono-Regular", ui-monospace, Consolas, monospace;
 
     /* Shape: the radius scale the product's own parts use. A look sets these
@@ -103,7 +110,7 @@
 
     position: absolute;
     top: 0;
-    left: 0;
+    left: 0; /* physical: placed and scaled from its box's top left in either direction */
     transform-origin: 0 0;
     font-family: var(--ss-font);
     -webkit-font-smoothing: antialiased;
@@ -121,6 +128,39 @@
     text-transform: none;
     white-space: normal;
     color: #000;
+  }
+
+  /* Direction (dir.ts, references/rtl.md). The stage's dir attribute flips
+     every logical property in the kit; these are what logical CSS can't do. */
+  .ss-stage[dir="rtl"],
+  .ss-stage [dir="rtl"] {
+    --ss-x: -1;
+  }
+  .ss-stage [dir="ltr"] {
+    --ss-x: 1;
+  }
+  /* Arabic joins its letters: any tracking breaks the joins, and a look's
+     negative tracking for Latin display type is the usual culprit. Text
+     inside an Arabic scene that is not Arabic can opt back in with lang. */
+  .ss-stage:lang(ar) {
+    font-family: var(--ss-font-arabic), var(--ss-font);
+  }
+  .ss-stage:lang(ar) :where(*:not(:lang(en))) {
+    letter-spacing: 0 !important;
+  }
+  /* Text that is left to right in any scene: code, a terminal, a URL, an
+     email address or a number field marked dir="ltr". Isolated so the
+     paragraph around it keeps its order. */
+  .ss-stage :where(.ss-code, .ss-term, .ss-window__url) {
+    direction: ltr;
+  }
+  /* A glyph that points along the line (a chevron, an arrow, send) mirrors
+     where the line runs right to left. scale composes with any transform */
+  .ss-stage [data-flip]:dir(rtl) {
+    scale: -1 1;
+  }
+  .ss-stage[dir="rtl"] :where(.ss-window__url) {
+    text-align: right; /* physical: a URL reads ltr; in an rtl field it sits at the field's start, its right */
   }
 
   /* Orbs: a pale tile lit by a few huge, soft color orbs (Stage ground).

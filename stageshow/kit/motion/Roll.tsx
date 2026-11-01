@@ -26,6 +26,8 @@ export function Roll({ delay = 0, children, ...rest }: Parameters<typeof RollNow
   return <RollNow {...rest}>{delay && !reduced ? held : children}</RollNow>
 }
 
+const RTL_LETTERS = /[\u0590-\u08FF\uFB1D-\uFDFF\uFE70-\uFEFF]/
+
 function RollNow({
   children,
   stagger = 45,
@@ -74,18 +76,23 @@ function RollNow({
     if (!parent) return
     const p = getComputedStyle(parent)
     const flex = /flex/.test(p.display) && p.flexDirection.startsWith('row')
-    // Pushed to the right edge by an auto margin (or anything else) reads the
+    // The row's end is its right in ltr and its left in rtl
+    const rtl = p.direction === 'rtl'
+    // Pushed to the end edge by an auto margin (or anything else) reads the
     // same from the layout: flush with the row's end, slack before it
     const pushed = () => {
       const prev = box.previousElementSibling
       const r = box.getBoundingClientRect()
       const pr = parent.getBoundingClientRect()
-      const flush = Math.abs(pr.right - parseFloat(p.paddingRight) - parseFloat(p.borderRightWidth) - r.right) < 1
-      const slack = prev ? r.left - prev.getBoundingClientRect().right - (parseFloat(p.columnGap) || 0) : 0
+      const pb = prev?.getBoundingClientRect()
+      const flush = rtl
+        ? Math.abs(pr.left + parseFloat(p.paddingLeft) + parseFloat(p.borderLeftWidth) - r.left) < 1
+        : Math.abs(pr.right - parseFloat(p.paddingRight) - parseFloat(p.borderRightWidth) - r.right) < 1
+      const slack = pb ? (rtl ? pb.left - r.right : r.left - pb.right) - (parseFloat(p.columnGap) || 0) : 0
       return flush && slack > 1
     }
     const end =
-      /right|end/.test(getComputedStyle(el).textAlign) ||
+      (rtl ? /left|end/ : /right|end/).test(getComputedStyle(el).textAlign) ||
       (flex && box === parent.lastElementChild && (/space-between|flex-end|^end/.test(p.justifyContent) || pushed()))
     setSide(end ? 'end' : 'start')
   }, [align])
@@ -165,7 +172,11 @@ function RollNow({
   // Characters for numbers, whole words (with their spaces) for text
   const units = numeric ? now.split('') : now.split(/(?<=\s)/)
   return (
-    <span ref={root} className={`ss-roll${className ? ` ${className}` : ''}`} data-variant={variant} data-align={side} style={style}>
+    // Text with no right-to-left letters (a price, a count, an English label)
+    // reads ltr in any scene. Its changing part is an inline-grid, which the
+    // bidi algorithm treats as one neutral object: inside an rtl paragraph it
+    // would reorder a number split around it ("0.0" | "1")
+    <span ref={root} className={`ss-roll${className ? ` ${className}` : ''}`} dir={RTL_LETTERS.test(children) || RTL_LETTERS.test(view.old) ? undefined : 'ltr'} data-variant={variant} data-align={side} style={style}>
       {text.slice(0, head)}
       <span ref={mid} className="ss-roll__mid">
         {old && (

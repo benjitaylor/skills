@@ -46,7 +46,7 @@
 
   /* The x's round hover sits as far from the end as the label from the start, optically */
   .ss-chip[data-removable] {
-    padding-right: 4px;
+    padding-inline-end: 4px;
   }
 
   .ss-chip__x {

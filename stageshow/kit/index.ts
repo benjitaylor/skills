@@ -12,6 +12,9 @@ export type { Act, Script } from './act'
 export type { Point, Rect, Target } from './measure'
 export type { CursorKind, CursorStyle } from './cursor'
 export type { Theme, Palette, Fidelity, Layout } from './looks'
+// Direction: rtl scenes, Eastern Arabic digits, points that mirror (references/rtl.md)
+export { toDigits, toLatin, formatNumber, fromStart, mirror, mirrorRect, mirrorX, sign, isRtl } from './dir'
+export type { Dir, Digits } from './dir'
 export type { KeysAt } from './keys'
 export { clock, installVirtualClock } from './clock'
 export type { ClockControl } from './clock'
@@ -33,7 +36,7 @@ export { EASE, bezier, css as easeCss } from './ease'
 export type { EaseName, Bezier } from './ease'
 
 // Small parts: starting points with quiet defaults; restyle them as the product does (parts/, controls/)
-export { Avatar, Check, Icon, Spinner, Toast, Tooltip, Meter, Menu, Facepile, Chip, BrandMark, Pin, Row } from './parts'
+export { Avatar, Check, Icon, Spinner, Toast, Tooltip, Meter, Menu, Facepile, Chip, BrandMark, Pin, Row, Money, Riyal } from './parts'
 export type { AvatarProps, IconName, BrandMarkProps, PinProps, RowProps } from './parts'
 export { brandMarks } from './brands'
 export type { BrandName, BrandAsset } from './brands'

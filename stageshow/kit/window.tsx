@@ -82,7 +82,7 @@ function Lock() {
 
 function Chevron({ back }: { back?: boolean }) {
   return (
-    <svg className="ss-window__chev" width="10" height="10" viewBox="0 0 10 10" aria-hidden>
+    <svg className="ss-window__chev" data-flip width="10" height="10" viewBox="0 0 10 10" aria-hidden>
       <path d={back ? 'M6.5 1.5 3 5l3.5 3.5' : 'M3.5 1.5 7 5 3.5 8.5'} fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   )

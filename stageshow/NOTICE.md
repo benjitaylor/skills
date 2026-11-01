@@ -20,6 +20,11 @@ playground does not fetch fonts or photographs from external services at runtime
 
 The local brand registry in `kit/brands/` includes SVG artwork from SVGL (MIT), payment-icons (Apache 2.0), Cryptocurrency Icons (CC0 1.0), and official Linear, American Express and Circle assets. Per-file sources, hashes and license files are listed in [`kit/brands/SOURCES.md`](kit/brands/SOURCES.md). The original artwork and brand usage terms remain with their respective owners.
 
+The riyal sign drawn by `Riyal` and `Money` (`kit/parts/Money.tsx`) uses the
+paths of Lucide's `saudi-riyal` icon, from lucide-static 1.66.0, ISC licensed
+(Copyright (c) Lucide Contributors). The sign itself is the Saudi Central
+Bank's; U+20C1 SAUDI RIYAL SIGN is encoded in Unicode 17.0.
+
 `Phone frame="photo"` is optional. Supply your own permitted bezel image via
 `--ss-phone-photo-light: url(...)` and optionally `--ss-phone-photo-dark`.
 Without it, the kit uses its CSS-drawn `pro` frame. No bezel photographs are

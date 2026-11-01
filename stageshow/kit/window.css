@@ -75,7 +75,7 @@
   .ss-window__url {
     flex: 1;
     min-width: 0;
-    margin-left: 8px;
+    margin-inline-start: 8px;
     padding: 4px 10px;
     overflow: hidden;
     background: var(--ss-ink-1);
@@ -98,7 +98,7 @@
   .ss-window__title {
     flex: 1;
     /* Optically centered: offsets the three dots on the left */
-    margin-right: 36px;
+    margin-inline-end: 36px;
     text-align: center;
     font-size: 13px;
     font-weight: 600;
@@ -381,7 +381,7 @@
     display: inline-block;
     width: 0.6em;
     height: 1.2em;
-    margin-left: 1px;
+    margin-inline-start: 1px;
     vertical-align: -0.22em;
     background: #e8e8ec;
     animation: ss-term-blink 1.06s steps(1) infinite;
@@ -402,20 +402,21 @@
   /* With toolbar controls the bar becomes a unified toolbar, as in Notes or
      Finder: the title goes left beside the lights and the controls go right. */
   .ss-window__title[data-toolbar] {
-    margin: 0 0 0 14px;
-    text-align: left;
+    margin-block: 0;
+    margin-inline: 14px 0;
+    text-align: start;
   }
 
   .ss-window__nav {
     display: flex;
     flex-shrink: 0;
     gap: 6px;
-    margin-left: 10px;
+    margin-inline-start: 10px;
     color: var(--ss-text-faint);
   }
 
   .ss-window__nav + .ss-window__url {
-    margin-left: 4px;
+    margin-inline-start: 4px;
   }
 
   /* Browser with tabs: the strip holds the lights at the same 38px height; the
@@ -432,7 +433,7 @@
 
   .ss-window__tabs .ss-window__lights {
     align-self: center;
-    margin-right: 14px;
+    margin-inline-end: 14px;
   }
 
   .ss-window__tab {
@@ -472,11 +473,11 @@
   }
 
   [data-kind="tabs"] > .ss-window__bar .ss-window__url {
-    margin-left: 0;
+    margin-inline-start: 0;
   }
 
   [data-kind="tabs"] > .ss-window__bar .ss-window__nav {
-    margin-left: 0;
+    margin-inline-start: 0;
   }
 
   /* Sidebar app: the sidebar runs the full height, the lights sit in its top
@@ -491,7 +492,7 @@
     flex-direction: column;
     flex-shrink: 0;
     background: var(--ss-canvas);
-    border-right: 1px solid var(--ss-line);
+    border-inline-end: 1px solid var(--ss-line);
   }
 
   .ss-window__side-top {
@@ -586,8 +587,9 @@
   .ss-window[data-side="floating"] > .ss-window__side {
     position: relative;
     z-index: 1;
-    margin: var(--ss-side-inset) 0 var(--ss-side-inset) var(--ss-side-inset);
-    border-right: 0;
+    margin-block: var(--ss-side-inset);
+    margin-inline: var(--ss-side-inset) 0;
+    border-inline-end: 0;
     border-radius: 16px;
     box-shadow:
       0 0 0 0.5px rgba(0, 0, 0, 0.07),
