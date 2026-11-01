@@ -1,0 +1,41 @@
+{
+  "name": "stageshow-native",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "main": "playground/index.ts",
+  "scripts": {
+    "start": "expo start",
+    "ios": "expo start --ios",
+    "android": "expo start --android",
+    "web": "expo start --web",
+    "typecheck": "tsc --noEmit",
+    "test": "jest --runInBand",
+    "check:parity": "node scripts/check-parity.mjs",
+    "export": "expo export --platform ios --platform android --output-dir dist",
+    "format": "prettier --write kit playground tests scripts *.json *.cjs *.md",
+    "format:check": "prettier --check kit playground tests scripts *.json *.cjs *.md"
+  },
+  "dependencies": {
+    "@react-native-masked-view/masked-view": "0.3.2",
+    "expo": "~57.0.0",
+    "expo-blur": "~57.0.3",
+    "lucide-react-native": "1.66.0",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "react-native": "0.86.3",
+    "react-native-safe-area-context": "~5.7.0",
+    "react-native-svg": "15.15.4",
+    "react-native-web": "^0.21.0"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.14",
+    "@types/react": "~19.2.0",
+    "@types/react-test-renderer": "^19.3.0",
+    "jest": "^29.7.0",
+    "jest-expo": "~57.0.0",
+    "prettier": "^3.6.2",
+    "react-test-renderer": "19.2.3",
+    "typescript": "~6.0.3"
+  }
+}

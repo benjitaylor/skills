@@ -1,0 +1,17 @@
+{
+  "extends": "expo/tsconfig.base",
+  "compilerOptions": {
+    "strict": true,
+    "noEmit": true,
+    "types": ["jest"],
+    "noUncheckedIndexedAccess": false
+  },
+  "include": [
+    "kit/**/*.ts",
+    "kit/**/*.tsx",
+    "playground/**/*.ts",
+    "playground/**/*.tsx",
+    "tests/**/*.ts",
+    "tests/**/*.tsx"
+  ]
+}
