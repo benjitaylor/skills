@@ -64,7 +64,7 @@ examples, with separate component and regression pages.
 
 The new gold check supplies six reduced-motion poster pairs and 24 live sample
 pairs, with recordings. The original web examples are imported without restyling.
-Live samples use matching elapsed waits, not a synchronized clock. The existing
+Live samples use parallel wall-clock deadlines, not a synchronized clock. The existing
 48-pair theme/size/state matrix remains complementary coverage. These browser
 reports compare DOM and React Native Web; actual iOS evidence is separate.
 

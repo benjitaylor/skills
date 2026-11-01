@@ -127,7 +127,7 @@ check; 63-value/44-type API coverage; iOS/Android Hermes and web exports. The
 reduced-motion checks in both browser renderers. Gold coverage adds six stable
 reduced-motion poster pairs and 24 sampled live pairs, plus recordings and a
 source check that the two ported stories retain the original choreography.
-Live capture uses matching elapsed waits, not a synchronized virtual clock;
+Live capture uses parallel wall-clock deadlines, not a synchronized virtual clock;
 intermediate poses may differ because of paint/capture timing.
 
 A fresh reviewer compared all 12 gold poster frames and all 24 live sample

@@ -26,7 +26,8 @@ const output = resolve(process.env.GOLD_OUTPUT || 'gold-results')
 await mkdir(output, { recursive: true })
 const browser = await chromium.launch({ executablePath: process.env.CHROME_PATH || undefined })
 const errors = [],
-  rows = []
+  rows = [],
+  liveCaptures = []
 const bases = [
   process.env.WEB_GOLD_URL || 'http://127.0.0.1:5178/?capture=native-gold',
   process.env.NATIVE_GOLD_URL || 'http://127.0.0.1:8086/?capture=1',
@@ -73,7 +74,7 @@ try {
   if (!process.env.GOLD_STILLS_ONLY)
     for (const gold of ['messages', 'subscriptions'])
       for (const width of [358, 720]) {
-        // Sample the same elapsed times in both renderers; videos retain the intervening frames.
+        // Capture both renderers together against wall-clock deadlines; retain actual offsets.
         const contexts = await Promise.all(
           bases.map(() =>
             browser.newContext({
@@ -88,16 +89,25 @@ try {
         const id = `${gold}-${width}-live`
         pages.forEach((page, i) => page.on('pageerror', (e) => errors.push(`${id}-${i}: ${e.message}`)))
         await Promise.all(pages.map((page, i) => page.goto(`${bases[i]}&gold=${gold}&width=${width}`)))
-        let previous = 0
+        const started = Date.now()
         for (const ms of [1000, 3500, 6500, 10000, 14000, 18000]) {
-          await Promise.all(pages.map((p) => p.waitForTimeout(ms - previous)))
-          for (const [i, page] of pages.entries()) {
-            assert.equal(await page.getByTestId('gold-error').count(), 0, `${id}: native choreography failed`)
-            await page
-              .getByTestId('gold-scene')
-              .screenshot({ path: resolve(output, `${id}-${ms}-${i ? 'native' : 'web'}.png`) })
-          }
-          previous = ms
+          await pages[0].waitForTimeout(Math.max(0, ms - (Date.now() - started)))
+          await Promise.all(
+            pages.map(async (page, i) => {
+              assert.equal(await page.getByTestId('gold-error').count(), 0, `${id}: native choreography failed`)
+              const captureStarted = Date.now() - started
+              await page
+                .getByTestId('gold-scene')
+                .screenshot({ path: resolve(output, `${id}-${ms}-${i ? 'native' : 'web'}.png`) })
+              liveCaptures.push({
+                id,
+                renderer: i ? 'native' : 'web',
+                requestedMs: ms,
+                captureStartedMs: captureStarted,
+                captureFinishedMs: Date.now() - started,
+              })
+            }),
+          )
           rows.push(`${id}-${ms}`)
         }
         await Promise.all(contexts.map((c) => c.close()))
@@ -109,7 +119,7 @@ try {
   assert.deepEqual(errors, [])
   await writeFile(
     resolve(output, 'index.html'),
-    `<!doctype html><meta charset="utf-8"><title>Original gold / native</title><style>body{font:14px system-ui;background:#eee;padding:24px}section{background:white;padding:16px;margin:16px 0}img{max-width:48%;vertical-align:top}</style><h1>Original gold left · React Native Web right</h1><p>Original components are imported without restyling. Posters and live sequences use the original design sizes and compact layouts. Samples are taken at matching elapsed waits, not a synchronized virtual clock; live poses may differ by capture/paint timing. Native device evidence is separate.</p>${rows.map((id) => `<section><h2>${id}</h2><img src="${id}-web.png"><img src="${id}-native.png"></section>`).join('')}`,
+    `<!doctype html><meta charset="utf-8"><title>Original gold / native</title><style>body{font:14px system-ui;background:#eee;padding:24px}section{background:white;padding:16px;margin:16px 0}img{max-width:48%;vertical-align:top}</style><h1>Original gold left · React Native Web right</h1><p>Original components are imported without restyling. Posters and live sequences use the original design sizes and compact layouts. Samples are taken together against wall-clock deadlines, not a synchronized virtual clock; actual capture offsets are in results.json and live poses may differ by capture/paint timing. Native device evidence is separate.</p>${rows.map((id) => `<section><h2>${id}</h2><img src="${id}-web.png"><img src="${id}-native.png"></section>`).join('')}`,
   )
   await writeFile(
     resolve(output, 'results.json'),
@@ -118,7 +128,8 @@ try {
         pairs: rows.length,
         errors,
         originalsRestyled: false,
-        liveSampling: 'matching elapsed waits; not frame-locked',
+        liveSampling: 'parallel wall-clock deadlines; not frame-locked',
+        liveCaptures,
       },
       null,
       2,
