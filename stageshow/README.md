@@ -46,6 +46,14 @@ The kit supports React 18 and later. It needs no third-party animation runtime. 
 playground uses Vite; filming uses `playwright-core` and locally installed
 Chrome (or `CHROME_PATH`). Those tools are not runtime dependencies of a demo.
 
+## React Native preview
+
+A native contribution preview lives in [`native/`](native/README.md). It includes
+all public component names, native target measurement, the `Stage` / `Act`
+choreography API, an Expo playground, and tests. Read its
+[parity ledger](native/PARITY.md) for native adaptations and the remaining device
+review gate. It has its own dependencies and does not change the web kit imports.
+
 ## Verify
 
 ```sh
@@ -64,6 +72,7 @@ review. No automated clean result replaces watching the motion.
 ## Contents
 
 - `kit/`: portable React source and styles.
+- `native/`: React Native contribution preview, Expo playground, and parity checks.
 - `examples/`: gold scenes and reference specimens.
 - `teaching/`: explicitly flawed/corrected pairs, separate from gold.
 - `references/`: design judgment, APIs, and verification guidance.

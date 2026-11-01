@@ -1,0 +1,11 @@
+{
+  "expo": {
+    "name": "Stageshow Native",
+    "slug": "stageshow-native",
+    "version": "0.1.0",
+    "orientation": "default",
+    "userInterfaceStyle": "automatic",
+    "ios": { "supportsTablet": true },
+    "web": { "bundler": "metro" }
+  }
+}

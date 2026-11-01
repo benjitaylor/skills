@@ -1,6 +1,6 @@
 ---
 name: stageshow
-description: Build faux product UI that looks like a real product, as a still illustration or an animated demo with a cursor. Browser and app windows, dashboards, phones, notifications, terminals, bento grids and cursor walkthroughs, framed, masked and cropped the way a marketing page, feature card or docs hero needs them. Use whenever someone wants a fake or mocked UI, a product demo or walkthrough animation, a hero or feature-card illustration of an app, a product shot in the style of a polished marketing site, or an animated cursor doing things in an interface, even if they never say "faux UI". React and plain CSS.
+description: Build faux product UI that looks like a real product, as a still illustration or an animated demo with a cursor. Browser and app windows, dashboards, phones, notifications, terminals, bento grids and cursor walkthroughs, framed, masked and cropped the way a marketing page, feature card or docs hero needs them. Use whenever someone wants a fake or mocked UI, a product demo or walkthrough animation, a hero or feature-card illustration of an app, a product shot in the style of a polished marketing site, or an animated cursor doing things in an interface, even if they never say "faux UI". React and plain CSS, with a React Native contribution preview.
 ---
 
 # Stageshow
@@ -26,6 +26,15 @@ These are authored illustrations, not browser automation: `a.click()` draws the 
 ## How hard to press
 
 Build it the way a product designer builds a launch page they will be judged on. The gold examples in `examples/` are the bar, not a reference: if yours is the emptier, flatter or smaller one beside the closest gold, that is the first fix. Then look at the frame the way the most exacting designer you know would, the one who screenshots the one wrong thing and sends it back with "what is this?": a dot off its avatar, a unit on its own line, a grabber under the island, copy touching a card. If you can picture that screenshot, you have found the next fix.
+
+## Platform
+
+For React Native or Expo, read `native/AUTHORING.md`, `native/README.md` and `native/PARITY.md` first.
+Use `native/kit/`, native `View` / `Text`, and `SceneView` targets. Keep the design
+and choreography guidance below, but use native styles and simulator/device
+rehearsal. The native preview has a separate validation ledger; do not claim
+production parity from its export count. Browser CSS and `film.mjs` DOM probes
+do not run against native views. For a web project, continue using `kit/`.
 
 ## Workflow
 

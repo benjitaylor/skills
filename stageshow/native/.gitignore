@@ -1,0 +1,11 @@
+node_modules/
+.expo/
+dist/
+coverage/
+recordings/
+ios/
+android/
+web-dist/
+scene-results/
+
+gold-results/
