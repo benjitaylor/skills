@@ -106,3 +106,42 @@ A fresh screenshot review was used to find the corrections above. The short
 recording and matching-scene report are linked from the PR. Generated evidence
 is kept outside source control. Android rendering, physical devices, performance,
 all fidelity/chrome/cursor combinations and exhaustive shaping/RTL remain open.
+
+## Third review pass — original gold compositions and guidance
+
+The default demo now opens native renditions of `examples/messages`,
+`examples/subscriptions` and `examples/dark-bento`. Their original content,
+script data, timings, crop and compact compositions are retained. The browser
+comparison imports the original components without restyling them.
+
+Comparison corrected inherited ink/border values, system-font rendering in the
+web preview, measured tabular digit widths, window URL/chrome styling, phone
+content inset and shadow, avatar artwork/text styling, radial gradients, album
+cover edges, composer glyphs and the checkout loading indicator's contrast.
+Native SVG ellipse radii need a separate browser adapter because browser SVG
+uses a radius plus transform. The native renderer keeps its own rx/ry behavior.
+
+Validation: 34 tests in six suites; native and web TypeScript; CSS namespace
+check; 63-value/44-type API coverage; iOS/Android Hermes and web exports. The
+48-pair theme/size/state matrix also passed interruption, replay and forced/OS
+reduced-motion checks in both browser renderers. Gold coverage adds six stable
+reduced-motion poster pairs and 24 sampled live pairs, plus recordings and a
+source check that the two ported stories retain the original choreography.
+Live capture uses matching elapsed waits, not a synchronized virtual clock;
+intermediate poses may differ because of paint/capture timing.
+
+A fresh reviewer compared all 12 gold poster frames and all 24 live sample
+pairs. Findings were cover depth, checkout word spacing, composer glyph weight
+and spinner contrast; those were corrected. Actual iPhone 17 Pro / iOS 26.5
+inspection covers all three compact gold posters, message playback and the
+subscription loop. The review includes a native screen recording. This is
+simulator evidence, not a physical-device performance measurement. Android
+rendering, accessibility services, shaping/RTL and the exhaustive variant matrix
+remain open as recorded above.
+
+The standalone generator now includes AUTHORING.md, the shared skill, all 15
+unchanged craft references, original example sources, the native API guide and
+AGENTS.md routing. Its check verifies those files, guide links and refusal to
+overwrite an existing destination. The web example sources are comparison
+material; native examples are the runnable starting points. Browser filming
+commands in the original references still belong to the contribution checkout.

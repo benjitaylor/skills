@@ -1,4 +1,5 @@
 import { createContext, useContext } from 'react'
+import { Platform } from 'react-native'
 
 export type Theme = 'light' | 'dark' | 'blueprint' | 'glass'
 export type Palette = 'accent' | 'mono'
@@ -33,7 +34,7 @@ const light: Tokens = {
   background: '#f6f5f4',
   surface: '#ffffff',
   well: '#efeeec',
-  border: 'rgba(0,0,0,0.1)',
+  border: 'rgba(0,0,0,0.06)',
   text: '#262628',
   muted: '#7a7a7d',
   accent: '#3b82f6',
@@ -41,8 +42,9 @@ const light: Tokens = {
   success: '#22c55e',
   danger: '#ef4444',
   warning: '#f59e0b',
-  ink: ['#efeeec', '#eae9e5', '#dbdad5', '#c7c6c0', '#aaa9a2'],
+  ink: ['rgba(0,0,0,0.04)', 'rgba(0,0,0,0.06)', 'rgba(0,0,0,0.08)', 'rgba(0,0,0,0.1)', 'rgba(0,0,0,0.15)'],
   fontSize: 12,
+  fontFamily: Platform.OS === 'web' ? 'system-ui, -apple-system, sans-serif' : undefined,
   radius: 10,
 }
 export function resolveTokens(
@@ -67,11 +69,17 @@ export function resolveTokens(
       background: '#111113',
       surface: '#1a1a1d',
       well: '#0a0a0b',
-      border: 'rgba(255,255,255,0.13)',
+      border: 'rgba(255,255,255,0.08)',
       text: '#ececee',
       muted: '#9d9da1',
       accentSoft: 'rgba(59,130,246,0.2)',
-      ink: ['#25272b', '#303238', '#41444b', '#5a5e67', '#797e88'],
+      ink: [
+        'rgba(255,255,255,0.05)',
+        'rgba(255,255,255,0.07)',
+        'rgba(255,255,255,0.1)',
+        'rgba(255,255,255,0.13)',
+        'rgba(255,255,255,0.2)',
+      ],
     }
   if (theme === 'blueprint')
     t = {

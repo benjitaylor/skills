@@ -1,6 +1,7 @@
+import { RadialGradient } from './radial-gradient'
 import { createContext, useId, useEffect, useRef, useState, type ReactNode } from 'react'
 import { Image, View, type ImageSourcePropType } from 'react-native'
-import Svg, { Defs, LinearGradient, RadialGradient, Stop, Path, Rect, Circle, G } from 'react-native-svg'
+import Svg, { Defs, LinearGradient, Stop, Path, Rect, Circle, G } from 'react-native-svg'
 import { Label, SceneView, row, absolute, type NativeProps } from './native'
 import { useLook } from './look'
 import { Mask } from './mask'
@@ -27,6 +28,8 @@ const edges: Record<PhoneFrame, number> = {
   outline: 8,
   android: 11,
 }
+const fShadow = (scale: number) =>
+  `0 ${40 * scale}px ${80 * scale}px ${-16 * scale}px rgba(50,50,93,.25), 0 ${24 * scale}px ${48 * scale}px ${-24 * scale}px rgba(0,0,0,.3)`
 export const PhoneContext = createContext<{ width: number; height: number; radius: number } | null>(null)
 export interface PhoneProps extends NativeProps {
   width: number
@@ -103,7 +106,15 @@ export function Phone({
       // iOS this uses the device display scale and prevents a nested Stage scale
       // from reusing a low-resolution intermediate surface for text and SVG.
       shouldRasterizeIOS={rest.shouldRasterizeIOS ?? true}
-      style={[{ width, height: totalH * scale }, style]}
+      style={[
+        {
+          width,
+          height: totalH * scale,
+          borderRadius: (screen.radius + edge) * scale,
+          boxShadow: frame === 'outline' || frame === 'bare' ? undefined : fShadow(scale),
+        },
+        style,
+      ]}
     >
       <View
         style={{
@@ -168,9 +179,7 @@ export function Phone({
             </BlurTargetView>
             <BlurBackground.Provider value={wallpaperTarget}>
               <PhoneContext.Provider value={screen}>
-                <View style={{ flex: 1, paddingTop: showStatus ? 62 : 44, paddingBottom: chrome ? 28 : 0 }}>
-                  {children}
-                </View>
+                <View style={{ flex: 1, paddingTop: showStatus ? 62 : 44, paddingBottom: 0 }}>{children}</View>
               </PhoneContext.Provider>
             </BlurBackground.Provider>
             {showStatus && (

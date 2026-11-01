@@ -1,5 +1,5 @@
 import { useId, type ReactNode } from 'react'
-import { Animated, Image, View, type StyleProp, type TextStyle } from 'react-native'
+import { Animated, Image, View, StyleSheet, type StyleProp, type TextStyle, type ViewStyle } from 'react-native'
 import Svg, { Circle, Path, SvgXml, SvgUri, Defs, LinearGradient, Stop } from 'react-native-svg'
 import { Mask } from '../mask'
 import { useLook } from '../look'
@@ -15,6 +15,10 @@ export function personColor(name: string) {
   return PEOPLE[hash % PEOPLE.length]
 }
 export interface AvatarProps extends NativeProps {
+  /** Native text styles do not inherit from the avatar's view. */
+  textStyle?: StyleProp<TextStyle>
+  /** Artwork behind initials, clipped by the kit's circular face. */
+  background?: ReactNode
   name?: string
   plain?: boolean
   size?: number
@@ -29,10 +33,12 @@ export function Avatar({
   tone = name ? 'person' : 'ink',
   src,
   ring,
+  textStyle,
+  background,
   style,
   ...rest
 }: AvatarProps) {
-  const { fidelity, tokens: t } = useLook(),
+  const { fidelity, tokens: t, theme } = useLook(),
     spin = useCycle(1300, ring === 'waiting')
   const disc = plain || fidelity === 'minimal',
     words = name.trim().split(/\s+/).filter(Boolean)
@@ -49,10 +55,18 @@ export function Avatar({
           ? t.success
           : tone === 'ios'
             ? '#929dab'
-            : t.ink[2]
+            : theme === 'dark'
+              ? '#313134'
+              : '#ebebeb'
   const ringColor = ring === 'confirmed' ? t.success : ring === 'declined' ? t.danger : t.ink[3]
   return (
-    <SceneView {...rest} style={[{ width: size, height: size, alignItems: 'center', justifyContent: 'center' }, style]}>
+    <SceneView
+      {...rest}
+      style={[
+        { width: size, height: size, borderRadius: size / 2, alignItems: 'center', justifyContent: 'center' },
+        style,
+      ]}
+    >
       {ring && (
         <View
           style={{
@@ -95,21 +109,25 @@ export function Avatar({
           height: size,
           borderRadius: size / 2,
           overflow: 'hidden',
-          backgroundColor: fill,
+          backgroundColor: (StyleSheet.flatten(style) as ViewStyle | undefined)?.backgroundColor ?? fill,
           alignItems: 'center',
           justifyContent: 'center',
         }}
       >
+        {background && !disc && <View style={{ position: 'absolute', inset: 0 }}>{background}</View>}
         {src && !disc ? (
           <Image source={{ uri: src }} style={{ width: size, height: size }} />
         ) : (
           !disc && (
             <Label
-              style={{
-                color: tone === 'ink' ? t.muted : '#fff',
-                fontWeight: '500',
-                fontSize: Math.round(size * (tone === 'ios' ? 0.4 : size < 24 ? 0.5 : 0.42)),
-              }}
+              style={[
+                {
+                  color: tone === 'ink' ? t.muted : '#fff',
+                  fontWeight: '500',
+                  fontSize: Math.round(size * (tone === 'ios' ? 0.4 : size < 24 ? 0.5 : 0.42)),
+                },
+                textStyle,
+              ]}
             >
               {initial.toUpperCase()}
             </Label>
@@ -171,7 +189,7 @@ export function Check({
     </SceneView>
   )
 }
-export function Spinner({ size = 16, style, ...rest }: NativeProps & { size?: number }) {
+export function Spinner({ size = 16, color, style, ...rest }: NativeProps & { size?: number; color?: string }) {
   const { tokens } = useLook(),
     p = useCycle(900)
   return (
@@ -188,8 +206,22 @@ export function Spinner({ size = 16, style, ...rest }: NativeProps & { size?: nu
       ]}
     >
       <Svg width={size} height={size} viewBox="0 0 20 20">
-        <Circle cx={10} cy={10} r={7} stroke={tokens.border} strokeWidth={2} fill="none" />
-        <Path d="M10 3a7 7 0 0 1 7 7" stroke={tokens.accent} strokeWidth={2} strokeLinecap="round" fill="none" />
+        <Circle
+          cx={10}
+          cy={10}
+          r={7}
+          stroke={color ?? tokens.border}
+          strokeOpacity={color ? 0.2 : 1}
+          strokeWidth={2}
+          fill="none"
+        />
+        <Path
+          d="M10 3a7 7 0 0 1 7 7"
+          stroke={color ?? tokens.accent}
+          strokeWidth={2}
+          strokeLinecap="round"
+          fill="none"
+        />
       </Svg>
     </SceneView>
   )
@@ -310,9 +342,17 @@ export function Facepile({
   overlap = 6,
   gap = 2,
   tones,
+  avatars,
   style,
   ...rest
-}: NativeProps & { names: string[]; size?: number; overlap?: number; gap?: number; tones?: AvatarProps['tone'][] }) {
+}: NativeProps & {
+  names: string[]
+  size?: number
+  overlap?: number
+  gap?: number
+  tones?: AvatarProps['tone'][]
+  avatars?: ReactNode[]
+}) {
   const r = size / 2
   return (
     <SceneView {...rest} style={[row, style]}>
@@ -321,7 +361,7 @@ export function Facepile({
         const xml = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${size} ${size}"><path d="${path}" fill="black" fill-rule="evenodd"/></svg>`
         return (
           <Mask key={i} xml={xml} style={{ width: size, height: size, marginLeft: i ? -overlap : 0 }}>
-            <Avatar name={name} size={size} tone={tones?.[i] ?? 'person'} />
+            {avatars?.[i] ?? <Avatar name={name} size={size} tone={tones?.[i] ?? 'person'} />}
           </Mask>
         )
       })}

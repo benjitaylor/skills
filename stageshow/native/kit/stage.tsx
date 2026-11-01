@@ -1,6 +1,7 @@
+import { RadialGradient } from './radial-gradient'
 import { useEffect, useId, useMemo, useRef, useState, useSyncExternalStore, type ReactNode } from 'react'
 import { Animated, AppState, Platform, View, type StyleProp, type ViewStyle } from 'react-native'
-import Svg, { Defs, Pattern, Path, RadialGradient, Stop, Rect as SvgRect } from 'react-native-svg'
+import Svg, { Defs, Pattern, Path, Stop, Rect as SvgRect } from 'react-native-svg'
 import { BlurTargetView } from 'expo-blur'
 import { BlurBackground } from './glass'
 import { createAct, Stopped, type Script } from './act'
@@ -322,6 +323,7 @@ export function Stage<S extends object>({
           transform: [{ scale }],
           transformOrigin: 'top left',
           overflow: 'hidden',
+          ...(Platform.OS === 'web' ? { WebkitFontSmoothing: 'antialiased' } : {}),
           backgroundColor: unframed ? 'transparent' : look.tokens.background,
         }}
       >

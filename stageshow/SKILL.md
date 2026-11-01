@@ -29,7 +29,7 @@ Build it the way a product designer builds a launch page they will be judged on.
 
 ## Platform
 
-For React Native or Expo, read `native/README.md` and `native/PARITY.md` first.
+For React Native or Expo, read `native/AUTHORING.md`, `native/README.md` and `native/PARITY.md` first.
 Use `native/kit/`, native `View` / `Text`, and `SceneView` targets. Keep the design
 and choreography guidance below, but use native styles and simulator/device
 rehearsal. The native preview has a separate validation ledger; do not claim

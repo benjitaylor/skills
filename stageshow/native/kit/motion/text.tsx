@@ -34,7 +34,7 @@ function Digit({
     current = useRef(10 + value),
     previous = useRef(value)
   const height = style.lineHeight ?? (style.fontSize ?? 12) * 1.2,
-    width = (style.fontSize ?? 12) * 0.65
+    [width, setWidth] = useState((style.fontSize ?? 12) * 0.65)
   useEffect(() => {
     if (previous.current === value && !reduced) return
     previous.current = value
@@ -67,6 +67,17 @@ function Digit({
   }, [value, rising, duration, delay, reduced, speed, position])
   return (
     <View accessibilityElementsHidden style={{ width, height, overflow: 'hidden' }}>
+      <View pointerEvents="none" style={{ position: 'absolute', opacity: 0, width: 1000 }}>
+        <RNText
+          onLayout={(event) => {
+            const w = event.nativeEvent.layout.width
+            if (w > 0 && Math.abs(w - width) > 0.01) setWidth(w)
+          }}
+          style={[style, { alignSelf: 'flex-start', fontVariant: ['tabular-nums'], includeFontPadding: false }]}
+        >
+          0
+        </RNText>
+      </View>
       <Animated.View style={{ transform: [{ translateY: Animated.multiply(position, -height) }] }}>
         {Array.from({ length: 30 }, (_, i) => (
           <RNText

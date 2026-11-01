@@ -3,8 +3,9 @@
 Baseline: `benjitaylor/skills` at
 `802057409787133703c56001080169e347305572`.
 Scope: every component, public helper, exported type name and `Act` method in
-`stageshow/kit/index.ts`. Porting all of the web playground's authored examples
-and browser filming tools is outside component parity.
+`stageshow/kit/index.ts`. The original Messages, Subscriptions and Dark Bento compositions now have native
+gold examples. Porting the remaining authored examples and browser filming tools
+is outside component parity.
 
 ## Implemented surface
 
@@ -52,6 +53,20 @@ See the native contract in [README.md](README.md). In particular:
   hardware.
 - The optional web preview has its own CSS-mask adapter; the upstream browser
   kit remains the web implementation to use in a web product.
+
+## Authoring and visual evidence
+
+The generated demo carries AUTHORING.md, the full shared skill, all 15 unchanged
+craft references, original web example sources and an agent entry point. Native
+gold examples preserve the original story data and choreography; automated checks
+compare those sources and capture both design sizes. The demo defaults to those
+examples, with separate component and regression pages.
+
+The new gold check supplies six reduced-motion poster pairs and 24 live sample
+pairs, with recordings. The original web examples are imported without restyling.
+Live samples use matching elapsed waits, not a synchronized clock. The existing
+48-pair theme/size/state matrix remains complementary coverage. These browser
+reports compare DOM and React Native Web; actual iOS evidence is separate.
 
 ## Release gate still open
 

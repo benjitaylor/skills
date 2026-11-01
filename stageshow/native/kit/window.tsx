@@ -65,9 +65,11 @@ export function Window({
   const lightColors =
     lights === 'white'
       ? ['#fff', '#fff', '#fff']
-      : lights === 'grey' || chrome === 'glass' || palette === 'mono'
-        ? [t.ink[4], t.ink[4], t.ink[4]]
-        : ['#ff5f57', '#febc2e', '#28c840']
+      : lights === 'grey'
+        ? ['#6c7480', '#6c7480', '#6c7480']
+        : chrome === 'glass' || palette === 'mono'
+          ? [t.ink[4], t.ink[4], t.ink[4]]
+          : ['#ff5f57', '#febc2e', '#28c840']
   const dots = (
     <View style={[row, { gap: lightsSize === 'large' ? 8 : 6, height: barHeight }]}>
       {lightColors.map((color, i) => (
@@ -105,14 +107,14 @@ export function Window({
             paddingVertical: 4,
             paddingHorizontal: 10,
             borderRadius: urlShape === 'pill' || chrome === 'glass' ? 99 : 6,
-            backgroundColor: chrome === 'hairline' ? 'transparent' : t.well,
-            justifyContent: 'center',
+            backgroundColor: chrome === 'hairline' ? 'transparent' : t.ink[0],
+            justifyContent: chrome === 'glass' || chrome === 'card' ? 'center' : 'flex-start',
             gap: 5,
           },
         ]}
       >
         {chrome === 'glass' && <Icon name="lock" size={9} />}
-        <Label lines={1} style={{ fontSize: 10.5, color: t.muted }}>
+        <Label lines={1} style={{ fontSize: 10.5, lineHeight: 14.7, color: theme === 'light' ? '#9a9a9d' : t.muted }}>
           {url}
         </Label>
       </View>
@@ -124,11 +126,11 @@ export function Window({
         row,
         {
           height: barHeight,
-          gap: 8,
-          paddingHorizontal: 14,
+          gap: 6,
+          paddingHorizontal: 14.5,
           borderBottomWidth: terminal || chrome === 'card' ? 0 : 0.5,
           borderBottomColor: t.border,
-          backgroundColor: terminal ? '#191b20' : t.well,
+          backgroundColor: terminal ? '#191b20' : theme === 'dark' ? '#1d1d20' : t.surface,
         },
       ]}
     >

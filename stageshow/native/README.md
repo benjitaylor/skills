@@ -8,6 +8,10 @@ This is a contribution preview. [PARITY.md](PARITY.md) separates implemented
 coverage, native API adaptations, and validation still needed before calling the
 port production ready. The existing web kit remains a separate entry point.
 
+Read [AUTHORING.md](AUTHORING.md) for the native authoring workflow and exact gold
+starting points. The standalone generator includes this guidance, every original
+craft reference and the original web example sources for comparison.
+
 ## Preview
 
 Use Node 22.13 or later and npm. From this folder:
@@ -19,8 +23,9 @@ npm run android   # running Android emulator or connected device
 npm run web       # optional React Native Web preview
 ```
 
-The Expo 57 demo opens **Showcases** (Inbox, Kit, Motion, and Devices) and
-**Compare scenes** (matching web/native controls and phone stories). Choose a theme
+The Expo 57 demo opens **Examples** (Messages, Subscriptions and Dark Bento),
+with **Components** (Inbox, Kit, Motion, and Devices) and
+**Compare** (matching web/native controls and phone stories). Choose a theme
 and fidelity, switch to the poster, replay, or use Focus for a larger view.
 Step mode starts a fresh scene on the kit's virtual clock. Advance by 50 ms to
 inspect a transition, or one second to reach the next beat. The host controls
@@ -144,6 +149,7 @@ changes scene state. They do not operate real app controls.
 npm run typecheck
 npm test
 npm run check:parity
+npm run check:demo
 npm run format:check
 npx expo install --check
 ```
@@ -196,3 +202,22 @@ It embeds the original SVG XML and copies source/license notices. Device,
 keyboard, cursor and geometry changes should be compared with their upstream
 counterparts during review; those native adaptations are intentionally readable
 source files, not a runtime dependency on the DOM kit.
+
+## Gold reference comparisons
+
+`npm run check:gold` renders the original, unmodified Messages, Subscriptions and
+Dark Bento beside the native renditions, at compact and wide design sizes. It
+checks meaningful reduced-motion posters, frame bounds, runtime errors and
+unchanged choreography data, then records both renderers and samples the live
+sequences. Matching elapsed waits are not frame-locked; use the recordings to
+judge timing. Reports live in `gold-results/` and are uploaded by CI.
+
+Use the same servers as the matching-scene check. `GOLD_STILLS_ONLY=1` runs the
+poster pass; `GOLD_OUTPUT`, `WEB_GOLD_URL` and `NATIVE_GOLD_URL` override paths.
+The native demo's Examples tab is the composition reference; Components and
+Compare remain diagnostic tools.
+
+Spinner accepts a native `color` prop for contrast on filled surfaces. Avatar
+accepts `textStyle` and a clipped `background` artwork slot; Facepile accepts
+custom `avatars` while keeping its overlap masks. These replace web text/color
+inheritance and selector styling in native compositions.

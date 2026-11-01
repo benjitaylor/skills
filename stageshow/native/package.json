@@ -13,10 +13,12 @@
     "test": "jest --runInBand",
     "check:parity": "node scripts/check-parity.mjs",
     "export": "expo export --platform ios --platform android --output-dir dist",
-    "format": "prettier --write kit playground demo review tests scripts *.json *.cjs *.md",
-    "format:check": "prettier --check kit playground demo review tests scripts *.json *.cjs *.md",
+    "format": "prettier --write kit examples playground demo review tests scripts *.json *.cjs *.md",
+    "format:check": "prettier --check kit examples playground demo review tests scripts *.json *.cjs *.md",
     "create:demo": "node scripts/create-demo.mjs",
-    "check:scenes": "node scripts/check-scenes.mjs"
+    "check:scenes": "node scripts/check-scenes.mjs",
+    "check:gold": "node scripts/check-gold.mjs",
+    "check:demo": "node scripts/check-demo.mjs"
   },
   "dependencies": {
     "@react-native-masked-view/masked-view": "0.3.2",

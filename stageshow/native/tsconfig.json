@@ -16,6 +16,8 @@
     "demo/**/*.ts",
     "demo/**/*.tsx",
     "review/**/*.ts",
-    "review/**/*.tsx"
+    "review/**/*.tsx",
+    "examples/**/*.ts",
+    "examples/**/*.tsx"
   ]
 }

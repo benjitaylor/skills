@@ -28,7 +28,7 @@ jobs:
       - run: npm ci
       - run: npm run typecheck && npm run check:css
         working-directory: stageshow
-      - run: npm run typecheck && npm test -- --silent && npm run check:parity && npm run format:check
+      - run: npm run typecheck && npm test -- --silent && npm run check:parity && npm run format:check && npm run check:demo
       - run: npx expo install --check
       - run: npm run export
       - run: npx expo export --platform web --output-dir web-dist
@@ -53,9 +53,12 @@ jobs:
             sleep 1
           done
           npm run check:scenes
+          npm run check:gold
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: matching-scene-captures
-          path: stageshow/native/scene-results
+          path: |
+            stageshow/native/scene-results
+            stageshow/native/gold-results
           if-no-files-found: ignore
