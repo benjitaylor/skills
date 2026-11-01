@@ -34,11 +34,21 @@
     position: absolute;
     inset: 0;
     background: #f2f2f7;
-    transition: opacity 0.6s ease;
+    transition: opacity 0.6s ease, filter 0.6s ease;
   }
 
+  /* Behind the sheet it recedes to a quiet ground: faded and desaturated,
+     so its art never reads as a muddy band between banner and sheet */
   .co-store[data-back] {
-    opacity: 0.5;
+    opacity: 0.35;
+    filter: saturate(0.3);
+  }
+
+  .co-store__name {
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 28px;
+    color: #000;
   }
 
   .co-store__head {
@@ -254,16 +264,15 @@
     color: #b0b0b5;
   }
 
-  /* Toggled rather than mounted: it drops in and rises away on one transition */
+  /* Toggled rather than mounted, and opaque throughout as iOS draws it:
+     it slides down from above the screen and rises back out of it */
   .co-banner {
     animation: none;
-    opacity: 0;
-    transform: translateY(-120px);
-    transition: transform 0.52s cubic-bezier(0.2, 0.9, 0.25, 1), opacity 0.3s ease;
+    transform: translateY(-160px);
+    transition: transform 0.52s cubic-bezier(0.2, 0.9, 0.25, 1);
   }
 
   .co-banner[data-show] {
-    opacity: 1;
     transform: none;
   }
 

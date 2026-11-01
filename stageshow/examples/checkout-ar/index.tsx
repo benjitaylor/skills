@@ -1,4 +1,4 @@
-import { Stage, Phone, Bar, BrandMark, Icon, Money, Notification, Spinner, States, mirror, fromStart, type Act } from '../../kit'
+import { Stage, Phone, Bar, BrandMark, Icon, Money, Notification, Spinner, States, mirror, type Act } from '../../kit'
 import './checkout.css'
 
 // An Arabic checkout on a phone, written right to left: the gold for rtl
@@ -15,7 +15,8 @@ import './checkout.css'
 // number's left as SAMA sets it. The only direction in this file is in the
 // cursor's resting place, written with mirror().
 //
-// Real strings: إتمام الطلب, الإجمالي, the amount, the card, ادفع / تم الدفع,
+// Real strings: the store's name (it carries the frame between loops),
+// إتمام الطلب, الإجمالي, the amount, the card's last four, ادفع / تم الدفع,
 // and the notification. Everything else is a line or a shape.
 
 type Phase = 'idle' | 'working' | 'paid'
@@ -35,8 +36,7 @@ const script = async (a: Act<S>) => {
   a.mark('pay')
   await a.click('pay')
   a.put({ phase: 'working' })
-  // The finger lifts off toward the line's start while the payment goes through
-  await a.move(fromStart(a.rect('pay'), 40, 90, a.dir))
+  // The finger lifts where it tapped while the payment goes through
   await a.wait(1300)
   a.put({ phase: 'paid' })
   await a.wait(500)
@@ -60,7 +60,7 @@ export default function CheckoutAr() {
     <Stage<S>
       width={W}
       height={520}
-      compact={{ below: 400, width: 358, height: 500 }}
+      compact={{ below: 400, width: 358, height: 530 }}
       dir="rtl"
       initial={START}
       poster={{ open: true, phase: 'paid', banner: true }}
@@ -75,7 +75,7 @@ export default function CheckoutAr() {
             {/* The store page the sheet rises over: art and lines only */}
             <div className="co-store" data-back={s.open || undefined}>
               <div className="co-store__head">
-                <Bar w={110} h={14} r={5} tone={4} />
+                <span className="co-store__name">متجر نخلة</span>
                 <span className="co-store__bag" />
               </div>
               <div className="co-store__hero" />
@@ -122,7 +122,7 @@ export default function CheckoutAr() {
 
               <div className="co-method">
                 <BrandMark brand="visa" size={30} />
-                <span className="co-method__card">فيزا •••• 4417</span>
+                <span className="co-method__card">•••• 4417</span>
                 <Icon name="chevron-right" size={16} stroke={2} className="co-method__go" />
               </div>
 

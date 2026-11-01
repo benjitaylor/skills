@@ -148,6 +148,13 @@
   .ss-stage:lang(ar) :where(*:not(:lang(en))) {
     letter-spacing: 0 !important;
   }
+  /* Arabic hangs its dots deep below the baseline (the final yeh's two
+     dots most of all), and a truncated line clips them with its overflow:
+     a word loses its dots and reads misspelled. In an Arabic scene these
+     single lines clip only across, keeping their ellipsis */
+  .ss-stage:lang(ar) :where(.ss-notification__title, .ss-row__title, .ss-row__subtitle, .ss-window__tab-label) {
+    overflow: clip visible;
+  }
   /* Text that is left to right in any scene: code, a terminal, a URL, an
      email address or a number field marked dir="ltr". Isolated so the
      paragraph around it keeps its order. */
