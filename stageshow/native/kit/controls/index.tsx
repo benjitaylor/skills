@@ -67,24 +67,24 @@ export function Field({
   }, [chip, value])
   const shown = value || (leaving ? held.current : '')
   const opacity = useTween(leaving ? 0 : 1, 200)
-  const borderColor = status === 'error' ? t.danger : status === 'valid' ? t.success : focused ? t.accent : t.border
+  const borderColor = status === 'error' ? t.danger : focused ? t.accent : t.border
   return (
     <SceneView {...rest} style={[{ gap: 6 }, style]}>
-      {label && <Label style={{ fontSize: 11, color: t.muted }}>{label}</Label>}
+      {label && <Label style={{ fontSize: 11.5, fontWeight: '500', color: t.text }}>{label}</Label>}
       <SceneView
         cursor="ibeam"
         {...box}
         style={[
           row,
           {
-            minHeight: 36,
+            minHeight: 34,
             gap: 7,
             borderWidth: 1,
             borderColor,
-            borderRadius: 7,
+            borderRadius: 8,
             paddingHorizontal: 10,
             backgroundColor: t.surface,
-            boxShadow: focused ? `0 0 0 2px ${t.accentSoft}` : undefined,
+            boxShadow: focused ? `0 0 0 3px ${t.accentSoft}` : undefined,
           },
           box?.style,
         ]}
@@ -93,7 +93,7 @@ export function Field({
         <View style={[row, { flex: 1, minWidth: 0, minHeight: 20, overflow: 'hidden' }]}>
           {!shown && (
             <View pointerEvents="none" style={{ position: 'absolute', left: 0, right: 0 }}>
-              <Label lines={1} style={{ color: t.muted }}>
+              <Label lines={1} style={{ fontSize: 13, color: t.muted }}>
                 {placeholder}
               </Label>
             </View>
@@ -112,7 +112,9 @@ export function Field({
                 },
               ]}
             >
-              <Label lines={1}>{password ? '•'.repeat(shown.length) : shown}</Label>
+              <Label lines={1} style={{ fontSize: 13 }}>
+                {password ? '•'.repeat(shown.length) : shown}
+              </Label>
               {remove !== undefined && (chip || leaving) && (
                 <SceneView target={remove || undefined} cursor="hand">
                   <Icon name="close" size={10} />
@@ -224,7 +226,7 @@ export function Tabs({
   )
 }
 export function Toggle({ on, style, ...rest }: NativeProps & { on: boolean }) {
-  const { tokens } = useLook(),
+  const { tokens, theme } = useLook(),
     p = useTween(on ? 1 : 0, 250)
   return (
     <SceneView
@@ -247,7 +249,7 @@ export function Toggle({ on, style, ...rest }: NativeProps & { on: boolean }) {
           width: 14,
           height: 14,
           borderRadius: 7,
-          backgroundColor: '#fff',
+          backgroundColor: theme === 'blueprint' ? '#1450b4' : '#fff',
           transform: [{ translateX: p.interpolate({ inputRange: [0, 1], outputRange: [0, 12] }) }],
           boxShadow: '0 1px 2px rgba(0,0,0,.15)',
         }}
@@ -263,8 +265,16 @@ export function Badge({
   style,
   ...rest
 }: NativeProps & { tone?: 'neutral' | 'accent' | 'success' | 'danger' | 'warning'; dot?: boolean; icon?: ReactNode }) {
-  const { tokens } = useLook(),
-    color = tone === 'neutral' ? tokens.muted : tokens[tone]
+  const { tokens, theme } = useLook(),
+    color = tone === 'neutral' ? tokens.text : tokens[tone],
+    textColor =
+      theme === 'blueprint'
+        ? '#fff'
+        : theme === 'dark'
+          ? color
+          : { success: '#15803d', danger: '#b91c1c', warning: '#b45309', accent: tokens.accent, neutral: tokens.text }[
+              tone
+            ]
   return (
     <SceneView
       {...rest}
@@ -273,17 +283,24 @@ export function Badge({
         {
           alignSelf: 'flex-start',
           gap: 4,
-          paddingHorizontal: 7,
-          paddingVertical: 4,
-          borderRadius: 5,
-          backgroundColor: tone === 'accent' ? tokens.accentSoft : tokens.well,
+          height: 20,
+          paddingHorizontal: dot || icon ? 7 : 9,
+          borderRadius: 999,
+          overflow: 'hidden',
+          backgroundColor: tone === 'neutral' ? tokens.ink[1] : 'transparent',
         },
         style,
       ]}
     >
+      {tone !== 'neutral' && (
+        <View
+          pointerEvents="none"
+          style={{ position: 'absolute', inset: 0, backgroundColor: color, opacity: theme === 'dark' ? 0.16 : 0.12 }}
+        />
+      )}
       {dot && <View style={{ width: 5, height: 5, borderRadius: 3, backgroundColor: color }} />}
       {icon}
-      <Label style={{ fontSize: 10, fontWeight: '500', color }}>{children}</Label>
+      <Label style={{ fontSize: 11, fontWeight: '500', color: textColor }}>{children}</Label>
     </SceneView>
   )
 }

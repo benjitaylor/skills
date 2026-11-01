@@ -1,0 +1,5 @@
+.native-parity { padding:16px; color:#243d33; background:#f2f1ee; font-family:system-ui,sans-serif; }
+.native-parity-controls { display:flex; gap:8px; padding-bottom:12px; }
+.native-parity-controls button { border:0; border-radius:18px; padding:10px 12px; background:#e7ebe8; color:#243d33; }
+
+.native-parity .ss-stage[data-theme="light"], .native-parity .ss-stage[data-theme="dark"] { background-color:var(--ss-canvas); }

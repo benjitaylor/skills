@@ -1,0 +1,61 @@
+name: Stageshow Native
+on:
+  pull_request:
+    paths: ['stageshow/**', '.github/workflows/stageshow-native.yml']
+  push:
+    branches: ['codex/react-native-port']
+    paths: ['stageshow/**', '.github/workflows/stageshow-native.yml']
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: stageshow/native
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: |
+            stageshow/package-lock.json
+            stageshow/native/package-lock.json
+      - run: npm ci
+        working-directory: stageshow
+      - run: npm ci
+      - run: npm run typecheck && npm run check:css
+        working-directory: stageshow
+      - run: npm run typecheck && npm test -- --silent && npm run check:parity && npm run format:check
+      - run: npx expo install --check
+      - run: npm run export
+      - run: npx expo export --platform web --output-dir web-dist
+      - name: Verify standalone demo
+        run: |
+          npm run create:demo -- "$RUNNER_TEMP/stageshow-demo"
+          cd "$RUNNER_TEMP/stageshow-demo"
+          npm ci
+          npm run typecheck
+          npm run export
+      - run: npx playwright-core install --with-deps chromium
+        working-directory: stageshow
+      - name: Compare matching scenes
+        run: |
+          (cd .. && npx vite playground --config playground/vite.config.ts --host 127.0.0.1 --port 5178) > /tmp/stageshow-web.log 2>&1 &
+          WEB_PID=$!
+          python3 -m http.server 8086 --bind 127.0.0.1 --directory web-dist > /tmp/stageshow-native-web.log 2>&1 &
+          NATIVE_PID=$!
+          trap 'kill "$WEB_PID" "$NATIVE_PID" || true' EXIT
+          for attempt in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:5178/ >/dev/null && curl -fsS http://127.0.0.1:8086/ >/dev/null; then break; fi
+            sleep 1
+          done
+          npm run check:scenes
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: matching-scene-captures
+          path: stageshow/native/scene-results
+          if-no-files-found: ignore

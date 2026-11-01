@@ -140,9 +140,19 @@ export function Chart({
                   {area && points.length > 1 && (
                     <Path d={`${path}L${last.x} ${height}L${first.x} ${height}Z`} fill={`url(#${id}fill)`} />
                   )}
-                  <Path d={path} stroke={tokens.accent} strokeWidth={1.5} strokeLinecap="round" fill="none" />
+                  <Path d={path} stroke={tokens.accent} strokeWidth={2} strokeLinecap="round" fill="none" />
                 </G>
-                {dot && <Circle cx={x} cy={y} r={3.5} fill={tokens.accent} opacity={progress ? 1 : 0} />}
+                {dot && (
+                  <Circle
+                    cx={x}
+                    cy={y}
+                    r={3.5}
+                    fill={tokens.accent}
+                    stroke={tokens.surface}
+                    strokeWidth={2}
+                    opacity={progress ? 1 : 0}
+                  />
+                )}
               </>
             )}
       </Svg>

@@ -1,5 +1,5 @@
 import { useContext, useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react'
-import { Animated, View, type LayoutRectangle } from 'react-native'
+import { Animated, StyleSheet, View, type ViewStyle, type LayoutRectangle } from 'react-native'
 import { SceneView, Label, absolute, useScene, SuppressTargets, HiddenTargets, type NativeProps } from '../native'
 import { useTween, useNumber } from '../animate'
 import { useReducedMotion, MotionContext } from '../reduced-motion'
@@ -48,7 +48,9 @@ export function Collapse({
 export function Probe({
   children,
   onSize,
+  maxWidth,
 }: {
+  maxWidth?: number
   children: ReactNode
   onSize(size: { width: number; height: number }): void
 }) {
@@ -61,9 +63,15 @@ export function Probe({
           pointerEvents="none"
           accessibilityElementsHidden
           importantForAccessibility="no-hide-descendants"
-          style={{ position: 'absolute', width: scene?.width ?? 1000, opacity: 0 }}
+          style={{ position: 'absolute', width: maxWidth ?? scene?.width ?? 1000, opacity: 0 }}
         >
-          <View style={{ alignSelf: 'flex-start' }} onLayout={(event) => onSize(event.nativeEvent.layout)}>
+          <View
+            style={{ alignSelf: 'flex-start', maxWidth: '100%' }}
+            onLayout={(event) => {
+              const { width, height } = event.nativeEvent.layout
+              onSize({ width: Math.ceil(width) + 1, height: Math.ceil(height) })
+            }}
+          >
             <Label>{children}</Label>
           </View>
         </View>
@@ -126,6 +134,7 @@ export function Swap({
     const timer = clock.timeout(() => setOutgoing(null), duration / speed)
     return () => clock.clearTimeout(timer)
   }, [outgoing, duration, speed, reduced])
+  const maxWidth = (StyleSheet.flatten(style) as ViewStyle | undefined)?.maxWidth
   const w = useTween(size.width, duration, { delay: outgoing && size.width < outgoing.width ? duration / 2 : 0 }),
     h = useTween(size.height, duration)
   return (
@@ -142,6 +151,7 @@ export function Swap({
       ]}
     >
       <Probe
+        maxWidth={typeof maxWidth === 'number' ? maxWidth : undefined}
         key={id}
         onSize={(value) => setSize((old) => (old.width === value.width && old.height === value.height ? old : value))}
       >

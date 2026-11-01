@@ -5,3 +5,5 @@ coverage/
 recordings/
 ios/
 android/
+web-dist/
+scene-results/

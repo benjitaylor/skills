@@ -1,6 +1,6 @@
 import { useEffect, useId, useMemo, useRef, useState, useSyncExternalStore, type ReactNode } from 'react'
 import { Animated, AppState, Platform, View, type StyleProp, type ViewStyle } from 'react-native'
-import Svg, { Defs, RadialGradient, Stop, Rect as SvgRect } from 'react-native-svg'
+import Svg, { Defs, Pattern, Path, RadialGradient, Stop, Rect as SvgRect } from 'react-native-svg'
 import { BlurTargetView } from 'expo-blur'
 import { BlurBackground } from './glass'
 import { createAct, Stopped, type Script } from './act'
@@ -288,7 +288,11 @@ export function Stage<S extends object>({
     () => ({ registry, root, scale, width: designW, height: designH, instantScope }),
     [registry, scale, designW, designH, instantScope],
   )
-  const colors = Array.isArray(ground) ? ground : ['#d5c9f4', '#f8d3b5', '#d2e8f5']
+  const colors = Array.isArray(ground)
+    ? ground
+    : theme === 'glass'
+      ? [look.tokens.accent, '#8b5cf6', '#ffa878']
+      : ['#d5c9f4', '#f8d3b5', '#d2e8f5']
   return (
     <View
       accessibilityLabel={accessibilityLabel}
@@ -325,19 +329,30 @@ export function Stage<S extends object>({
           ref={background}
           style={{ position: 'absolute', inset: 0, backgroundColor: unframed ? 'transparent' : look.tokens.background }}
         >
-          {ground && (
+          {theme === 'blueprint' && !unframed && (
+            <Svg style={{ position: 'absolute' }} width={designW} height={designH}>
+              <Defs>
+                <Pattern id={`${groundId}grid`} width={16} height={16} patternUnits="userSpaceOnUse">
+                  <Path d="M16 0H0V16" fill="none" stroke="rgba(214,232,255,0.08)" strokeWidth={1} />
+                </Pattern>
+              </Defs>
+              <SvgRect width="100%" height="100%" fill={`url(#${groundId}grid)`} />
+            </Svg>
+          )}
+          {(ground || (theme === 'glass' && !unframed)) && (
             <Svg style={{ position: 'absolute' }} width={designW} height={designH}>
               <Defs>
                 {colors.map((color, i) => (
                   <RadialGradient
                     key={i}
                     id={`${groundId}orb${i}`}
-                    cx={i === 0 ? '20%' : '80%'}
-                    cy={i === 1 ? '80%' : '20%'}
-                    r="80%"
+                    cx={theme === 'glass' ? ['12%', '88%', '58%'][i] : i === 0 ? '20%' : '80%'}
+                    cy={theme === 'glass' ? ['18%', '28%', '100%'][i] : i === 1 ? '80%' : '20%'}
+                    rx={theme === 'glass' ? ['55%', '50%', '60%'][i] : '80%'}
+                    ry={theme === 'glass' ? ['65%', '60%', '55%'][i] : '80%'}
                   >
-                    <Stop offset="0" stopColor={color} />
-                    <Stop offset="1" stopColor={color} stopOpacity={0} />
+                    <Stop offset="0" stopColor={color} stopOpacity={theme === 'glass' ? (i === 1 ? 0.38 : 0.42) : 1} />
+                    <Stop offset={theme === 'glass' ? 0.7 : 1} stopColor={color} stopOpacity={0} />
                   </RadialGradient>
                 ))}
               </Defs>

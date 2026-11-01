@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "license": "MIT",
-  "main": "playground/index.ts",
+  "main": "demo/index.ts",
   "scripts": {
     "start": "expo start",
     "ios": "expo start --ios",
@@ -13,8 +13,10 @@
     "test": "jest --runInBand",
     "check:parity": "node scripts/check-parity.mjs",
     "export": "expo export --platform ios --platform android --output-dir dist",
-    "format": "prettier --write kit playground tests scripts *.json *.cjs *.md",
-    "format:check": "prettier --check kit playground tests scripts *.json *.cjs *.md"
+    "format": "prettier --write kit playground demo review tests scripts *.json *.cjs *.md",
+    "format:check": "prettier --check kit playground demo review tests scripts *.json *.cjs *.md",
+    "create:demo": "node scripts/create-demo.mjs",
+    "check:scenes": "node scripts/check-scenes.mjs"
   },
   "dependencies": {
     "@react-native-masked-view/masked-view": "0.3.2",

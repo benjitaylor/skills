@@ -55,8 +55,8 @@ See the native contract in [README.md](README.md). In particular:
 
 ## Release gate still open
 
-The contribution is a draft until device-level review covers Android and the
-full visual variant matrix. iOS simulator inspection and bundle exports are
+The contribution is ready for maintainer review. Production-release validation
+still needs Android device review and the full visual variant matrix. iOS simulator inspection and bundle exports are
 recorded separately in [REHEARSAL.md](REHEARSAL.md). In particular, do not infer
 that every combination of theme, fidelity, phone frame, window chrome, cursor,
 rapid interruption, text shaping, and compact layout has passed from the

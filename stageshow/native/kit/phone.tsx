@@ -27,7 +27,7 @@ const edges: Record<PhoneFrame, number> = {
   outline: 8,
   android: 11,
 }
-export const PhoneContext = createContext({ width: 402, height: 874, radius: 64 })
+export const PhoneContext = createContext<{ width: number; height: number; radius: number } | null>(null)
 export interface PhoneProps extends NativeProps {
   width: number
   frame?: PhoneFrame
@@ -97,7 +97,14 @@ export function Phone({
             ? []
             : [[edge, frame === 'soft' ? '#fafafa' : '#111113']]
   return (
-    <SceneView {...rest} style={[{ width, height: totalH * scale }, style]}>
+    <SceneView
+      {...rest}
+      // Rasterize at the phone's displayed bounds, after its internal scale. On
+      // iOS this uses the device display scale and prevents a nested Stage scale
+      // from reusing a low-resolution intermediate surface for text and SVG.
+      shouldRasterizeIOS={rest.shouldRasterizeIOS ?? true}
+      style={[{ width, height: totalH * scale }, style]}
+    >
       <View
         style={{
           width: screen.width + edge * 2,

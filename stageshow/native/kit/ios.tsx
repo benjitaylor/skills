@@ -80,7 +80,15 @@ export function Keyboard({
     <SceneView
       {...rest}
       style={[
-        { paddingHorizontal: 6, paddingBottom: 10, gap: 10, backgroundColor: dark ? '#303238' : '#dce0e7' },
+        {
+          borderTopLeftRadius: 28,
+          borderTopRightRadius: 28,
+          overflow: 'hidden',
+          paddingHorizontal: 6,
+          paddingBottom: 10,
+          gap: 10,
+          backgroundColor: dark ? '#303238' : '#dce0e7',
+        },
         style,
       ]}
     >

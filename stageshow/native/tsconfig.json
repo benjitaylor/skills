@@ -12,6 +12,10 @@
     "playground/**/*.ts",
     "playground/**/*.tsx",
     "tests/**/*.ts",
-    "tests/**/*.tsx"
+    "tests/**/*.tsx",
+    "demo/**/*.ts",
+    "demo/**/*.tsx",
+    "review/**/*.ts",
+    "review/**/*.tsx"
   ]
 }

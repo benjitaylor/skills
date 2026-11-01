@@ -165,15 +165,13 @@ export function Chip({
           alignSelf: 'flex-start',
           height: 24,
           gap: 5,
-          paddingHorizontal: 8,
-          borderRadius: 6,
-          backgroundColor: t.well,
-          borderWidth: 0.5,
-          borderColor: t.border,
+          paddingHorizontal: 10,
+          borderRadius: 999,
+          backgroundColor: t.accentSoft,
         },
       ]}
     >
-      <Label lines={1} style={{ fontSize: 11 }}>
+      <Label lines={1} style={{ fontSize: 12, fontWeight: '500' }}>
         {children}
       </Label>
       {remove !== undefined && (

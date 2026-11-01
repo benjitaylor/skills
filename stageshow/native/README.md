@@ -19,11 +19,27 @@ npm run android   # running Android emulator or connected device
 npm run web       # optional React Native Web preview
 ```
 
-The Expo 57 playground includes Inbox, Kit, Motion, and Devices. Choose a theme
+The Expo 57 demo opens **Showcases** (Inbox, Kit, Motion, and Devices) and
+**Compare scenes** (matching web/native controls and phone stories). Choose a theme
 and fidelity, switch to the poster, replay, or use Focus for a larger view.
 Step mode starts a fresh scene on the kit's virtual clock. Advance by 50 ms to
 inspect a transition, or one second to reach the next beat. The host controls
 continue using native time. Leave step mode to restore live playback.
+
+## Create a standalone demo
+
+```sh
+npm run create:demo -- /path/to/new-folder
+cd /path/to/new-folder
+npm ci
+npm run ios
+```
+
+The generator refuses existing folders and includes all source and licenses.
+It does not import the parent repository. See [demo/README.md](demo/README.md).
+Compare scenes supports four themes, opening/typing/payoff beats, compact/wide
+layouts, live replay, Reduce motion and Focus. Wide layouts need a landscape
+phone or tablet. Focus leaves only Back and Replay above the scene.
 
 ## Use in an Expo app
 
@@ -104,6 +120,13 @@ changes scene state. They do not operate real app controls.
   shows the poster until tapped, then plays once; another tap replays it.
 - The OS Reduce Motion preference always wins. `reducedMotion` and `specimen`
   can force a still for previews. Always supply a meaningful `poster`.
+- `Phone` rasterizes its displayed bounds on iOS to keep text sharp through
+  nested scaling. Set `shouldRasterizeIOS={false}` to opt out. This trades an
+  offscreen bitmap and memory for rendering quality; it is not a performance
+  guarantee. Profile animation-heavy scenes on your target hardware.
+- `Thread` takes its natural content height by default, as on web. Set
+  `style={{ flex: 1 }}` explicitly when a conversation should fill a screen.
+  Phone messages use phone text sizes, while standalone threads remain smaller.
 - `Phone wallpaper` takes a color, `WALLPAPER`, or a native image source.
   `Phone bezel` supplies the optional photo frame. CSS gradients and image URLs
   in CSS variables become native SVG / image content.
@@ -142,6 +165,29 @@ For native visual review, use the simulator/device plus Step mode. The web
 `film.mjs` DOM probes do not inspect native views. Follow the composition and
 motion questions in `../references/verify.md` and record actual device coverage
 in [REHEARSAL.md](REHEARSAL.md). An export is a bundle check, not a device test.
+
+## Matching-scene checks
+
+The CI workflow installs the parent web kit and this demo, checks both, exports
+native/web bundles, recreates a standalone app, then runs `npm run check:scenes`.
+It uploads an HTML report with 96 screenshots: two scenes × four themes × two
+sizes × three beats × two renderers. The test also interrupts transitions,
+replays mid-story, and checks forced and OS reduced motion.
+
+To run locally, export web first with the dev server stopped:
+
+```sh
+npx expo export --platform web --output-dir web-dist
+# Serve web-dist on 127.0.0.1:8086 and the parent Vite playground on port 5178.
+# Install Chromium from the parent: npx playwright-core install chromium
+npm run check:scenes
+```
+
+`CHROME_PATH`, `WEB_SCENE_URL`, `NATIVE_SCENE_URL` and `SCENE_OUTPUT` override the
+browser, URLs and report folder. These are DOM and React Native Web comparisons;
+iOS simulator/device captures remain a separate review. The test asserts scene
+bounds, content, cancellation and stable reduced-motion frames, not pixel
+identity. Typography and native blur can differ by platform.
 
 ## Updating shared artwork
 

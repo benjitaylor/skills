@@ -1,6 +1,6 @@
 # Native rehearsal — 2026-11-01
 
-Status: contribution preview; full visual and device parity is still an open gate.
+Status: ready for maintainer review; full device and release validation remains open.
 Reference: upstream web kit at `802057409787133703c56001080169e347305572`.
 
 ## Automated checks
@@ -58,7 +58,7 @@ for composition, not a frame-by-frame motion comparison. The upstream browser
 film also reported uneven gutters in its reference scene; no native film gate is
 inferred from that browser run. Generated captures are excluded from git.
 
-## Required before removing draft status
+## Remaining production-release validation
 
 - Android emulator and physical-device review, including animated masks, native
   blur, text measurement and cursor targeting. No Android device run was available
@@ -70,7 +70,39 @@ inferred from that browser run. Generated captures are excluded from git.
 - Theme/fidelity/chrome/cursor variants at compact and wide host sizes; native
   Reduce Motion setting changes, navigation/background transitions, large text,
   RTL and complex shaping. Unit tests cover some logic, not this visual matrix.
-- Resolve the scaled-phone text softness noted above, and inspect glyphs at 4×.
+- Verify the iOS phone rasterization tradeoff and text sharpness on physical devices.
 
 Use [PARITY.md](PARITY.md) for the implementation ledger and platform adaptations.
 Do not describe this rehearsal as full behavioral or visual parity.
+
+## Second review pass — demo and matching scenes
+
+The scaled phone softness was reproduced on iPhone 17 Pro / iOS 26.5. Removing
+only the mask did not resolve it. Rasterizing the outer phone at its displayed
+bounds did, while retaining the superellipse mask and original phone size.
+`shouldRasterizeIOS` remains overridable; no memory/frame-time benchmark is
+claimed. React Native sets the rasterization scale to the device display scale
+when that flag is enabled.
+
+The new standalone demo includes the gallery plus two shared web/native fixtures.
+A common data/choreography file names opening, typing and payoff. The native and
+DOM renditions use explicit platform layout styles. Comparison exposed and fixed
+rounded pill styling, status/blueprint colors, chart marker styling, glass color
+placement, a subpixel measurement truncation, phone message sizing and vertical
+spacing, reaction anchoring and keyboard upper corners. The web reference's
+black Count on dark/blueprint is retained as an upstream reference defect; native
+keeps readable text. Matching captures do not claim pixel identity.
+
+The new checks bring the total to 30 passing tests. They add matching fixture
+mounts, replay cancellation during typing, meaningful OS reduced-motion posters
+and URL option validation. Browser checks cover 48 scene pairs / 96 captures,
+plus rapid state interruption, repeated playback and both forced/OS reduced
+motion in each theme and renderer. The HTML report is an artifact, not committed
+output. The workflow runs these checks and validates the generated demo.
+
+Actual iOS inspection covers four themes in both scenes, the compact layout,
+the wide controls layout in landscape, and replay/reduced-motion interaction.
+A fresh screenshot review was used to find the corrections above. The short
+recording and matching-scene report are linked from the PR. Generated evidence
+is kept outside source control. Android rendering, physical devices, performance,
+all fidelity/chrome/cursor combinations and exhaustive shaping/RTL remain open.

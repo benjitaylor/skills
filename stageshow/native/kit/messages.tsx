@@ -12,7 +12,7 @@ import {
   type ReactElement,
   type ReactNode,
 } from 'react'
-import { Animated, View } from 'react-native'
+import { Animated, StyleSheet, View, type ViewStyle } from 'react-native'
 import Svg, { Path } from 'react-native-svg'
 import { SceneView, Label, row, useScene, type NativeProps } from './native'
 import { useLook } from './look'
@@ -22,16 +22,18 @@ import { bezier } from './ease'
 import { MotionContext } from './reduced-motion'
 import { clock } from './clock'
 import { Bar } from './window'
+import { PhoneContext } from './phone'
 import { Collapse, Swap, Roll } from './motion'
 
-const ThreadContext = createContext<{ app: 'imessage' | 'sms' | 'chat'; ready: { current: boolean } }>({
+const ThreadContext = createContext<{ app: 'imessage' | 'sms' | 'chat'; ready: { current: boolean }; width: number }>({
   app: 'imessage',
   ready: { current: false },
+  width: 358,
 })
 export interface ThreadProps extends NativeProps {
   app?: 'imessage' | 'sms' | 'chat'
 }
-function ThreadRow({ children }: { children: ReactNode }) {
+function ThreadRow({ children, gap = 0 }: { children: ReactNode; gap?: number }) {
   const previous = useRef<number | null>(null),
     current = useRef(0),
     value = useRef(new Animated.Value(0)).current
@@ -67,28 +69,54 @@ function ThreadRow({ children }: { children: ReactNode }) {
         }
         frame.current = clock.raf(step)
       }}
-      style={{ transform: [{ translateY: value }] }}
+      style={{ marginTop: gap, transform: [{ translateY: value }] }}
     >
       {children}
     </Animated.View>
   )
 }
 export function Thread({ app = 'imessage', children, style, ...rest }: ThreadProps) {
-  const ready = useRef(false)
+  const ready = useRef(false),
+    [width, setWidth] = useState(358)
+  const flat = StyleSheet.flatten(style) as ViewStyle | undefined
+  const side = (value: unknown) => (typeof value === 'number' ? value : 0)
+  const padding =
+    side(flat?.paddingLeft ?? flat?.paddingHorizontal ?? flat?.padding) +
+    side(flat?.paddingRight ?? flat?.paddingHorizontal ?? flat?.padding)
   useEffect(() => {
     ready.current = true
   }, [])
   const list = Children.toArray(children).filter(isValidElement) as ReactElement<BubbleProps>[]
   return (
-    <ThreadContext.Provider value={{ app, ready }}>
-      <SceneView {...rest} style={[{ flex: 1, justifyContent: 'flex-end', overflow: 'hidden', gap: 6 }, style]}>
+    <ThreadContext.Provider value={{ app, ready, width: width - padding }}>
+      <SceneView
+        {...rest}
+        onLayout={(e) => {
+          setWidth(e.nativeEvent.layout.width)
+          rest.onLayout?.(e)
+        }}
+        style={[{ justifyContent: 'flex-end', overflow: 'visible', gap: 3 }, style]}
+      >
         {list.map((child, index) => {
           let item = child
           if (child.type === Bubble && child.props.tail === undefined) {
             const next = list.slice(index + 1).find((candidate) => candidate.type === Bubble)
             item = cloneElement(child, { tail: !next || next.props.from !== child.props.from })
           }
-          return <ThreadRow key={child.key ?? index}>{item}</ThreadRow>
+          return (
+            <ThreadRow
+              key={child.key ?? index}
+              gap={
+                child.type === Bubble &&
+                list[index - 1]?.type === Bubble &&
+                list[index - 1].props.from !== child.props.from
+                  ? 8
+                  : 0
+              }
+            >
+              {item}
+            </ThreadRow>
+          )
         })}
       </SceneView>
     </ThreadContext.Provider>
@@ -140,7 +168,8 @@ export function Bubble({
   'data-target': alias,
   ...rest
 }: BubbleProps) {
-  const { app, ready } = useContext(ThreadContext),
+  const { app, ready, width } = useContext(ThreadContext),
+    phone = useContext(PhoneContext),
     arrived = useRef(ready.current).current
   const { fidelity, tokens, theme } = useLook(),
     reduced = useReducedMotion(),
@@ -194,14 +223,16 @@ export function Bubble({
   ) : fidelity === 'minimal' && typeof children === 'string' ? (
     <Bar w={Math.min(180, children.length * 5.5)} />
   ) : (
-    <Label style={{ fontSize: 15, lineHeight: 20, color }}>{children}</Label>
+    <Label style={{ fontSize: phone ? 17 : 15, lineHeight: phone ? 22.1 : 19.5, letterSpacing: -0.17, color }}>
+      {children}
+    </Label>
   )
   return (
     <SceneView
       style={[
         {
           alignSelf: from === 'me' ? 'flex-end' : 'flex-start',
-          maxWidth: '86%',
+          maxWidth: '75%',
           marginBottom: Animated.multiply(tap, 16),
         },
         style,
@@ -215,7 +246,7 @@ export function Bubble({
           style={{
             backgroundColor: fill,
             borderRadius: 18,
-            paddingVertical: 9,
+            paddingVertical: phone ? 7.14 : 6.3,
             paddingHorizontal: 13,
             opacity: p,
             transform: [
@@ -228,7 +259,11 @@ export function Bubble({
             ],
           }}
         >
-          <Swap id={typing ? 'typing' : String(typeof children === 'string' ? children : 'message')} duration={400}>
+          <Swap
+            id={typing ? 'typing' : String(typeof children === 'string' ? children : 'message')}
+            duration={400}
+            style={{ maxWidth: Math.max(1, width * 0.75 - 26) }}
+          >
             {content}
           </Swap>
           {app !== 'chat' && (
@@ -237,6 +272,8 @@ export function Bubble({
               style={{
                 position: 'absolute',
                 bottom: 0,
+                width: 18,
+                height: 16,
                 left: from === 'me' ? undefined : -4,
                 right: from === 'me' ? -4 : undefined,
                 opacity: tailProgress,
@@ -260,8 +297,8 @@ export function Bubble({
               style={{
                 position: 'absolute',
                 bottom: -16,
-                right: from === 'me' ? undefined : -4,
-                left: from === 'me' ? -4 : undefined,
+                right: from === 'me' ? 8 : undefined,
+                left: from === 'me' ? undefined : 8,
                 width: 28,
                 height: 28,
                 borderRadius: 14,
@@ -283,10 +320,11 @@ export function Bubble({
   )
 }
 export function Stamp({ children, style, ...rest }: NativeProps) {
-  const { tokens } = useLook()
+  const { tokens } = useLook(),
+    phone = useContext(PhoneContext)
   return (
     <SceneView {...rest} style={[{ alignItems: 'center', paddingVertical: 10 }, style]}>
-      <Label style={{ color: tokens.muted, fontSize: 10 }}>{children}</Label>
+      <Label style={{ color: tokens.muted, fontSize: phone ? 14 : 11 }}>{children}</Label>
     </SceneView>
   )
 }
@@ -296,11 +334,12 @@ export function Receipt({
   style,
   ...rest
 }: Omit<NativeProps, 'children'> & { show?: boolean; children: string }) {
-  const { tokens } = useLook()
+  const { tokens } = useLook(),
+    phone = useContext(PhoneContext)
   return (
     <Collapse {...rest} open={show} style={style}>
       <View style={{ alignSelf: 'flex-end', paddingTop: 3, paddingRight: 4 }}>
-        <Roll variant="fade" style={{ color: tokens.muted, fontSize: 10 }}>
+        <Roll variant="fade" style={{ color: tokens.muted, fontSize: phone ? 14 : 11 }}>
           {children}
         </Roll>
       </View>
