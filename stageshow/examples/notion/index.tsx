@@ -164,7 +164,7 @@ function Crumb({ compact }: { compact: boolean }) {
   return (
     <span className="nt-crumb">
       {compact && (
-        <ChevronsRight
+        <ChevronsRight data-flip
           size={16}
           strokeWidth={1.75}
           className="nt-ico nt-crumb__toggle"

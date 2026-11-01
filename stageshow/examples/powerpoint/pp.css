@@ -52,8 +52,8 @@
 .pp-tab[data-active]::after {
   content: "";
   position: absolute;
-  left: 0;
-  right: 0;
+  inset-inline-start: 0;
+  inset-inline-end: 0;
   bottom: 3px;
   height: 2px;
   border-radius: 1px;
@@ -164,27 +164,27 @@
   position: relative;
   flex-shrink: 0;
   background: var(--ss-canvas);
-  border-right: 1px solid var(--ss-line);
+  border-inline-end: 1px solid var(--ss-line);
 }
 
 .pp-thumb {
   position: absolute;
-  left: 0;
-  right: 0;
+  inset-inline-start: 0;
+  inset-inline-end: 0;
   display: flex;
   align-items: flex-start;
   gap: 8px;
-  padding-left: 10px;
+  padding-inline-start: 10px;
 }
 
-.pp-window[data-layout="compact"] .pp-thumb { gap: 5px; padding-left: 6px; }
+.pp-window[data-layout="compact"] .pp-thumb { gap: 5px; padding-inline-start: 6px; }
 
 .pp-num {
   width: 10px;
   font-size: 10px;
   line-height: 1.3;
   color: var(--ss-text-faint);
-  text-align: right;
+  text-align: end;
 }
 
 .pp-window[data-layout="compact"] .pp-num { width: 7px; font-size: 9px; }
@@ -222,7 +222,7 @@
 
 .pp-fit {
   position: absolute;
-  left: 0;
+  inset-inline-start: 0;
   top: 0;
   width: 640px;
   height: 360px;
@@ -279,15 +279,15 @@
 .pp-pane {
   position: absolute;
   top: 0;
-  right: 0;
+  inset-inline-end: 0;
   bottom: 0;
   display: flex;
   flex-direction: column;
   gap: 14px;
   padding: 0 16px;
   background: var(--ss-surface);
-  border-left: 1px solid var(--ss-line);
-  transform: translateX(100%);
+  border-inline-start: 1px solid var(--ss-line);
+  transform: translateX(calc(100% * var(--ss-x, 1)));
   transition: transform 0.6s cubic-bezier(0.3, 0.75, 0.1, 1);
 }
 
@@ -319,7 +319,7 @@
   justify-content: center;
   width: 22px;
   height: 22px;
-  margin-right: -4px;
+  margin-inline-end: -4px;
   border-radius: 5px;
   color: var(--ss-icon);
   transition: background 0.15s ease;
@@ -361,12 +361,12 @@
 
 .pp-panel {
   position: absolute;
-  left: 300px;
+  inset-inline-start: 300px;
   top: 0;
   width: 340px;
   height: 360px;
   background: #1f2b3a;
-  transform: translateX(100%);
+  transform: translateX(calc(100% * var(--ss-x, 1)));
   transition: transform var(--move);
 }
 
@@ -393,7 +393,7 @@
 
 .pp-rule {
   position: absolute;
-  left: 336px;
+  inset-inline-start: 336px;
   top: 108px;
   width: 44px;
   height: 4px;
@@ -411,7 +411,7 @@
 
 .pp-title {
   position: absolute;
-  left: 0;
+  inset-inline-start: 0;
   top: 0;
   font-size: 32px;
   font-weight: 600;
@@ -429,7 +429,7 @@
 
 .pp-bullets {
   position: absolute;
-  left: 0;
+  inset-inline-start: 0;
   top: 0;
   display: flex;
   flex-direction: column;
@@ -510,5 +510,5 @@
    row and ribbon start that far in, so they begin in frame with Home, never
    a word sliced at the stage edge. Paste goes to make room. */
 .pp-window[data-layout="compact"] .pp-tabs,
-.pp-window[data-layout="compact"] .pp-ribbon { padding-left: 94px; }
+.pp-window[data-layout="compact"] .pp-ribbon { padding-inline-start: 94px; }
 .pp-window[data-layout="compact"] .pp-ribbon > :first-child { display: none; }

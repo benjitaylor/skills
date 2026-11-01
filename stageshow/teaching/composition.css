@@ -8,21 +8,21 @@
 .tc-lessons .cp-action { display: inline-flex; justify-content: center; align-items: center; flex: none; min-height: 30px; padding: 5px 10px; border-radius: 5px; color: #fff; background: #333; font: 500 11px/20px var(--ss-font); white-space: nowrap; }
 
 .tc-lessons .cp-frame { position: relative; width: 320px; height: 252px; overflow: hidden; background: #f4f4f4; }
-.tc-lessons .cp-export-window { position: absolute; left: 6px; top: 8px; width: 308px; border: 1px solid #e4e4e4; border-radius: 9px; background: #fff; box-shadow: 0 4px 14px #0000000b; }
+.tc-lessons .cp-export-window { position: absolute; inset-inline-start: 6px; top: 8px; width: 308px; border: 1px solid #e4e4e4; border-radius: 9px; background: #fff; box-shadow: 0 4px 14px #0000000b; }
 .tc-lessons .cp-window-bar { position: relative; display: grid; place-items: center; height: 30px; border-bottom: 1px solid #eee; color: #888; font-size: 10px; }
-.tc-lessons .cp-window-dots { position: absolute; top: 12px; left: 11px; display: flex; gap: 4px; }
+.tc-lessons .cp-window-dots { position: absolute; top: 12px; inset-inline-start: 11px; display: flex; gap: 4px; }
 .tc-lessons .cp-window-dots i { width: 6px; height: 6px; border-radius: 50%; background: #d8d8d8; }
 .tc-lessons .cp-export-heading { display: flex; align-items: baseline; justify-content: space-between; padding: 15px 14px 9px; }
 .tc-lessons .cp-export-heading strong { font-weight: 550; color: #333; }
 .tc-lessons .cp-export-heading > span { color: #999; font-size: 10px; }
 .tc-lessons .cp-export-row { display: flex; align-items: center; gap: 9px; margin: 0 14px; padding: 9px 0; border-bottom: 1px solid #f1f1f1; }
 .tc-lessons .cp-export-row small { display: block; color: #999; font-size: 10px; line-height: 14px; }
-.tc-lessons .cp-ready { margin-left: auto; color: #888; font-size: 10px; }
-.tc-lessons .cp-export-status { position: absolute; top: 53px; left: 186px; width: 146px; padding: 10px 11px 10px 27px; border-radius: 7px; background: #fff; color: #555; box-shadow: 0 3px 12px #0000001c, 0 0 0 1px #e8e8e8; font-size: 11px; line-height: 16px; }
+.tc-lessons .cp-ready { margin-inline-start: auto; color: #888; font-size: 10px; }
+.tc-lessons .cp-export-status { position: absolute; top: 53px; inset-inline-start: 186px; width: 146px; padding-block: 10px; padding-inline: 27px 11px; border-radius: 7px; background: #fff; color: #555; box-shadow: 0 3px 12px #0000001c, 0 0 0 1px #e8e8e8; font-size: 11px; line-height: 16px; }
 .tc-lessons .cp-export-status small { display: block; color: #999; font-size: 10px; }
-.tc-lessons .cp-status-dot { position: absolute; left: 12px; top: 15px; width: 6px; height: 6px; border-radius: 50%; background: #65947a; }
-.tc-lessons .cp-frame[data-good] .cp-export-window { left: 22px; top: 78px; width: 276px; }
-.tc-lessons .cp-frame[data-good] .cp-export-status { top: 16px; left: 150px; width: 146px; }
+.tc-lessons .cp-status-dot { position: absolute; inset-inline-start: 12px; top: 15px; width: 6px; height: 6px; border-radius: 50%; background: #65947a; }
+.tc-lessons .cp-frame[data-good] .cp-export-window { inset-inline-start: 22px; top: 78px; width: 276px; }
+.tc-lessons .cp-frame[data-good] .cp-export-status { top: 16px; inset-inline-start: 150px; width: 146px; }
 
 .tc-lessons .cp-anatomy { width: 284px; padding: 16px; border: 1px solid #e9e9e9; border-radius: 8px; background: #fff; }
 .tc-lessons .cp-project-head { display: flex; align-items: center; gap: 12px; }
@@ -30,7 +30,7 @@
 .tc-lessons .cp-project-head h3, .tc-lessons .cp-project-head p { font-size: 12px; font-weight: 400; color: #777; line-height: 18px; }
 .tc-lessons .cp-project-rows { display: grid; gap: 10px; margin: 18px 0; color: #777; }
 .tc-lessons .cp-project-rows > div { display: flex; align-items: center; gap: 15px; }
-.tc-lessons .cp-project-rows > div:last-child { padding-left: 7px; gap: 31px; }
+.tc-lessons .cp-project-rows > div:last-child { padding-inline-start: 7px; gap: 31px; }
 .tc-lessons .cp-project-rows small { font-size: 12px; color: #777; }
 .tc-lessons .cp-project-foot { display: flex; flex-direction: column; align-items: center; gap: 7px; color: #777; font-size: 12px; }
 .tc-lessons .cp-anatomy[data-good] .cp-project-head { align-items: flex-start; gap: 10px; }
@@ -80,11 +80,11 @@
 .tc-lessons .cp-symbol { display: block; flex: none; color: inherit; }
 .tc-lessons .cp-symbol path { fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
 .tc-lessons .cp-edges { position: relative; width: 320px; height: 252px; }
-.tc-lessons .cp-sync-panel { position: absolute; left: 18px; top: 24px; width: 264px; padding: 16px; border: 1px solid #e5e5e5; border-radius: 9px; background: #fff; }
+.tc-lessons .cp-sync-panel { position: absolute; inset-inline-start: 18px; top: 24px; width: 264px; padding: 16px; border: 1px solid #e5e5e5; border-radius: 9px; background: #fff; }
 .tc-lessons .cp-sync-panel h3 { margin-bottom: 14px; }
 .tc-lessons .cp-sync-panel > div { display: flex; justify-content: space-between; align-items: baseline; padding: 8px 0; }
 .tc-lessons .cp-sync-panel small { color: #888; font-size: 10px; }
-.tc-lessons .cp-sync-status { position: absolute; left: 156px; top: 161px; display: flex; align-items: center; gap: 7px; padding: 11px 12px; border: 1px solid #e5e5e5; border-radius: 7px; background: #fff; box-shadow: 0 3px 8px #00000008; font-size: 11px; white-space: nowrap; }
+.tc-lessons .cp-sync-status { position: absolute; inset-inline-start: 156px; top: 161px; display: flex; align-items: center; gap: 7px; padding: 11px 12px; border: 1px solid #e5e5e5; border-radius: 7px; background: #fff; box-shadow: 0 3px 8px #00000008; font-size: 11px; white-space: nowrap; }
 .tc-lessons .cp-sync-status .cp-symbol { width: 15px; height: 15px; color: #698471; }
 .tc-lessons .cp-edges[data-good] .cp-sync-status { top: 176px; }
 
@@ -94,7 +94,7 @@
 .tc-lessons .cp-preference-row { display: flex; justify-content: space-between; align-items: center; height: 33px; gap: 12px; }
 .tc-lessons .cp-preference-row small { color: #888; font-size: 10px; }
 .tc-lessons .cp-toggle { width: 26px; height: 16px; padding: 2px; border-radius: 10px; background: #6e8474; }
-.tc-lessons .cp-toggle i { display: block; width: 12px; height: 12px; margin-left: 10px; border-radius: 50%; background: #fff; }
+.tc-lessons .cp-toggle i { display: block; width: 12px; height: 12px; margin-inline-start: 10px; border-radius: 50%; background: #fff; }
 .tc-lessons .cp-preferences > .cp-action { width: 100%; margin-top: 12px; }
 .tc-lessons .cp-nesting[data-good] { padding: 12px; }
 .tc-lessons .cp-nesting[data-good] .cp-preferences { padding: 14px; }
@@ -135,7 +135,7 @@
 .tc-lessons .cp-icon-list { width: 284px; padding: 16px; border: 1px solid #e9e9e9; border-radius: 8px; background: #fff; }
 .tc-lessons .cp-icon-list h3 { margin-bottom: 12px; }
 .tc-lessons .cp-icon-row { display: flex; align-items: center; gap: 9px; height: 38px; }
-.tc-lessons .cp-icon-row small { margin-left: auto; color: #888; font-size: 10px; }
+.tc-lessons .cp-icon-row small { margin-inline-start: auto; color: #888; font-size: 10px; }
 .tc-lessons .cp-icon-slot { display: grid; place-items: center; width: 22px; height: 22px; color: #777; }
 .tc-lessons .cp-icon-inbox .cp-symbol { width: 17px; height: 17px; }
 .tc-lessons .cp-icon-inbox .cp-symbol path { fill: currentColor; stroke: none; fill-rule: evenodd; }
@@ -168,7 +168,7 @@
 .tc-lessons .cp-product { width: 284px; border: 1px solid #e5e5e5; border-radius: 8px; background: #fff; overflow: hidden; }
 .tc-lessons .cp-product-top { position: relative; display: flex; align-items: center; justify-content: center; height: 36px; border-bottom: 1px solid #e9e9e9; background: #f6f6f6; }
 .tc-lessons .cp-product-top h3 { font-size: 11px; font-weight: 450; }
-.tc-lessons .cp-product-top .cp-window-dots { top: 15px; left: 12px; }
+.tc-lessons .cp-product-top .cp-window-dots { top: 15px; inset-inline-start: 12px; }
 .tc-lessons .cp-document { display: flex; align-items: center; justify-content: center; gap: 7px; height: 32px; margin: 10px 12px; border: 1px solid #e6e6e6; border-radius: 5px; background: #fafafa; font-size: 11px; }
 .tc-lessons .cp-document .cp-file { width: 12px; height: 14px; }
 .tc-lessons .cp-permission { display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 9px; padding: 10px 12px 18px; }
@@ -191,5 +191,5 @@
 
 /* Unread gutter: an inbox with two unread rows */
 .tc-lessons .cp-inbox { width: 100%; padding: 12px 8px; background: #fff; border-radius: 10px; }
-.tc-lessons .cp-inbox[data-shove] .ss-row[data-unread] { padding-left: 20px; }
-.tc-lessons .cp-inbox h3 { margin: 0 0 6px; padding-left: 12px; font: 600 13px/18px var(--ss-font); color: #2b3238; }
+.tc-lessons .cp-inbox[data-shove] .ss-row[data-unread] { padding-inline-start: 20px; }
+.tc-lessons .cp-inbox h3 { margin: 0 0 6px; padding-inline-start: 12px; font: 600 13px/18px var(--ss-font); color: #2b3238; }

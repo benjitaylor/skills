@@ -111,7 +111,7 @@
   & .rb-picture--hero,
   & .rb-picture--restore,
   & .rb-picture--map {
-    left: 0;
+    inset-inline-start: 0;
     width: 100%;
   }
 
@@ -123,7 +123,7 @@
     -webkit-mask-image: linear-gradient(90deg, transparent calc(50% - var(--half)), #000 calc(50% - var(--half) + 72px), #000 calc(50% + var(--half) - 72px), transparent calc(50% + var(--half)));
     mask-image: linear-gradient(90deg, transparent calc(50% - var(--half)), #000 calc(50% - var(--half) + 72px), #000 calc(50% + var(--half) - 72px), transparent calc(50% + var(--half)));
     width: 1200px;
-    margin-left: -600px;
+    margin-inline-start: -600px;
   }
 
   & .rb-stage .ss-stage {
@@ -136,7 +136,7 @@
   & .rb-term {
     position: absolute;
     top: 18px;
-    left: var(--pad);
+    inset-inline-start: var(--pad);
     width: calc(100% + 40px);
     height: 330px;
     --ss-term-bg: #141518;
@@ -214,7 +214,7 @@
   & .rb-count .ss-count {
     display: inline-block;
     min-width: 2ch;
-    text-align: right;
+    text-align: end;
   }
 
   /* ---- Reads (stat) ---- */
@@ -254,7 +254,7 @@
   }
 
   & .rb-stat-unit {
-    margin-left: 4px;
+    margin-inline-start: 4px;
     font-size: 40px;
     letter-spacing: -0.02em;
     color: var(--ink-2);
@@ -313,14 +313,15 @@
     align-items: center;
     gap: 6px;
     height: 24px;
-    padding: 0 9px 0 8px;
+    padding-block: 0;
+    padding-inline: 8px 9px;
     border-radius: 12px;
     background: var(--panel);
     box-shadow: inset 0 0 0 1px var(--panel-edge);
     font: 500 11px/1 var(--ss-mono);
     color: #b4b7be;
     /* Centered on its point by the dot, not the pill */
-    transform: translate(-14px, -50%);
+    transform: translate(calc(-14px * var(--ss-x, 1)), -50%);
   }
 
   & .rb-node__dot {
@@ -351,7 +352,7 @@
   & .rb-restore {
     position: absolute;
     top: 6px;
-    left: var(--pad);
+    inset-inline-start: var(--pad);
     box-sizing: border-box;
     width: calc(100% + 40px);
     height: 250px;
@@ -413,7 +414,7 @@
 
   & .rb-restore .rb-track {
     /* Stop the track short of the crop so its end reads as now */
-    margin-right: calc(var(--pad) + 40px);
+    margin-inline-end: calc(var(--pad) + 40px);
   }
 
   & .rb-track__bar {
@@ -431,9 +432,9 @@
     position: absolute;
     top: -22px;
     bottom: 0;
-    left: calc(var(--cell-w) * (var(--drop) + 1.5) - var(--gutter) / 2);
+    inset-inline-start: calc(var(--cell-w) * (var(--drop) + 1.5) - var(--gutter) / 2);
     width: 2px;
-    margin-left: -1px;
+    margin-inline-start: -1px;
     border-radius: 1px;
     background: #f0605a;
   }
@@ -441,7 +442,7 @@
   & .rb-event__tag {
     position: absolute;
     top: -26px;
-    left: 8px;
+    inset-inline-start: 8px;
     height: 20px;
     padding: 0 7px;
     border-radius: 6px;
@@ -451,16 +452,16 @@
     white-space: nowrap;
   }
 
-  & .rb-restore[data-layout="wide"] .rb-event__tag { left: auto; right: 8px; }
+  & .rb-restore[data-layout="wide"] .rb-event__tag { inset-inline-start: auto; inset-inline-end: 8px; }
 
   /* The handle: starts at now, slides back to just before the drop */
   & .rb-handle {
     position: absolute;
     top: -14px;
     bottom: -6px;
-    left: 100%;
+    inset-inline-start: 100%;
     width: 2px;
-    margin-left: -1px;
+    margin-inline-start: -1px;
     border-radius: 1px;
     background: var(--accent);
     will-change: transform;
@@ -474,14 +475,14 @@
     left: 50%;
     width: 12px;
     height: 12px;
-    margin-left: -6px;
+    margin-inline-start: -6px;
     border-radius: 6px;
     background: var(--accent);
     box-shadow: 0 0 0 3px var(--panel);
   }
 
   & .rb-restore[data-on] .rb-handle {
-    left: calc(var(--cell-w) * var(--drop) - var(--gutter) / 2);
+    inset-inline-start: calc(var(--cell-w) * var(--drop) - var(--gutter) / 2);
   }
 
   & .rb-axis {
@@ -493,12 +494,12 @@
   }
 
   & .rb-restore .rb-axis {
-    margin-right: calc(var(--pad) + 40px);
+    margin-inline-end: calc(var(--pad) + 40px);
   }
 
   & .rb-axis span {
     position: absolute;
-    left: calc((100% + 3px) / var(--n) * var(--at));
+    inset-inline-start: calc((100% + 3px) / var(--n) * var(--at));
   }
 
   /* ---- Drivers (collection) ---- */

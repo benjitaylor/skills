@@ -1,0 +1,285 @@
+/* All rules belong to this example, including its responsive variants.
+   Logical properties only: inline-start is the right in this rtl scene, and
+   the same file lays out an ltr copy without a change (references/rtl.md). */
+.co {
+  & .ss-stage {
+    --ss-accent: #0e7a56;
+    --ss-accent-2: #17946b;
+    --ss-accent-soft: rgba(14, 122, 86, 0.12);
+    /* The sheet rising: quick off the start, a long soft settle, as iOS does */
+    --co-sheet: cubic-bezier(0.3, 0.75, 0.1, 1);
+    overflow: hidden;
+    border-radius: 14px;
+    background: #f3f3f0;
+  }
+
+  .co-wash {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(60% 50% at 50% 0%, rgba(23, 148, 107, 0.14), transparent 70%),
+      radial-gradient(70% 60% at 50% 100%, rgba(23, 148, 107, 0.08), transparent 70%);
+  }
+
+  /* Pinned, bottom bleed: a gutter from the top, centered, off the bottom */
+  .co-phone {
+    position: absolute;
+    top: 48px;
+    inset-inline-start: 50px;
+  }
+
+  /* ---- The store page behind ---- */
+
+  .co-store {
+    position: absolute;
+    inset: 0;
+    background: #f2f2f7;
+    transition: opacity 0.6s ease;
+  }
+
+  .co-store[data-back] {
+    opacity: 0.5;
+  }
+
+  .co-store__head {
+    position: absolute;
+    top: 74px;
+    inset-inline: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .co-store__bag {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #e3e3e8;
+  }
+
+  .co-store__hero {
+    position: absolute;
+    top: 128px;
+    inset-inline: 16px;
+    height: 130px;
+    border-radius: 22px;
+    background: linear-gradient(135deg, #cfe6db, #e9d9c0);
+  }
+
+  .co-store__grid {
+    position: absolute;
+    top: 296px;
+    inset-inline: 16px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+
+  .co-store__item {
+    display: grid;
+    gap: 7px;
+    padding: 10px;
+    border-radius: 18px;
+    background: #fff;
+  }
+
+  .co-store__art {
+    height: 110px;
+    margin-bottom: 4px;
+    border-radius: 12px;
+    background: #ece7dd;
+  }
+
+  .co-store__art[data-i="1"] { background: #dbe9e2; }
+  .co-store__art[data-i="2"] { background: #e8e1ef; }
+  .co-store__art[data-i="3"] { background: #f0e4d6; }
+
+  /* ---- The checkout sheet ---- */
+
+  .co-sheet {
+    position: absolute;
+    top: 182px;
+    bottom: 0;
+    inset-inline: 0;
+    z-index: 1;
+    padding-inline: 20px;
+    border-radius: 34px 34px 0 0;
+    background: #fff;
+    box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.08);
+    transform: translateY(105%);
+    transition: transform 0.62s var(--co-sheet);
+    /* A layer of its own for good, so its text never hops as it lands */
+    will-change: transform;
+  }
+
+  .co-sheet[data-open] {
+    transform: none;
+  }
+
+  .co-sheet__grab {
+    display: block;
+    width: 36px;
+    height: 5px;
+    margin: 7px auto 0;
+    border-radius: 3px;
+    background: #d6d6db;
+  }
+
+  .co-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 12px;
+  }
+
+  .co-title {
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 30px;
+    color: #000;
+  }
+
+  .co-close {
+    display: grid;
+    place-items: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: #ececf0;
+    color: #6b6b70;
+  }
+
+  .co-items {
+    display: grid;
+    gap: 12px;
+    margin-top: 20px;
+  }
+
+  .co-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .co-item__art {
+    width: 46px;
+    height: 46px;
+    flex-shrink: 0;
+    border-radius: 12px;
+    background: #ece7dd;
+  }
+
+  .co-item__art[data-i="1"] {
+    background: #dbe9e2;
+  }
+
+  .co-item__text {
+    display: grid;
+    flex: 1;
+    gap: 7px;
+  }
+
+  .co-total {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid #ececf0;
+  }
+
+  .co-total__label {
+    font-size: 17px;
+    font-weight: 500;
+    color: #3c3c43;
+  }
+
+  .co-total__value {
+    font-size: 26px;
+    font-weight: 700;
+    color: #000;
+  }
+
+  .co-method {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 18px;
+    padding: 12px 14px;
+    border-radius: 16px;
+    background: #f5f5f7;
+  }
+
+  .co-method__card {
+    flex: 1;
+    font-size: 16px;
+    font-weight: 500;
+    color: #1c1c1e;
+  }
+
+  .co-method__go {
+    color: #a1a1a6;
+  }
+
+  .co-pay {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 54px;
+    margin-top: 18px;
+    border-radius: 27px;
+    background: var(--ss-accent);
+    color: #fff;
+    font-size: 18px;
+    font-weight: 600;
+    transition: background-color 0.35s ease;
+  }
+
+  .co-pay[data-phase="paid"] {
+    background: var(--ss-accent-2);
+  }
+
+  .co-pay .ss-states__item {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .co-note {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 16px;
+    color: #b0b0b5;
+  }
+
+  /* Toggled rather than mounted: it drops in and rises away on one transition */
+  .co-banner {
+    animation: none;
+    opacity: 0;
+    transform: translateY(-120px);
+    transition: transform 0.52s cubic-bezier(0.2, 0.9, 0.25, 1), opacity 0.3s ease;
+  }
+
+  .co-banner[data-show] {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* Arabic sets small at the same size as Latin: its letters sit lower and
+     narrower. A one-word label this small takes a step up to stay legible */
+  .co-banner .ss-notification__time {
+    font-size: 15px;
+  }
+
+  .co-banner .ss-notification__icon {
+    background: #1b3f6b;
+  }
+
+  /* Narrow: the phone at its compact width, a gutter in from the start */
+  & .ss-stage[data-layout="compact"] .co-phone {
+    top: 16px;
+    inset-inline-start: 16px;
+  }
+}

@@ -8,7 +8,7 @@
   .fd-window {
     position: absolute;
     top: 24px;
-    left: 24px;
+    inset-inline-start: 24px;
     width: 560px;
     height: 340px;
     box-shadow: var(--ss-shadow-hero);
@@ -21,7 +21,7 @@
   .fd-head {
     display: grid;
     grid-template-columns: repeat(5, 104px);
-    margin-left: 52px;
+    margin-inline-start: 52px;
     padding: 10px 0 8px;
     border-bottom: 1px solid var(--ss-line);
     font: 500 11px/1 var(--ss-font);
@@ -29,7 +29,7 @@
   }
 
   .fd-head span {
-    padding-left: 6px;
+    padding-inline-start: 6px;
   }
 
   .fd-body {
@@ -43,7 +43,7 @@
     padding: 0 8px;
     font: 500 10px/1 var(--ss-font);
     color: var(--ss-text-faint);
-    text-align: right;
+    text-align: end;
   }
 
   .fd-hours span {
@@ -71,7 +71,7 @@
   .fd-target {
     position: absolute;
     top: 0;
-    left: 0;
+    left: 0; /* physical: moved by a translate from measured x */
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.12s ease;
@@ -83,13 +83,13 @@
   .fd-card {
     position: absolute;
     top: 0;
-    left: 0;
+    left: 0; /* physical: moved by a translate from measured x */
     z-index: 10;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     padding: 7px 8px;
-    border-left: 3px solid var(--ss-accent);
+    border-inline-start: 3px solid var(--ss-accent);
     border-radius: 6px;
     background: color-mix(in srgb, var(--ss-accent) 12%, var(--ss-surface));
     font: 600 11px/1.3 var(--ss-font);
@@ -114,7 +114,7 @@
   }
 
   .fd-card__people .ss-avatar + .ss-avatar {
-    margin-left: -4px;
+    margin-inline-start: -4px;
     box-shadow: 0 0 0 1.5px var(--ss-surface);
   }
 
@@ -124,8 +124,8 @@
 
   /* The phone is a closer calendar viewport, not a smaller calendar. The two
      days involved in the drag stay fully visible; neighboring days bleed. */
-  & .ss-stage[data-layout='compact'] .fd-window { left: 16px; top: 16px; }
-  & .ss-stage[data-layout='compact'] .fd-head { transform: translateX(-104px); }
-  & .ss-stage[data-layout='compact'] .fd-grid { margin-left: -104px; }
+  & .ss-stage[data-layout='compact'] .fd-window { inset-inline-start: 16px; top: 16px; }
+  & .ss-stage[data-layout='compact'] .fd-head { transform: translateX(calc(-104px * var(--ss-x, 1))); }
+  & .ss-stage[data-layout='compact'] .fd-grid { margin-inline-start: -104px; }
   & .ss-stage[data-layout='compact'] .fd-hours { position: relative; z-index: 1; flex: none; background: var(--ss-surface); }
 }

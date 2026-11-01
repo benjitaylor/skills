@@ -7,7 +7,7 @@
 .ov-win {
   position: absolute;
   top: 32px;
-  left: 120px;
+  inset-inline-start: 120px;
   width: 480px;
   height: 420px;
 }
@@ -24,7 +24,7 @@
   align-content: start;
   gap: 12px;
   padding: 18px 16px;
-  border-right: 1px solid var(--ss-line);
+  border-inline-end: 1px solid var(--ss-line);
   background: var(--ss-well);
 }
 
@@ -64,7 +64,7 @@
 .ov-card {
   position: absolute;
   top: 112px;
-  left: 32px;
+  inset-inline-start: 32px;
   width: 214px;
   display: grid;
   gap: 4px;
@@ -115,16 +115,17 @@
 /* Narrow: the window moves in, a narrower sidebar, and the card's right edge
    stops 24px short of its line (90 + 120 = 210) */
 .ov .ss-stage[data-layout='compact'] .ov-win {
-  left: 90px;
+  inset-inline-start: 90px;
   width: 280px;
 }
 
 .ov .ss-stage[data-layout='compact'] .ov-main {
-  padding: 18px 28px 18px 16px;
+  padding-block: 18px;
+  padding-inline: 16px 28px;
 }
 
 .ov .ss-stage[data-layout='compact'] .ov-card {
-  left: 16px;
+  inset-inline-start: 16px;
   width: 170px;
   padding: 16px 14px 16px;
 }

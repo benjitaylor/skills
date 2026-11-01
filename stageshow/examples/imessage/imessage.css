@@ -70,11 +70,11 @@
 }
 
 .im-back {
-  left: 8px;
+  inset-inline-start: 8px;
 }
 
 .im-video {
-  right: 18px;
+  inset-inline-end: 18px;
   top: 26px;
 }
 
@@ -108,7 +108,8 @@
   flex: 1;
   /* Older messages pass under the translucent bar instead of being cut */
   overflow: visible;
-  padding: 0 18px 10px 16px;
+  padding-block: 0 10px;
+  padding-inline: 16px 18px;
 }
 
 .im-thread .ss-stamp {
@@ -131,7 +132,8 @@
   flex: none;
   align-items: center;
   gap: 9px;
-  padding: 6px 12px 8px 10px;
+  padding-block: 6px 8px;
+  padding-inline: 10px 12px;
 }
 
 .im-plus {
@@ -151,7 +153,8 @@
   flex: 1;
   align-items: center;
   height: 36px;
-  padding: 0 4px 0 14px;
+  padding-block: 0;
+  padding-inline: 14px 4px;
   border: 1px solid #d4d4d8;
   border-radius: 18px;
 }
@@ -181,7 +184,7 @@
 }
 
 .im-field__ph {
-  margin-left: -4px;
+  margin-inline-start: -4px;
 }
 
 .im-caret[data-solid] {
@@ -198,7 +201,7 @@
 .im-send {
   position: absolute;
   top: 3px;
-  right: 3px;
+  inset-inline-end: 3px;
   display: grid;
   place-items: center;
   width: 28px;

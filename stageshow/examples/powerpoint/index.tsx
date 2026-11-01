@@ -319,7 +319,7 @@ export default function PowerPointDemo() {
         const g = G[layout]
         const f = fit(layout, s.pane)
         return (
-          <Window title="Team Offsite" className="pp-window" data-layout={layout} style={{ left: g.win.x, top: g.win.y, width: g.win.w, height: g.win.h }}>
+          <Window title="Team Offsite" className="pp-window" data-layout={layout} style={{ insetInlineStart: g.win.x, top: g.win.y, width: g.win.w, height: g.win.h }}>
             <Tabs layout={layout} />
             <Ribbon layout={layout} open={s.pane} />
             <div className="pp-main">
@@ -327,14 +327,15 @@ export default function PowerPointDemo() {
                 {[1, 2, 3, 4, 5, 6].map((n, i) => (
                   <div key={n} className="pp-thumb" style={{ top: 12 + i * g.step }}>
                     <span className="pp-num">{n}</span>
-                    <div className="pp-thumb-box" data-target={`thumb-${n}`} data-selected={s.slide === n || undefined}>
+                    <div className="pp-thumb-box" dir="ltr" data-target={`thumb-${n}`} data-selected={s.slide === n || undefined}>
                       <Mini n={n} design={n === 2 ? s.design : 'plain'} width={g.thumb} />
                     </div>
                   </div>
                 ))}
               </aside>
               <div className="pp-work" data-crop>
-                <div className="pp-canvas" data-crop style={{ height: g.canvas }}>
+                {/* A slide is a document with its own direction (this deck is English), so its fitted canvas keeps it */}
+                <div className="pp-canvas" dir="ltr" data-crop style={{ height: g.canvas }}>
                   <div className="pp-fit" style={{ transform: `translate(${f.x}px, ${f.y}px) scale(${f.k})` }}>
                     {[1, 2].map((n) => (
                       <div key={n} className="pp-page" data-on={s.slide === n || undefined}>

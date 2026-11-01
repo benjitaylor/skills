@@ -90,7 +90,7 @@
 
 .pt-rest {
   position: absolute;
-  right: 28px;
+  inset-inline-end: 28px;
   bottom: 22px;
 }
 

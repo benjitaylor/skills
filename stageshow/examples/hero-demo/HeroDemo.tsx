@@ -1,4 +1,4 @@
-import { Bar, Stage, Text, Window, between, box, contains, inset, type Act, type Point, type Rect, States } from '../../kit'
+import { Bar, Stage, Text, Window, between, box, contains, inset, fromStart, sign, type Act, type Point, type Rect, States } from '../../kit'
 import { Icon } from './icons'
 import './hero.css'
 
@@ -88,14 +88,16 @@ async function script(a: Act<S>) {
   await a.set({ highlight: false })
   await a.wait(100)
   const btn = a.rect('export')
-  await annotate(a, 'button.export-btn', 'blue', { x: btn.x + btn.width / 2 - 80, y: btn.y + btn.height + 10 }, 'Change to primary style')
+  await annotate(a, 'button.export-btn', 'blue', { x: btn.x + btn.width / 2 - 80 * sign(a.dir), y: btn.y + btn.height + 10 }, 'Change to primary style')
   await a.set({ m3: { at: a.center('export'), show: true } })
   await a.wait(600)
 
-  // 2. Drag over an area
+  // 2. Drag over an area, from its far bottom corner back to its near top
+  // one (bottom right to top left in ltr; mirrored in rtl)
   const icons = a.rect('icons')
-  const from = { x: icons.x + icons.width + 2, y: icons.y + icons.height + 2 }
-  const to = { x: icons.x - 2, y: icons.y - 2 }
+  const k = sign(a.dir)
+  const from = { x: (k > 0 ? icons.x + icons.width : icons.x) + 2 * k, y: icons.y + icons.height + 2 }
+  const to = { x: (k > 0 ? icons.x : icons.x + icons.width) - 2 * k, y: icons.y - 2 }
   await a.move(from)
   await a.wait(150)
   await a.drag(to, (at) => {
@@ -105,21 +107,25 @@ async function script(a: Act<S>) {
   })
   await a.wait(200)
   await a.set({ dragging: false, picked: [], area: { r: between(from, to), show: true } })
-  await annotate(a, 'Sidebar icons', 'green', { x: to.x + 110, y: (from.y + to.y) / 2 - 40 }, 'Add hover states')
+  await annotate(a, 'Sidebar icons', 'green', { x: to.x + 110 * k, y: (from.y + to.y) / 2 - 40 }, 'Add hover states')
   await a.set({ m4: { at: { x: from.x, y: to.y }, show: true } })
   await a.wait(400)
 
   // 3. Select text
   const title = a.rect('title')
   const y = title.y + title.height / 2
-  await a.move({ x: title.x, y })
+  // From the title's first letter to its last: left to right in ltr text,
+  // right to left in rtl, the highlight growing from where it began
+  const first = k > 0 ? title.x : title.x + title.width
+  const last = k > 0 ? title.x + title.width : title.x
+  await a.move({ x: first, y })
   await a.wait(150)
-  await a.drag({ x: title.x + title.width, y }, (at) =>
-    a.put({ selection: { x: title.x, y: title.y - 2, width: at.x - title.x, height: 16 } }),
+  await a.drag({ x: last, y }, (at) =>
+    a.put({ selection: { x: Math.min(first, at.x), y: title.y - 2, width: Math.abs(at.x - first), height: 16 } }),
   )
   await a.wait(200)
   await annotate(a, `"${TITLE}"`, 'orange', { x: Math.max(100, title.x + title.width / 2), y: title.y + title.height + 7 }, 'Make this more prominent')
-  await a.set({ selection: null, m5: { at: { x: title.x + title.width + 2, y }, show: true } })
+  await a.set({ selection: null, m5: { at: { x: last + 2 * k, y }, show: true } })
   await a.wait(400)
 
   // Copy, then paste into the agent
@@ -145,8 +151,8 @@ async function script(a: Act<S>) {
 
 export function HeroDemo() {
   return (
-    <Stage width={720} height={340} compact={{ below: 600, width: 358, height: 400 }} initial={initial} poster={POSTER} script={script} cursor={{ at: REST }} className="hd">
-      {(s, rect, layout) => (
+    <Stage width={720} height={340} compact={{ below: 600, width: 358, height: 400 }} initial={initial} poster={POSTER} script={script} cursor={{ at: 'rest' }} className="hd">
+      {(s, rect, layout, dir) => (
         <>
           <Window url="localhost:3000" className="hd-browser" data-cursor={s.toolbar ? 'crosshair' : 'pointer'} receded={s.terminal}>
             <div className="hd-content">
@@ -226,10 +232,10 @@ export function HeroDemo() {
           <div className="hd-area" data-show={s.area.show} style={box(s.area.r)} />
           {s.selection && <div className="hd-selection" style={{ left: s.selection.x, top: s.selection.y, width: s.selection.width }} />}
 
-          <div className="hd-marker" data-show style={{ left: rect('metric-0').x + 28, top: rect('metric-0').y + 14 }}>
+          <div className="hd-marker" data-show style={{ left: fromStart(rect('metric-0'), 28, 14, dir).x, top: rect('metric-0').y + 14 }}>
             1
           </div>
-          <div className="hd-marker" data-show style={{ left: rect('row-0').x + 140, top: rect('row-0').y + 10 }}>
+          <div className="hd-marker" data-show style={{ left: fromStart(rect('row-0'), 140, 10, dir).x, top: rect('row-0').y + 10 }}>
             2
           </div>
           <div className="hd-marker" data-show={s.m3.show} style={{ left: s.m3.at.x, top: s.m3.at.y }}>
@@ -264,7 +270,7 @@ export function HeroDemo() {
               <span style={{ opacity: 0.4 }}>█</span>
             </div>
           </Window>
-          <span data-target="rest" style={{ position: 'absolute', ...{ left: REST[layout].x, top: REST[layout].y } }} />
+          <span data-target="rest" style={{ position: 'absolute', ...{ insetInlineStart: REST[layout].x, top: REST[layout].y } }} />
         </>
       )}
     </Stage>

@@ -26,7 +26,7 @@
   .sp-balance {
     position: absolute;
     top: 40px;
-    left: 170px;
+    inset-inline-start: 170px;
     display: grid;
     gap: 10px;
     width: 300px;
@@ -38,7 +38,7 @@
     opacity: 0;
     --sp-x: 0px;
     --sp-y: 24px;
-    transform: translate(var(--sp-x), var(--sp-y));
+    transform: translate(calc(var(--sp-x) * var(--ss-x, 1)), var(--sp-y));
     align-content: start;
     /* A retained layer carries the type through both the rise and travel. */
     will-change: transform;
@@ -106,7 +106,7 @@
   .sp-instant {
     position: absolute;
     top: 40px;
-    left: 364px;
+    inset-inline-start: 364px;
     display: grid;
     gap: 16px;
     width: 236px;
@@ -115,7 +115,7 @@
     background: var(--ss-raised);
     box-shadow: var(--ss-shadow-satellite);
     opacity: 0;
-    transform: translateX(32px);
+    transform: translateX(calc(32px * var(--ss-x, 1)));
     will-change: transform;
     transition: opacity 0.8s ease 0.2s, transform 1.1s var(--sp-ease) 0.2s;
   }
@@ -231,9 +231,9 @@
   .sp-note[data-in] { opacity: 1; transform: translateY(0); transition-timing-function: ease, cubic-bezier(0.25, 0.8, 0.25, 1); }
 
   /* The payout sits below its source on the phone; type remains at design size. */
-  & .ss-stage[data-layout='compact'] .sp-balance { left: 16px; top: 24px; width: 326px; height: 640px; }
+  & .ss-stage[data-layout='compact'] .sp-balance { inset-inline-start: 16px; top: 24px; width: 326px; height: 640px; }
   & .ss-stage[data-layout='compact'] .sp-balance[data-aside] { --sp-x: 0px; }
-  & .ss-stage[data-layout='compact'] .sp-instant { left: 40px; top: 302px; width: 302px; }
+  & .ss-stage[data-layout='compact'] .sp-instant { inset-inline-start: 40px; top: 302px; width: 302px; }
   & .ss-stage[data-layout='compact'] .sp-row:nth-last-child(-n + 2) { display: none; }
 }
 

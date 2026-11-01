@@ -38,7 +38,7 @@
 
 .sl-win {
   position: absolute;
-  left: 40px;
+  inset-inline-start: 40px;
   top: 40px;
   width: 860px;
   height: 560px;
@@ -60,7 +60,7 @@
 .sl-top__nav {
   display: flex;
   gap: 12px;
-  margin-left: 26px;
+  margin-inline-start: 26px;
 }
 
 .sl-top__search {
@@ -73,7 +73,7 @@
   gap: 7px;
   width: 380px;
   height: 24px;
-  margin-left: -190px;
+  margin-inline-start: -190px;
   border-radius: 6px;
   background: var(--sl-aub-raise);
   color: var(--sl-on-aub);
@@ -160,7 +160,7 @@
 
 .sl-rail__status {
   position: absolute;
-  right: -3px;
+  inset-inline-end: -3px;
   bottom: -3px;
   width: 12px;
   height: 12px;
@@ -192,7 +192,8 @@
   display: flex;
   flex: 1;
   min-width: 0;
-  margin: 0 6px 6px 0;
+  margin-block: 0 6px;
+  margin-inline: 0 6px;
   overflow: hidden;
   border-radius: 8px;
   background: #fff;
@@ -213,7 +214,8 @@
   align-items: center;
   gap: 4px;
   height: 49px;
-  padding: 0 4px 0 10px;
+  padding-block: 0;
+  padding-inline: 10px 4px;
   color: #fff;
 }
 
@@ -289,7 +291,8 @@
   gap: 8px;
   flex-shrink: 0;
   height: 49px;
-  padding: 0 12px 0 18px;
+  padding-block: 0;
+  padding-inline: 18px 12px;
 }
 
 .sl-channel__title {
@@ -302,7 +305,7 @@
 }
 
 .sl-channel__title .sl-i:last-child {
-  margin-left: 2px;
+  margin-inline-start: 2px;
   color: var(--sl-ink-2);
 }
 
@@ -311,7 +314,8 @@
   align-items: center;
   gap: 6px;
   height: 28px;
-  padding: 0 8px 0 4px;
+  padding-block: 0;
+  padding-inline: 4px 8px;
   border: 1px solid var(--sl-line-2);
   border-radius: 6px;
 }
@@ -326,7 +330,7 @@
 }
 
 .sl-members__faces .sl-face + .sl-face {
-  margin-left: -5px;
+  margin-inline-start: -5px;
 }
 
 .sl-members__count {
@@ -400,8 +404,8 @@
 .sl-divider::before {
   content: '';
   position: absolute;
-  left: 20px;
-  right: 20px;
+  inset-inline-start: 20px;
+  inset-inline-end: 20px;
   top: 50%;
   border-top: 1px solid var(--sl-line);
 }
@@ -495,7 +499,8 @@
   align-items: center;
   gap: 5px;
   height: 24px;
-  padding: 0 9px 0 7px;
+  padding-block: 0;
+  padding-inline: 7px 9px;
   border: 1px solid var(--sl-line-2);
   border-radius: 12px;
   background: #f5f5f5;
@@ -551,7 +556,7 @@
 .sl-hover {
   position: absolute;
   top: -15px;
-  right: 18px;
+  inset-inline-end: 18px;
   z-index: 2;
   display: flex;
   align-items: center;
@@ -632,7 +637,7 @@
 
 .sl-compose__placeholder {
   position: absolute;
-  left: 12px;
+  inset-inline-start: 12px;
   top: 11px;
   color: var(--sl-ink-3);
   transition: opacity 0.1s ease;
@@ -646,7 +651,7 @@
   display: inline-block;
   width: 1.5px;
   height: 18px;
-  margin-left: 1px;
+  margin-inline-start: 1px;
   vertical-align: -4px;
   background: var(--sl-ink);
   opacity: 0;
@@ -671,7 +676,8 @@
   align-items: center;
   gap: 12px;
   height: 36px;
-  padding: 0 6px 0 8px;
+  padding-block: 0;
+  padding-inline: 8px 6px;
   color: var(--sl-ink-2);
 }
 
@@ -724,12 +730,12 @@
 .sl-thread {
   position: absolute;
   top: 0;
-  left: 0;
+  inset-inline-start: 0;
   bottom: 0;
   display: flex;
   flex-direction: column;
   width: 280px;
-  border-left: 1px solid var(--sl-line);
+  border-inline-start: 1px solid var(--sl-line);
   background: #fff;
 }
 
@@ -739,7 +745,8 @@
   gap: 8px;
   flex-shrink: 0;
   height: 49px;
-  padding: 0 12px 0 16px;
+  padding-block: 0;
+  padding-inline: 16px 12px;
   border-bottom: 1px solid var(--sl-line);
 }
 
@@ -792,7 +799,7 @@
    words sliced at the thread's edge. */
 
 .ss-stage[data-layout='compact'] .sl-win {
-  left: 20px;
+  inset-inline-start: 20px;
   top: 20px;
   width: 400px;
   height: 460px;
@@ -806,13 +813,13 @@
 
 .ss-stage[data-layout='compact'] .sl-panel {
   position: relative;
-  margin-left: 6px;
+  margin-inline-start: 6px;
 }
 
 .ss-stage[data-layout='compact'] .sl-thread-wrap {
   position: absolute;
   top: 0;
-  right: 0;
+  inset-inline-end: 0;
   bottom: 0;
   z-index: 2;
   box-shadow: -12px 0 24px -16px rgba(0, 0, 0, 0.25);
@@ -837,7 +844,7 @@
 
 .ss-stage[data-layout='compact'] .sl-top__search {
   width: 280px;
-  margin-left: -140px;
+  margin-inline-start: -140px;
 }
 
 /* The compact feed keeps one older message, so Maya's arrival, its reaction

@@ -62,6 +62,11 @@
   box-decoration-break: clone;
 }
 
+.pr-sel:dir(rtl) {
+  /* The sweep runs from the selection's start: its right in rtl text */
+  background-position: right;
+}
+
 .pr-sel[data-on] {
   background-size: 100% 100%;
   transition: background-size 0.95s cubic-bezier(0.45, 0, 0.25, 1);
@@ -82,7 +87,8 @@
   display: inline-block;
   width: 2px;
   height: 1.15em;
-  margin: 0 -2px 0 0;
+  margin-block: 0;
+  margin-inline: 0 -2px;
   vertical-align: -0.2em;
   background: var(--who);
   opacity: 0;
@@ -97,7 +103,7 @@
 .pr-peer {
   position: absolute;
   top: 0;
-  left: 0;
+  left: 0; /* physical: moved by a translate from measured x */
   z-index: 10;
   pointer-events: none;
   will-change: transform;
@@ -110,14 +116,15 @@
 
 .pr-peer svg {
   display: block;
-  margin: -1.5px 0 0 -1.5px;
+  margin-block: -1.5px 0;
+  margin-inline: -1.5px 0;
   filter: drop-shadow(0 1px 1.5px rgb(0 0 0 / 0.2));
 }
 
 .pr-flag {
   position: absolute;
   top: 16px;
-  left: 11px;
+  inset-inline-start: 11px;
   padding: 3px 7px;
   border-radius: 6px;
   background: var(--who);

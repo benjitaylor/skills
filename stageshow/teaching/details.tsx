@@ -109,7 +109,7 @@ function Bar({ good }: { good: boolean }) {
   return (
     <div className="db-screen">
       <div className="db-top">
-        {good ? <span className="db-round"><ChevronLeft size={18} strokeWidth={2.25} /></span> : <span />}
+        {good ? <span className="db-round"><ChevronLeft data-flip size={18} strokeWidth={2.25} /></span> : <span />}
         <span className="db-round"><Ellipsis size={16} strokeWidth={2.25} /></span>
       </div>
       <div className="db-title">Inbox</div>

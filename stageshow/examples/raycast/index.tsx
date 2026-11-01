@@ -153,7 +153,7 @@ function Clip({ s, layout }: { s: S; layout: Layout }) {
     <div className="rc-page rc-clip" data-show={s.view === 'clip' || undefined}>
       <div className="rc-search">
         <span className="rc-back">
-          <ArrowLeft size={14} strokeWidth={2} />
+          <ArrowLeft data-flip size={14} strokeWidth={2} />
         </span>
         <span className="rc-input">
           <span className="rc-caret" />

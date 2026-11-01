@@ -121,7 +121,7 @@ export default function Story() {
               <Meter value={s.show >= 4 ? s.usage : 0} />
             </div>
 
-            <div className="st-chart" data-in={s.show >= 2 || undefined}>
+            <div className="st-chart" dir="ltr" data-in={s.show >= 2 || undefined}>
               <span className="st-muted">Tokens used, last 30 days</span>
               {/* The kit's Chart: bars grow in a stagger when the usage arrives */}
               <Chart kind="bars" className="st-bars" data={BARS} width={layout === 'compact' ? 270 : 204} height={92} show={s.show >= 4} />

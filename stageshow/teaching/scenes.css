@@ -2,7 +2,7 @@
 .tc-lessons .cs-pair { display: grid; grid-template-columns: minmax(0, 540px); justify-content: center; gap: 28px; }
 .tc-lessons .cs-figure { height: auto; min-width: 0; margin: 0; }
 .tc-lessons .cs-side-label { margin: 0 0 10px; color: #666; font: 500 12px/18px var(--ss-font); }
-.tc-lessons .cs-figure figcaption { padding: 10px 0 0; text-align: left; }
+.tc-lessons .cs-figure figcaption { padding: 10px 0 0; text-align: start; }
 @container (min-width: 1120px) { .tc-lessons .cs-pair { grid-template-columns: repeat(2, 540px); gap: 24px; } }
 .tc-lessons .cs-scene { position: relative; width: 540px; height: 420px; overflow: hidden; color: #35414a; font: 400 12px/18px var(--ss-font); }
 .tc-lessons .cs-scene[data-compact] { width: var(--cs-width, 340px); height: 520px; }
@@ -19,7 +19,7 @@
 .tc-lessons .cs-eyebrow { color: #83909a; font-size: 10px; line-height: 16px; }
 
 .tc-lessons .cs-device { background: #e4edf3; }
-.tc-lessons .cs-device-window { top: 32px; left: 32px; width: 344px; height: 420px; }
+.tc-lessons .cs-device-window { top: 32px; inset-inline-start: 32px; width: 344px; height: 420px; }
 .tc-lessons .cs-dashboard { width: 234px; padding: 20px 16px; }
 .tc-lessons .cs-dashboard h3 { margin-top: 4px; font-size: 28px; line-height: 34px; }
 .tc-lessons .cs-dashboard h3 > span { display: block; font-size: 11px; font-weight: 400; line-height: 18px; color: #83909a; }
@@ -29,8 +29,8 @@
 .tc-lessons .cs-payment-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 13px 0 10px; font-size: 11px; }
 .tc-lessons .cs-payment-row small { display: block; color: #8c969c; font-size: 10px; line-height: 16px; }
 .tc-lessons .cs-payment-row strong { font-size: 12px; font-weight: 500; }
-.tc-lessons .cs-device-phone { position: absolute; left: 172px; top: 70px; }
-.tc-lessons .cs-device[data-good] .cs-device-phone { left: 280px; top: 138px; }
+.tc-lessons .cs-device-phone { position: absolute; inset-inline-start: 172px; top: 70px; }
+.tc-lessons .cs-device[data-good] .cs-device-phone { inset-inline-start: 280px; top: 138px; }
 .tc-lessons .cs-phone-app { padding: 28px 24px; color: #33414a; }
 .tc-lessons .cs-phone-app h3 { font-size: 30px; line-height: 40px; }
 .tc-lessons .cs-phone-app p { font-size: 20px; line-height: 29px; color: #859198; }
@@ -41,12 +41,12 @@
 .tc-lessons .cs-phone-payment strong { display: block; margin: 10px 0; font-size: 42px; line-height: 50px; font-weight: 550; }
 .tc-lessons .cs-phone-payment p { font-size: 20px; }
 .tc-lessons .cs-phone-link { display: flex; align-items: center; justify-content: center; gap: 10px; padding: 22px 0; font-size: 21px; line-height: 30px; }
-.tc-lessons .cs-device[data-compact] .cs-device-window { top: 24px; left: 20px; width: calc(100% - 40px); height: 342px; }
+.tc-lessons .cs-device[data-compact] .cs-device-window { top: 24px; inset-inline-start: 20px; width: calc(100% - 40px); height: 342px; }
 .tc-lessons .cs-device[data-compact] .cs-dashboard { width: 100%; padding: 15px 16px; }
 .tc-lessons .cs-device[data-compact] .cs-mini-chart { height: 60px; }
 .tc-lessons .cs-device[data-compact] .cs-mini-chart i { max-height: 46px; }
-.tc-lessons .cs-device[data-compact] .cs-device-phone { left: 74px; top: 92px; }
-.tc-lessons .cs-device[data-compact][data-good] .cs-device-phone { left: calc(100% - 248px); top: 288px; }
+.tc-lessons .cs-device[data-compact] .cs-device-phone { inset-inline-start: 74px; top: 92px; }
+.tc-lessons .cs-device[data-compact][data-good] .cs-device-phone { inset-inline-start: calc(100% - 248px); top: 288px; }
 .tc-lessons .cs-device[data-compact] .cs-phone-app { padding: 16px 24px; }
 .tc-lessons .cs-device[data-compact] .cs-phone-app h3 { font-size: 28px; line-height: 34px; }
 .tc-lessons .cs-device[data-compact] .cs-phone-payment { margin-top: 16px; padding: 16px; }
@@ -54,30 +54,30 @@
 .tc-lessons .cs-device[data-compact] .cs-phone-payment strong { margin-block: 8px; }
 
 .tc-lessons .cs-export { background: #e3eee8; }
-.tc-lessons .cs-export-window { left: 32px; top: 36px; width: 400px; height: 390px; }
+.tc-lessons .cs-export-window { inset-inline-start: 32px; top: 36px; width: 400px; height: 390px; }
 .tc-lessons .cs-export-content { position: relative; z-index: 1; width: 245px; padding: 22px 20px; }
 .tc-lessons .cs-export-settings { display: grid; gap: 13px; margin: 22px 0; }
 .tc-lessons .cs-export-settings > span { display: flex; align-items: baseline; justify-content: space-between; font-size: 11px; }
 .tc-lessons .cs-export-settings strong { font-weight: 450; color: #7a8982; }
-.tc-lessons .cs-export-preview { position: absolute; left: 263px; right: 20px; top: 70px; display: grid; gap: 12px; }
+.tc-lessons .cs-export-preview { position: absolute; inset-inline-start: 263px; inset-inline-end: 20px; top: 70px; display: grid; gap: 12px; }
 .tc-lessons .cs-export-preview i { height: 54px; border-radius: 4px; background: #f0f4f1; }
-.tc-lessons .cs-export-receipt { position: absolute; z-index: 2; left: 146px; top: 130px; width: 226px; padding: 17px; border-radius: 9px; background: #fff; box-shadow: 0 0 0 1px #1b3d2b0b, 0 12px 28px -9px #163c2b38; display: grid; grid-template-columns: 28px 1fr; column-gap: 10px; row-gap: 13px; }
+.tc-lessons .cs-export-receipt { position: absolute; z-index: 2; inset-inline-start: 146px; top: 130px; width: 226px; padding: 17px; border-radius: 9px; background: #fff; box-shadow: 0 0 0 1px #1b3d2b0b, 0 12px 28px -9px #163c2b38; display: grid; grid-template-columns: 28px 1fr; column-gap: 10px; row-gap: 13px; }
 .tc-lessons .cs-export-receipt h3 { font-size: 13px; line-height: 18px; }
 .tc-lessons .cs-export-receipt p { margin-top: 2px; font-size: 10px; line-height: 16px; }
 .tc-lessons .cs-export-receipt div > span { display: block; color: #9aa39d; font-size: 10px; line-height: 16px; }
 .tc-lessons .cs-receipt-icon { display: grid; place-items: center; width: 28px; height: 28px; border-radius: 6px; background: #edf4ef; color: #65836f; }
 .tc-lessons .cs-export-receipt > .cs-status { grid-column: 1 / -1; padding-top: 10px; border-top: 1px solid #edf1ee; }
-.tc-lessons .cs-export[data-good] .cs-export-receipt { left: 282px; top: 250px; }
-.tc-lessons .cs-export[data-compact] .cs-export-window { left: 20px; top: 24px; width: calc(100% - 40px); height: 348px; }
+.tc-lessons .cs-export[data-good] .cs-export-receipt { inset-inline-start: 282px; top: 250px; }
+.tc-lessons .cs-export[data-compact] .cs-export-window { inset-inline-start: 20px; top: 24px; width: calc(100% - 40px); height: 348px; }
 .tc-lessons .cs-export[data-compact] .cs-export-content { width: 100%; }
 .tc-lessons .cs-export[data-compact] .cs-export-preview { display: none; }
-.tc-lessons .cs-export[data-compact] .cs-export-receipt { left: calc(100% - 246px); top: 154px; }
-.tc-lessons .cs-export[data-compact][data-good] .cs-export-receipt { left: calc(100% - 246px); top: 310px; }
+.tc-lessons .cs-export[data-compact] .cs-export-receipt { inset-inline-start: calc(100% - 246px); top: 154px; }
+.tc-lessons .cs-export[data-compact][data-good] .cs-export-receipt { inset-inline-start: calc(100% - 246px); top: 310px; }
 
 .tc-lessons .cs-focus { background: #e8e5ef; }
-.tc-lessons .cs-focus-assets { left: 32px; top: 32px; width: 292px; height: 260px; }
-.tc-lessons .cs-focus-feedback { left: 136px; top: 112px; width: 372px; height: 242px; }
-.tc-lessons .cs-focus-publish { left: 82px; top: 222px; width: 376px; height: 270px; }
+.tc-lessons .cs-focus-assets { inset-inline-start: 32px; top: 32px; width: 292px; height: 260px; }
+.tc-lessons .cs-focus-feedback { inset-inline-start: 136px; top: 112px; width: 372px; height: 242px; }
+.tc-lessons .cs-focus-publish { inset-inline-start: 82px; top: 222px; width: 376px; height: 270px; }
 .tc-lessons .cs-back-content { padding: 17px; }
 .tc-lessons .cs-back-content p { font-size: 10px; }
 .tc-lessons .cs-focus .cs-back-content .cs-status { font-size: 12px; color: #694ba8; }
@@ -91,13 +91,13 @@
 .tc-lessons .cs-publish-content { padding: 15px 20px 22px; }
 .tc-lessons .cs-publish-checks { display: flex; gap: 18px; margin: 10px 0; }
 .tc-lessons .cs-publish-content .cs-action { background: #62547e; }
-.tc-lessons .cs-focus[data-compact] .cs-focus-assets { left: 20px; top: 24px; width: calc(100% - 78px); }
-.tc-lessons .cs-focus[data-compact] .cs-focus-feedback { left: 52px; top: 116px; width: calc(100% - 72px); }
-.tc-lessons .cs-focus[data-compact] .cs-focus-publish { left: 20px; top: 256px; width: calc(100% - 40px); height: 280px; }
+.tc-lessons .cs-focus[data-compact] .cs-focus-assets { inset-inline-start: 20px; top: 24px; width: calc(100% - 78px); }
+.tc-lessons .cs-focus[data-compact] .cs-focus-feedback { inset-inline-start: 52px; top: 116px; width: calc(100% - 72px); }
+.tc-lessons .cs-focus[data-compact] .cs-focus-publish { inset-inline-start: 20px; top: 256px; width: calc(100% - 40px); height: 280px; }
 .tc-lessons .cs-focus[data-compact] .cs-publish-checks { flex-direction: column; gap: 6px; margin: 14px 0; }
 
 .tc-lessons .cs-color { background: #da805b; }
-.tc-lessons .cs-invoice { position: absolute; left: 32px; top: 32px; width: 350px; height: 400px; padding: 24px; border-radius: 10px; background: #ecac84; color: #813d31; box-shadow: 0 12px 28px #943c3c40; }
+.tc-lessons .cs-invoice { position: absolute; inset-inline-start: 32px; top: 32px; width: 350px; height: 400px; padding: 24px; border-radius: 10px; background: #ecac84; color: #813d31; box-shadow: 0 12px 28px #943c3c40; }
 .tc-lessons .cs-invoice-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; font-size: 11px; }
 .tc-lessons .cs-color .cs-status { color: #a3433c; }
 .tc-lessons .cs-invoice h3 { font-size: 17px; }
@@ -106,7 +106,7 @@
 .tc-lessons .cs-invoice-detail { display: flex; justify-content: space-between; gap: 20px; max-width: 220px; padding: 7px 0; font-size: 11px; }
 .tc-lessons .cs-invoice-paid { display: flex; align-items: center; gap: 6px; margin-top: 15px; padding-top: 14px; border-top: 1px solid #bf735733; font-size: 10px; }
 .tc-lessons .cs-invoice-paid .cs-mark { width: 14px; height: 14px; }
-.tc-lessons .cs-deposit { position: absolute; left: 286px; top: 230px; width: 222px; padding: 20px; border-radius: 10px; background: #e29b7c; color: #813d31; box-shadow: 0 0 0 1px #9c503633, 0 12px 28px #943c3c40; }
+.tc-lessons .cs-deposit { position: absolute; inset-inline-start: 286px; top: 230px; width: 222px; padding: 20px; border-radius: 10px; background: #e29b7c; color: #813d31; box-shadow: 0 0 0 1px #9c503633, 0 12px 28px #943c3c40; }
 .tc-lessons .cs-deposit .cs-eyebrow { color: inherit; }
 .tc-lessons .cs-deposit h3 { margin-top: 6px; font-size: 25px; line-height: 32px; }
 .tc-lessons .cs-deposit > div { display: flex; justify-content: space-between; align-items: center; margin-top: 19px; font-size: 10px; }
@@ -116,11 +116,11 @@
 .tc-lessons .cs-color[data-good] .cs-deposit { background: #fff; color: #4d433a; box-shadow: 0 0 0 1px #6c483714, 0 12px 28px -8px #6c483733; }
 .tc-lessons .cs-color[data-good] .cs-status { color: #60816c; }
 .tc-lessons .cs-color[data-good] p, .tc-lessons .cs-color[data-good] .cs-eyebrow { color: #9b9186; }
-.tc-lessons .cs-color[data-compact] .cs-invoice { left: 20px; top: 24px; width: calc(100% - 40px); height: 370px; padding: 20px; }
-.tc-lessons .cs-color[data-compact] .cs-deposit { left: calc(100% - 242px); top: 340px; width: 222px; }
+.tc-lessons .cs-color[data-compact] .cs-invoice { inset-inline-start: 20px; top: 24px; width: calc(100% - 40px); height: 370px; padding: 20px; }
+.tc-lessons .cs-color[data-compact] .cs-deposit { inset-inline-start: calc(100% - 242px); top: 340px; width: 222px; }
 
 .tc-lessons .cs-material { background: #202a37; }
-.tc-lessons .cs-files-window { left: 32px; top: 36px; width: 400px; height: 420px; color: #65717c; --ss-canvas: #303a45; --ss-chrome: #303a45; --ss-text-strong: #65717c; --ss-text: #65717c; --ss-text-soft: #65717c; --ss-line: #39434d; }
+.tc-lessons .cs-files-window { inset-inline-start: 32px; top: 36px; width: 400px; height: 420px; color: #65717c; --ss-canvas: #303a45; --ss-chrome: #303a45; --ss-text-strong: #65717c; --ss-text: #65717c; --ss-text-soft: #65717c; --ss-line: #39434d; }
 .tc-lessons .cs-files-window .ss-window__bar { background: #303a45; color: #65717c; }
 .tc-lessons .cs-files-content { width: 254px; padding: 22px 20px; }
 .tc-lessons .cs-files-content > p { color: #65717c; }
@@ -128,8 +128,8 @@
 .tc-lessons .cs-file-row + .cs-file-row { margin-top: 2px; }
 .tc-lessons .cs-file-row[data-selected] { background: #34414d; }
 .tc-lessons .cs-file-row small { display: block; font-size: 10px; line-height: 16px; }
-.tc-lessons .cs-file-row > span { margin-left: auto; font-size: 10px; }
-.tc-lessons .cs-document-preview { position: absolute; left: 286px; top: 154px; width: 222px; padding: 18px; border-radius: 6px; background: #cbd1d8; color: #a1aab5; box-shadow: 0 10px 30px #151b231a; }
+.tc-lessons .cs-file-row > span { margin-inline-start: auto; font-size: 10px; }
+.tc-lessons .cs-document-preview { position: absolute; inset-inline-start: 286px; top: 154px; width: 222px; padding: 18px; border-radius: 6px; background: #cbd1d8; color: #a1aab5; box-shadow: 0 10px 30px #151b231a; }
 .tc-lessons .cs-preview-meta { display: flex; justify-content: space-between; gap: 10px; margin-bottom: 19px; font-size: 10px; }
 .tc-lessons .cs-document-preview h3 { font-size: 17px; }
 .tc-lessons .cs-document-preview p { color: inherit; font-size: 10px; line-height: 16px; }
@@ -143,14 +143,14 @@
 .tc-lessons .cs-material[data-good] .cs-file-row[data-selected] { background: #405263; }
 .tc-lessons .cs-material[data-good] .cs-document-preview { background: #fff; color: #394550; box-shadow: 0 0 0 1px #ffffff14, 0 16px 32px -12px #0006; }
 .tc-lessons .cs-material[data-good] .cs-preview-meta, .tc-lessons .cs-material[data-good] .cs-document-preview p, .tc-lessons .cs-material[data-good] .cs-preview-foot { color: #87929d; }
-.tc-lessons .cs-material[data-compact] .cs-files-window { left: 20px; top: 24px; width: calc(100% - 40px); height: 400px; }
+.tc-lessons .cs-material[data-compact] .cs-files-window { inset-inline-start: 20px; top: 24px; width: calc(100% - 40px); height: 400px; }
 .tc-lessons .cs-material[data-compact] .cs-files-content { width: 100%; }
-.tc-lessons .cs-material[data-compact] .cs-document-preview { left: calc(100% - 242px); top: 260px; width: 222px; }
+.tc-lessons .cs-material[data-compact] .cs-document-preview { inset-inline-start: calc(100% - 242px); top: 260px; width: 222px; }
 
 .tc-lessons .cs-crop { background: #eee6e5; }
-.tc-lessons .cs-library-window { left: 32px; top: 58px; width: 760px; height: 460px; transform: scale(.626); transform-origin: top left; }
+.tc-lessons .cs-library-window { inset-inline-start: 32px; top: 58px; width: 760px; height: 460px; transform: scale(.626); transform-origin: top left; }
 .tc-lessons .cs-library-shell { display: flex; height: 422px; }
-.tc-lessons .cs-library-shell aside { display: flex; flex-direction: column; gap: 7px; flex: none; width: 120px; padding: 20px 12px; border-right: 1px solid #f0eeee; color: #969095; font-size: 11px; }
+.tc-lessons .cs-library-shell aside { display: flex; flex-direction: column; gap: 7px; flex: none; width: 120px; padding: 20px 12px; border-inline-end: 1px solid #f0eeee; color: #969095; font-size: 11px; }
 .tc-lessons .cs-library-shell aside strong { margin-bottom: 14px; color: #6c6269; font-weight: 500; }
 .tc-lessons .cs-library-shell aside span { padding: 6px 8px; border-radius: 4px; }
 .tc-lessons .cs-library-shell aside [data-active] { background: #f3eeee; color: #6c6269; }
@@ -164,13 +164,13 @@
 .tc-lessons .cs-library-context { display: grid; grid-template-columns: 1fr 1fr; align-content: start; gap: 18px; flex: 1; padding: 25px; background: #faf8f9; }
 .tc-lessons .cs-library-context i { height: 90px; border-radius: 5px; background: #f0ebef; }
 .tc-lessons .cs-crop[data-good] .cs-library-window { top: 32px; transform: none; }
-.tc-lessons .cs-crop[data-good]:not([data-compact]) .cs-library-context { padding-left: 56px; }
-.tc-lessons .cs-crop[data-compact] .cs-library-window { left: 20px; top: 80px; transform: scale(.395); }
+.tc-lessons .cs-crop[data-good]:not([data-compact]) .cs-library-context { padding-inline-start: 56px; }
+.tc-lessons .cs-crop[data-compact] .cs-library-window { inset-inline-start: 20px; top: 80px; transform: scale(.395); }
 .tc-lessons .cs-crop[data-compact][data-good] .cs-library-window { top: 24px; transform: none; width: 760px; height: 550px; }
 .tc-lessons .cs-crop[data-compact][data-good] .cs-library-shell aside { display: none; }
 .tc-lessons .cs-crop[data-compact][data-good] .cs-library-main { width: calc(var(--cs-width, 340px) - 40px); padding: 24px 16px; }
-.tc-lessons .cs-crop[data-compact][data-good] .cs-library-context { margin-left: 20px; }
-.tc-lessons .cs-frame[data-narrow] .cs-device:not([data-good]) .cs-device-phone { left: 36px; }
+.tc-lessons .cs-crop[data-compact][data-good] .cs-library-context { margin-inline-start: 20px; }
+.tc-lessons .cs-frame[data-narrow] .cs-device:not([data-good]) .cs-device-phone { inset-inline-start: 36px; }
 .tc-lessons .cs-frame[data-narrow] .cs-crop:not([data-good]) .cs-library-window { transform: scale(.326); }
 .tc-lessons .cs-frame[data-narrow] .cs-focus-feedback .cs-back-content { padding: 17px 12px; }
 .tc-lessons .cs-frame[data-narrow] .cs-focus .cs-back-content .cs-status { font-size: 10px; }
@@ -179,7 +179,7 @@
 
 /* Result weight, crop filler: one folder, its new file */
 .tc-lessons .cs-upload { background: #ecebe9; }
-.tc-lessons .cs-upload-window { left: 32px; top: 32px; width: 560px; height: 440px; }
+.tc-lessons .cs-upload-window { inset-inline-start: 32px; top: 32px; width: 560px; height: 440px; }
 .tc-lessons .cs-cropcut:not([data-good]) .cs-upload-window { width: 660px; }
 .tc-lessons .cs-files-list { padding: 4px 10px; font-size: 10px; }
 .tc-lessons .cs-files-list[data-big] { font-size: 13px; }
@@ -193,7 +193,7 @@
 .tc-lessons .cs-fl-name .cs-mark { width: 14px; height: 14px; color: #a9aeb3; }
 .tc-lessons .cs-files-list[data-big] .cs-fl-row[data-new] { background: #eef4fd; font-weight: 500; }
 .tc-lessons .cs-files-list[data-big] .cs-fl-row[data-new] .cs-mark { color: #3c6fd6; }
-.tc-lessons .cs-upload[data-compact] .cs-upload-window { left: 20px; top: 24px; width: calc(var(--cs-width, 340px) + 40px); height: 520px; }
+.tc-lessons .cs-upload[data-compact] .cs-upload-window { inset-inline-start: 20px; top: 24px; width: calc(var(--cs-width, 340px) + 40px); height: 520px; }
 .tc-lessons .cs-upload[data-compact] .cs-fl-head, .tc-lessons .cs-upload[data-compact] .cs-fl-row { grid-template-columns: minmax(0, 1fr) 72px 60px; }
 .tc-lessons .cs-cropcut[data-compact]:not([data-good]) .cs-fl-head, .tc-lessons .cs-cropcut[data-compact]:not([data-good]) .cs-fl-row { grid-template-columns: minmax(0, 1fr) 72px 120px; }
 .tc-lessons .cs-cropcut[data-compact][data-good] .cs-upload-window { width: calc(var(--cs-width, 340px) - 40px); }
@@ -209,10 +209,10 @@
 .tc-lessons .cs-tile-bars i:nth-child(3) { width: 60%; }
 .tc-lessons .cs-tiles[data-good] { grid-template-columns: 1.4fr 1fr; grid-template-rows: repeat(3, 1fr); }
 .tc-lessons .cs-tile-hero { grid-row: 1 / 4; }
-.tc-lessons .cs-tile-window { left: 16px; top: 52px; width: 380px; height: 420px; }
+.tc-lessons .cs-tile-window { inset-inline-start: 16px; top: 52px; width: 380px; height: 420px; }
 .tc-lessons .cs-tile-doc { padding: 16px; font-size: 12px; }
 .tc-lessons .cs-tile-doc strong { font-weight: 500; }
-.tc-lessons .cs-tile-caret { display: inline-block; margin-left: 2px; padding: 0 4px; border-radius: 3px; background: #d6457a; color: #fff; font-size: 9px; line-height: 14px; vertical-align: 2px; }
+.tc-lessons .cs-tile-caret { display: inline-block; margin-inline-start: 2px; padding: 0 4px; border-radius: 3px; background: #d6457a; color: #fff; font-size: 9px; line-height: 14px; vertical-align: 2px; }
 .tc-lessons .cs-tile-big { margin-top: 4px; font-size: 32px; line-height: 40px; font-weight: 550; color: #2d3a42; }
 .tc-lessons .cs-tile-marks { display: flex; gap: 8px; margin-top: 10px; }
 .tc-lessons .cs-tile-marks i { width: 28px; height: 28px; border-radius: 8px; background: #ececee; }

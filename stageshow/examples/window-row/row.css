@@ -13,17 +13,17 @@
 }
 
 .wr-win--hero {
-  left: 210px;
+  inset-inline-start: 210px;
   z-index: 1;
   box-shadow: var(--ss-shadow-hero);
 }
 
 .wr-win--left {
-  left: -110px;
+  inset-inline-start: -110px;
 }
 
 .wr-win--right {
-  left: 530px;
+  inset-inline-start: 530px;
 }
 
 .wr-body {
@@ -58,6 +58,6 @@
 }
 
 .wr .ss-stage[data-layout='compact'] .wr-win--hero {
-  left: 16px;
+  inset-inline-start: 16px;
   width: 326px;
 }

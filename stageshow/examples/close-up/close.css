@@ -8,7 +8,7 @@
 .cu-zoom {
   position: absolute;
   top: 18px;
-  left: 18px;
+  inset-inline-start: 18px;
   transform: scale(1.4);
   transform-origin: 0 0;
 }
@@ -46,6 +46,6 @@
 /* Narrow: a touch less zoom, so the row stays whole across with the same
    inset each side */
 .cu .ss-stage[data-layout='compact'] .cu-zoom {
-  left: 12px;
+  inset-inline-start: 12px;
   transform: scale(1.3);
 }

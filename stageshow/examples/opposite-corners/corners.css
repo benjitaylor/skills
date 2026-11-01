@@ -8,13 +8,14 @@
 .oc-art {
   position: absolute;
   top: -32px;
-  right: -32px;
+  inset-inline-end: -32px;
   width: 316px;
   height: 260px;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  padding: 0 52px 20px 20px;
+  padding-block: 0 20px;
+  padding-inline: 20px 52px;
   border-radius: 16px;
   background: var(--ss-surface);
   box-shadow: var(--ss-shadow-card);
@@ -23,7 +24,7 @@
 /* The copy: bottom-left at the tile's full inset */
 .oc-copy {
   position: absolute;
-  left: 24px;
+  inset-inline-start: 24px;
   bottom: 24px;
   display: grid;
   gap: 4px;

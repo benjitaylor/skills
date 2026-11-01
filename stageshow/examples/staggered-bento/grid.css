@@ -118,12 +118,12 @@
   & .sg-picture--coast {
     left: 50%;
     width: 600px;
-    margin-left: -300px;
+    margin-inline-start: -300px;
   }
 
   & .sg-picture--small,
   & .sg-picture--phone {
-    left: 0;
+    inset-inline-start: 0;
     width: 100%;
   }
 
@@ -221,14 +221,14 @@
      sideways. Its settled size and alignment remain the same as plain text. */
   & .sg-stat-value {
     display: inline-grid;
-    text-align: right;
+    text-align: end;
   }
 
   & .sg-stat-value > * { grid-area: 1 / 1; }
   & .sg-stat-sizer { visibility: hidden; }
 
   & .sg-stat-unit {
-    margin-left: 6px;
+    margin-inline-start: 6px;
     font-size: 32px;
     letter-spacing: -0.02em;
   }
@@ -247,7 +247,7 @@
   & .sg-note {
     position: absolute;
     top: 16px;
-    left: var(--pad);
+    inset-inline-start: var(--pad);
     box-sizing: border-box;
     width: calc(100% - var(--pad) * 2);
     height: 200px;
@@ -265,7 +265,7 @@
     grid-template-columns: 48px minmax(0, 1fr) auto;
     align-items: center;
     gap: 14px;
-    padding-right: 8px;
+    padding-inline-end: 8px;
   }
 
   & .sg-transcript {
@@ -346,14 +346,17 @@
   & .sg-book {
     position: absolute;
     box-sizing: border-box;
-    border-radius: 4px 8px 8px 4px;
+    border-start-start-radius: 4px;
+    border-start-end-radius: 8px;
+    border-end-end-radius: 8px;
+    border-end-start-radius: 4px;
     will-change: transform;
     transition: transform 1.1s cubic-bezier(0.25, 0.8, 0.25, 1);
   }
 
   & .sg-book--back {
     top: 34px;
-    left: calc(var(--pad) + 86px);
+    inset-inline-start: calc(var(--pad) + 86px);
     width: 150px;
     height: 196px;
     background: linear-gradient(90deg, #c9b590 0, #dccaa6 12px, #e4d4b2 100%);
@@ -364,14 +367,15 @@
 
   & .sg-book--front {
     top: 22px;
-    left: var(--pad);
+    inset-inline-start: var(--pad);
     display: flex;
     flex-direction: column;
     align-items: center;
     width: 160px;
     height: 210px;
     /* Centered on the cover, not the spine */
-    padding: 52px 0 0 14px;
+    padding-block: 52px 0;
+    padding-inline: 14px 0;
     background:
       repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.03) 0 1px, transparent 1px 3px),
       repeating-linear-gradient(90deg, rgba(0, 0, 0, 0.05) 0 1px, transparent 1px 3px),
@@ -389,9 +393,12 @@
     position: absolute;
     top: 0;
     bottom: 0;
-    left: 0;
+    inset-inline-start: 0;
     width: 14px;
-    border-radius: 4px 0 0 4px;
+    border-start-start-radius: 4px;
+    border-start-end-radius: 0;
+    border-end-end-radius: 0;
+    border-end-start-radius: 4px;
     background: linear-gradient(90deg, rgba(0, 0, 0, 0.28), rgba(0, 0, 0, 0.06) 70%, rgba(255, 255, 255, 0.08));
   }
 
@@ -402,7 +409,7 @@
     text-transform: uppercase;
     /* Tracking adds space after the last letter too; take it back so the
        word centers on its ink */
-    margin-right: -0.24em;
+    margin-inline-end: -0.24em;
   }
 
   & .sg-book__by {
@@ -410,7 +417,7 @@
     font-size: 10px;
     font-weight: 500;
     letter-spacing: 0.08em;
-    margin-right: -0.08em;
+    margin-inline-end: -0.08em;
     color: #c9b98e;
   }
 
@@ -419,7 +426,7 @@
   & .sg-phone {
     position: absolute;
     top: 26px;
-    left: var(--pad);
+    inset-inline-start: var(--pad);
     will-change: transform;
   }
 

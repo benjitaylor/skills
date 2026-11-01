@@ -19,12 +19,12 @@
    right edge */
 .sh-window > .ss-window__bar {
   height: 52px;
-  padding-right: 10.5px;
+  padding-inline-end: 10.5px;
 }
 
 .sh-lead {
   display: flex;
-  margin-left: 8px;
+  margin-inline-start: 8px;
   align-items: center;
   gap: 7px;
   font-size: 13px;
@@ -47,7 +47,8 @@
   align-items: center;
   gap: 5px;
   height: 30px;
-  padding: 0 12px 0 10px;
+  padding-block: 0;
+  padding-inline: 10px 12px;
   border-radius: 8px;
   background: var(--ss-accent);
   color: #fff;
@@ -121,7 +122,7 @@
   flex-shrink: 0;
   justify-content: flex-end;
   width: 96px;
-  margin-right: -6px;
+  margin-inline-end: -6px;
 }
 
 .sh-role__hit {
@@ -129,7 +130,8 @@
   align-items: center;
   gap: 4px;
   height: 24px;
-  padding: 0 6px 0 7px;
+  padding-block: 0;
+  padding-inline: 7px 6px;
   border-radius: 6px;
   color: var(--ss-text);
   white-space: nowrap;

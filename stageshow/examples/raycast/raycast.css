@@ -53,8 +53,8 @@
 .rc-menubar {
   position: absolute;
   top: 0;
-  left: 0;
-  right: 0;
+  inset-inline-start: 0;
+  inset-inline-end: 0;
   height: 24px;
   display: flex;
   align-items: center;
@@ -78,7 +78,7 @@
 /* The Raycast window: no title bar, vibrancy over the desktop */
 .rc-window {
   position: absolute;
-  left: var(--rc-x);
+  inset-inline-start: var(--rc-x);
   top: var(--rc-y);
   width: var(--rc-w);
   height: var(--rc-h);
@@ -142,7 +142,7 @@
   flex-shrink: 0;
   width: 2px;
   height: calc(var(--rc-search) + 3px);
-  margin-left: 1px;
+  margin-inline-start: 1px;
   border-radius: 1px;
   background: #ff6363;
   animation: ss-caret 1.06s steps(1) 0.5s infinite;
@@ -150,7 +150,7 @@
 
 .rc-placeholder {
   position: absolute;
-  left: 4px;
+  inset-inline-start: 4px;
   color: #6e6e73;
   transition: opacity 0.12s ease;
 }
@@ -177,7 +177,8 @@
   align-items: center;
   gap: 6px;
   height: 28px;
-  padding: 0 8px 0 10px;
+  padding-block: 0;
+  padding-inline: 10px 8px;
   border-radius: 7px;
   background: rgba(255, 255, 255, 0.06);
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
@@ -268,7 +269,7 @@
   flex-shrink: 0;
   width: var(--rc-list-w);
   padding: 4px 8px;
-  border-right: 1px solid var(--rc-line);
+  border-inline-end: 1px solid var(--rc-line);
 }
 
 .rc-entry-icon {
@@ -369,7 +370,7 @@
 
 .rc-v {
   position: absolute;
-  right: 0;
+  inset-inline-end: 0;
   opacity: 0;
   transition: opacity 0.14s ease;
 }
@@ -382,8 +383,8 @@
 /* Action bar, below the crop */
 .rc-actions {
   position: absolute;
-  left: 0;
-  right: 0;
+  inset-inline-start: 0;
+  inset-inline-end: 0;
   bottom: 0;
   height: 40px;
   display: flex;

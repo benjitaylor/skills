@@ -267,7 +267,7 @@ function Excel({ s, layout }: { s: S; layout: Layout }) {
         {/* The selection: one green frame with the fill handle, gliding as Excel's cell cursor does */}
         <div
           className="xl-selection"
-          style={{ left: g.rowHead + g.a - 1, width: g.b + 1, top: g.head + (top - 1) * g.row - 1, height: (bottom - top + 1) * g.row + 1 }}
+          style={{ insetInlineStart: g.rowHead + g.a - 1, width: g.b + 1, top: g.head + (top - 1) * g.row - 1, height: (bottom - top + 1) * g.row + 1 }}
         >
           <span className="xl-handle" />
         </div>
@@ -320,7 +320,7 @@ function ChartObject({ s, g }: { s: S; g: (typeof GEO)['wide'] }) {
   const MAX = 80000
   const ticks = [0, 20000, 40000, 60000, 80000]
   return (
-    <div className="xl-chart" data-cursor="pointer" style={{ left: g.chart.left, top: g.chart.top, width: g.chart.width, height: g.chart.height }}>
+    <div className="xl-chart" data-cursor="pointer" style={{ insetInlineStart: g.chart.left, top: g.chart.top, width: g.chart.width, height: g.chart.height }}>
       <div className="xl-chart-head">
         <span className="xl-chart-title">Q3 Sales by Region</span>
         <span className="xl-chart-total" data-show={s.total || undefined}>
@@ -332,7 +332,7 @@ function ChartObject({ s, g }: { s: S; g: (typeof GEO)['wide'] }) {
         </span>
       </div>
       <div className="xl-plot" style={{ height: h }}>
-        <div className="xl-axis">
+        <div className="xl-axis" dir="ltr">
           {ticks.map((t) => (
             <span key={t} style={{ bottom: (t / MAX) * (h - 2) + 1 }}>
               {t === 0 ? '0' : `${t / 1000}k`}

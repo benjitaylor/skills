@@ -7,7 +7,7 @@
 .dh-win {
   position: absolute;
   top: 48px;
-  left: 48px;
+  inset-inline-start: 48px;
   /* Off the right by a little: the columns end inside the stage, so only
      the window's empty margin is cut */
   width: 744px;
@@ -15,7 +15,7 @@
 }
 
 .dh .ss-stage[data-layout='compact'] .dh-win {
-  left: 16px;
+  inset-inline-start: 16px;
   width: 326px;
 }
 
@@ -41,7 +41,8 @@
 
 .dh-body {
   min-height: 460px;
-  padding: 22px 66px 0 26px;
+  padding-block: 22px 0;
+  padding-inline: 26px 66px;
   background: var(--ss-surface);
 }
 

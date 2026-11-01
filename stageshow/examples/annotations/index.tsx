@@ -1,5 +1,11 @@
 import { useId, useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
-import { Connector, Follow, Icon, Stage, States, type Act, type Rect } from '../../kit'
+import { Connector, Follow, Icon, Stage, States, mirror, mirrorRect, mirrorX, sign, type Act, type Dir, type Rect } from '../../kit'
+
+// Studies with hand-built geometry compute in the line's own space (measured
+// rects reflected in rtl, via `inLine`) and reflect each x back as they draw
+// (X), so one geometry serves both directions. In that space an x is a
+// distance from the start edge, so it places with insetInlineStart.
+const inLine = (rect: (name: string) => Rect, width: number, dir: Dir) => (name: string): Rect => mirrorRect(rect(name), width, dir)
 import './annotations.css'
 import { CollectionStudy, DetailStudy } from './composed'
 
@@ -69,17 +75,19 @@ function MeasureStudy({ width }: { width: number }) {
     a.mark('start'); await a.wait(650); await a.move('measure-card'); await a.click()
     await a.set({ selected: true }); await a.wait(500)
     await a.move('resize'); const from = a.center('resize'); a.mark('resize')
-    await a.drag({ x: from.x + finish.width - start.width, y: from.y + finish.height - start.height }, (p, origin) => a.put({ width: start.width + p.x - origin.x, height: start.height + p.y - origin.y }), { duration: 1400 })
+    // The handle is on the end corner, so the card grows toward the line's end
+    const k = sign(a.dir)
+    await a.drag({ x: from.x + (finish.width - start.width) * k, y: from.y + finish.height - start.height }, (p, origin) => a.put({ width: start.width + (p.x - origin.x) * k, height: start.height + p.y - origin.y }), { duration: 1400 })
     await a.set(finish); await a.wait(2100)
     await a.move('resize'); const back = a.center('resize'); a.mark('restore')
-    await a.drag({ x: back.x - finish.width + start.width, y: back.y - finish.height + start.height }, (p, origin) => a.put({ width: finish.width + p.x - origin.x, height: finish.height + p.y - origin.y }), { duration: 1400 })
+    await a.drag({ x: back.x - (finish.width - start.width) * k, y: back.y - finish.height + start.height }, (p, origin) => a.put({ width: finish.width + (p.x - origin.x) * k, height: finish.height + p.y - origin.y }), { duration: 1400 })
     await a.set(start); await a.move('measure-rest'); await a.click()
     await a.set({ selected: false }); await a.wait(650); a.mark('done'); await a.wait(650)
   }, [compact])
   return <Stage key={compact ? 'compact' : 'wide'} width={width} height={compact ? 420 : 380} initial={{ selected: false, ...start }} poster={{ selected: true, ...finish }} script={script} cursor={{ at: { x: width - 30, y: 340 } }} greys="cool" accent="#6979c9" className={`an-study an-measure${width < 330 ? ' an-measure--narrow' : ''}`}>
     {s => <>
       <div className="an-canvas-panel"><header className="an-product-head"><strong>Board layout</strong><span>Project card</span></header><span className="an-canvas-rest" data-target="measure-rest" /></div>
-      <div className="an-selection" data-selected={s.selected || undefined} style={{ left: x, top: compact ? 137 : 112, width: s.width, height: s.height }}>
+      <div className="an-selection" data-selected={s.selected || undefined} style={{ insetInlineStart: x, top: compact ? 137 : 112, width: s.width, height: s.height }}>
         <div className="an-design-card" data-target="measure-card" data-cursor="hand"><div><span className="an-card-project">Website refresh</span><strong>Release checklist</strong></div><div className="an-card-completion"><strong>6<span> / 8</span></strong><span>tasks complete</span></div><div className="an-card-bottom"><div className="an-card-progress"><i /></div><footer><span>Design team</span><time>Oct 28</time></footer></div></div>
         <div className="an-selection-ring" /><span className="an-resize-handle" data-target="resize" data-cursor="crosshair" />
         <div className="an-width-guide"><span>{Math.round(s.width)} px</span></div>
@@ -103,7 +111,10 @@ async function flowScript(a: Act<FlowState>) {
 function FlowStudy({ width }: { width: number }) {
   const compact = width < 480
   return <Stage width={width} height={compact ? 496 : 330} initial={{ step: 0 }} poster={{ step: 3 }} script={flowScript} cursor={{ at: { x: 25, y: compact ? 360 : 270 } }} greys="cool" accent="#468575" className={`an-study an-flow${compact ? ' an-flow--compact' : ''}`}>
-    {(s, rect) => {
+    {(s, measuredRect, _layout, dir) => {
+      const rect = inLine(measuredRect, width, dir)
+      const X = (p: { x: number; y: number }) => mirror(p, width, dir)
+      const XX = (x: number) => mirrorX(x, width, dir)
       const a = rect('billing'), b = rect('workspace')
       const from = compact ? { x: a.x + a.width / 2 - 28, y: a.y + a.height } : { x: a.x + a.width, y: a.y + a.height / 2 - 18 }
       const to = compact ? { x: b.x + b.width / 2 - 28, y: b.y } : { x: b.x, y: b.y + b.height / 2 - 18 }
@@ -111,18 +122,18 @@ function FlowStudy({ width }: { width: number }) {
       const backTo = compact ? { x: from.x + 56, y: from.y } : { x: from.x, y: from.y + 40 }
       return <>
         <header className="an-flow-title"><strong>Webhook delivery</strong><span data-target="clear-trace" data-cursor="hand">Clear trace</span></header>
-        <section className="an-flow-node an-flow-source" data-target="billing" style={compact ? { left: 32, top: 68, width: width - 64 } : { left: 32, top: 90, width: 220 }}>
+        <section className="an-flow-node an-flow-source" data-target="billing" style={compact ? { insetInlineStart: 32, top: 68, width: width - 64 } : { insetInlineStart: 32, top: 90, width: 220 }}>
           <div className="an-node-name"><strong>Invoice paid</strong><span className="an-event-kind">Event</span></div><code>invoice.paid</code>
           <div className="an-event-record"><span>Invoice <b>0084</b></span><strong>$189.00</strong></div>
           <footer className="an-event-footer"><span>Today, 14:32</span><div className="an-send" data-target="send" data-cursor="hand"><States value={String(s.step)} states={{ 0: 'Send event', 1: 'Sending…', 2: 'Awaiting reply', 3: 'Delivered' }} /></div></footer>
         </section>
-        <section className="an-flow-node an-flow-destination" data-target="workspace" data-received={s.step >= 2 || undefined} style={compact ? { left: 32, top: 330, width: width - 64 } : { left: width - 196, top: 115, width: 164 }}>
+        <section className="an-flow-node an-flow-destination" data-target="workspace" data-received={s.step >= 2 || undefined} style={compact ? { insetInlineStart: 32, top: 330, width: width - 64 } : { insetInlineStart: width - 196, top: 115, width: 164 }}>
           <div className="an-node-name"><Icon name="bell" size={13} /><strong>Activity</strong></div><span className="an-endpoint">Billing notifications</span>
           <div className="an-receipt"><States align="start" value={s.step >= 2 ? 'received' : 'waiting'} states={{ waiting: 'Waiting for event', received: 'Payment received' }} /></div><div className="an-receipt-amount" data-visible={s.step >= 2 || undefined}>$189.00 <span>Invoice 0084</span></div>
         </section>
-        <Connector className="an-request" from={from} to={to} route="straight" show={s.step >= 1 && a.width > 0} arrow label="POST" labelAt={compact ? .37 : .5} />
-        <Connector className="an-response" from={backFrom} to={backTo} route="straight" show={s.step >= 2 && b.width > 0} arrow dashed label="200 OK" labelAt={compact ? .37 : .5} />
-        <span className="an-composed-rest" data-target="flow-rest" style={{ left: width - 34, top: compact ? 275 : 290 }} />
+        <Connector className="an-request" from={X(from)} to={X(to)} route="straight" show={s.step >= 1 && a.width > 0} arrow label="POST" labelAt={compact ? .37 : .5} />
+        <Connector className="an-response" from={X(backFrom)} to={X(backTo)} route="straight" show={s.step >= 2 && b.width > 0} arrow dashed label="200 OK" labelAt={compact ? .37 : .5} />
+        <span className="an-composed-rest" data-target="flow-rest" style={{ insetInlineStart: width - 34, top: compact ? 275 : 290 }} />
       </>
     }}
   </Stage>
@@ -176,7 +187,10 @@ function BranchStudy({ width }: { width: number }) {
   const compact = width < 520
   const names = ['Preview', 'Search', 'Archive']
   return <Stage width={width} height={compact ? 340 : 320} initial={{ phase: 0, clearing: false }} poster={{ phase: 4, clearing: false }} script={branchScript} cursor={{ at: { x: 25, y: compact ? 312 : 292 } }} greys="cool" accent="#8659cc" className="an-study an-branch">
-    {(s, rect) => {
+    {(s, measuredRect, _layout, dir) => {
+      const rect = inLine(measuredRect, width, dir)
+      const X = (p: { x: number; y: number }) => mirror(p, width, dir)
+      const XX = (x: number) => mirrorX(x, width, dir)
       const source = rect('asset-source'), outputs = names.map((_, i) => rect(`asset-output-${i}`))
       const ports = outputs.map(r => compact ? { x: r.x + r.width / 2, y: r.y } : { x: r.x, y: r.y + r.height / 2 })
       const start = compact ? { x: source.x + source.width / 2, y: source.y + source.height } : { x: source.x + source.width, y: source.y + source.height / 2 }
@@ -185,20 +199,20 @@ function BranchStudy({ width }: { width: number }) {
       const measured = source.width > 0 && outputs.every(r => r.width > 0) && !s.clearing
       return <>
         <header className="an-flow-title"><strong>Asset processing</strong><span data-target="clear-jobs" data-cursor="hand">Clear jobs</span></header>
-        <section className="an-asset-source" data-target="asset-source" style={compact ? { left: (width - 180) / 2, top: 76, width: 180, height: 100 } : { left: 34, top: 110, width: 180, height: 100 }}>
+        <section className="an-asset-source" data-target="asset-source" style={compact ? { insetInlineStart: (width - 180) / 2, top: 76, width: 180, height: 100 } : { insetInlineStart: 34, top: 110, width: 180, height: 100 }}>
           <div className="an-asset-file"><Icon name="file" size={22} className="an-file-preview" /><div><strong>cover.jpg</strong><span>2.4 MB · Image</span></div></div>
           <div className="an-asset-action" data-target="process-asset" data-cursor="hand"><States value={s.phase === 0 ? 'idle' : s.phase === 1 ? 'storing' : 'stored'} states={{ idle: 'Process file', storing: 'Storing…', stored: 'Stored' }} /></div>
         </section>
-        {names.map((name, i) => <section className="an-asset-output" key={name} data-compact={compact || undefined} data-ready={s.phase >= (i === 1 ? 3 : 4) || undefined} aria-label={`${name}: ${s.phase >= (i === 1 ? 3 : 4) ? 'ready' : 'waiting'}`} style={compact ? { left: 16 + i * (width - 104) / 2, top: 254, width: 72, height: 48 } : { left: width - 214, top: 64 + i * 80, width: 180, height: 48 }}>
+        {names.map((name, i) => <section className="an-asset-output" key={name} data-compact={compact || undefined} data-ready={s.phase >= (i === 1 ? 3 : 4) || undefined} aria-label={`${name}: ${s.phase >= (i === 1 ? 3 : 4) ? 'ready' : 'waiting'}`} style={compact ? { insetInlineStart: 16 + i * (width - 104) / 2, top: 254, width: 72, height: 48 } : { insetInlineStart: width - 214, top: 64 + i * 80, width: 180, height: 48 }}>
           <strong className="an-job-pill" data-target={`asset-output-${i}`}><span>{name}</span><span className="an-job-mark"><Icon name="check" size={12} className="an-job-check" /></span></strong>
         </section>)}
         {/* Travel reaches the center first. Two non-overlapping spine halves
             grow out from there; outer branches wait for those arrivals.
             Connector owns each endpoint marker's actual arrival timing. */}
-        <Connector className="an-asset-trunk" from={start} to={junction} route="straight" show={measured && s.phase >= 1} />
-        {[0, 2].map(i => <Connector key={i} className={`an-asset-spine an-asset-spine--${i}`} from={junction} to={ends[i]} route="straight" show={measured && s.phase >= 2} />)}
-        {ports.map((port, i) => <Connector key={i} className={`an-asset-branch an-asset-branch--${i}`} from={ends[i]} to={port} route="straight" arrow show={measured && s.phase >= (i === 1 ? 2 : 3)} />)}
-        <span className="an-composed-rest" data-target="graph-rest" style={{ left: 24, top: compact ? 188 : 256 }} />
+        <Connector className="an-asset-trunk" from={X(start)} to={X(junction)} route="straight" show={measured && s.phase >= 1} />
+        {[0, 2].map(i => <Connector key={i} className={`an-asset-spine an-asset-spine--${i}`} from={X(junction)} to={X(ends[i])} route="straight" show={measured && s.phase >= 2} />)}
+        {ports.map((port, i) => <Connector key={i} className={`an-asset-branch an-asset-branch--${i}`} from={X(ends[i])} to={X(port)} route="straight" arrow show={measured && s.phase >= (i === 1 ? 2 : 3)} />)}
+        <span className="an-composed-rest" data-target="graph-rest" style={{ insetInlineStart: 24, top: compact ? 188 : 256 }} />
       </>
     }}
   </Stage>
@@ -220,19 +234,22 @@ function StreamStudy({ width }: { width: number }) {
   const compact = width < 520
   const revealId = `an-stream-${useId().replace(/:/g, '')}`
   return <Stage width={width} height={compact ? 504 : 330} initial={{ connected: false, receiving: false }} poster={{ connected: true, receiving: true }} script={streamScript} play="once" cursor={{ at: { x: 25, y: compact ? 356 : 270 } }} greys="cool" accent="#0d9488" className={`an-study an-stream${compact ? ' an-stream--compact' : ''}`}>
-    {(s, rect) => {
+    {(s, measuredRect, _layout, dir) => {
+      const rect = inLine(measuredRect, width, dir)
+      const X = (p: { x: number; y: number }) => mirror(p, width, dir)
+      const XX = (x: number) => mirrorX(x, width, dir)
       const a = rect('stream-source'), b = rect('stream-destination')
       const from = compact ? { x: a.x + a.width / 2, y: a.y + a.height } : { x: a.x + a.width, y: a.y + a.height / 2 }
       const to = compact ? { x: b.x + b.width / 2, y: b.y } : { x: b.x, y: from.y }
-      const path = `M${from.x} ${from.y}L${to.x} ${to.y}`
-      const arrow = compact ? `M${to.x - 3.5} ${to.y - 5}L${to.x} ${to.y}L${to.x + 3.5} ${to.y - 5}` : `M${to.x - 5} ${to.y - 3.5}L${to.x} ${to.y}L${to.x - 5} ${to.y + 3.5}`
+      const path = `M${XX(from.x)} ${from.y}L${XX(to.x)} ${to.y}`
+      const arrow = compact ? `M${XX(to.x - 3.5)} ${to.y - 5}L${XX(to.x)} ${to.y}L${XX(to.x + 3.5)} ${to.y - 5}` : `M${XX(to.x - 5)} ${to.y - 3.5}L${XX(to.x)} ${to.y}L${XX(to.x - 5)} ${to.y + 3.5}`
       return <>
         <header className="an-flow-title"><strong>Event stream</strong><span className="an-stream-status" data-live={s.receiving || undefined}><i /><States align="start" value={s.receiving ? 'live' : s.connected ? 'opening' : 'idle'} states={{ idle: 'Offline', opening: 'Connecting', live: 'Live' }} /></span></header>
-        <section className="an-stream-node an-stream-source" data-target="stream-source" style={compact ? { left: 32, top: 68, width: width - 64 } : { left: 32, top: 123, width: 160 }}>
+        <section className="an-stream-node an-stream-source" data-target="stream-source" style={compact ? { insetInlineStart: 32, top: 68, width: width - 64 } : { insetInlineStart: 32, top: 123, width: 160 }}>
           <div className="an-stream-source-title"><span className="an-stream-source-icon"><Icon name="bolt" size={16} /></span><div><strong>Checkout</strong><span>Production</span></div></div>
           <div className="an-stream-connect" data-target="connect-stream" data-cursor="hand"><States value={s.receiving ? 'live' : s.connected ? 'opening' : 'idle'} states={{ idle: 'Connect stream', opening: 'Connecting…', live: 'Connected' }} /></div>
         </section>
-        <section className="an-stream-warehouse" data-target="stream-destination" style={compact ? { left: 32, top: 266, width: width - 64 } : { left: width - 276, top: 80, width: 244 }}>
+        <section className="an-stream-warehouse" data-target="stream-destination" style={compact ? { insetInlineStart: 32, top: 266, width: width - 64 } : { insetInlineStart: width - 276, top: 80, width: 244 }}>
           <header><strong>Events</strong><span>Live feed</span></header>
           <div className="an-stream-columns"><span>Event</span><span>Time</span></div>
           <div className="an-stream-record" data-visible={s.receiving || undefined}><span><i /><States align="start" value={s.receiving ? 'live' : 'idle'} states={{ idle: 'Checkout started', live: 'Checkout completed' }} /></span><time><States align="end" value={s.receiving ? 'live' : 'idle'} states={{ idle: '14:31', live: '14:32' }} /></time></div>
@@ -246,8 +263,8 @@ function StreamStudy({ width }: { width: number }) {
           <path className="an-stream-phase" d={path} mask={`url(#${revealId})`} />
           <path className="an-stream-arrow" d={arrow} />
         </svg>
-        <span className="an-stream-rate" data-visible={s.receiving || undefined} style={compact ? { left: from.x + 12, top: (from.y + to.y) / 2 - 8 } : { left: (from.x + to.x) / 2, top: from.y - 26, transform: 'translateX(-50%)' }}>1.2k / sec</span>
-        <span className="an-stream-rest" data-target="stream-rest" style={{ left: width - 34, top: compact ? 215 : 290 }} />
+        <span className="an-stream-rate" data-visible={s.receiving || undefined} style={compact ? { insetInlineStart: from.x + 12, top: (from.y + to.y) / 2 - 8 } : { left: XX((from.x + to.x) / 2), top: from.y - 26, transform: 'translateX(-50%)' }}>1.2k / sec</span>
+        <span className="an-stream-rest" data-target="stream-rest" style={{ insetInlineStart: width - 34, top: compact ? 215 : 290 }} />
       </>
     }}
   </Stage>

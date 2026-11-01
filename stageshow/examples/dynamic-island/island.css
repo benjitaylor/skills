@@ -153,7 +153,8 @@
   .di-body {
     display: flex;
     flex-direction: column;
-    padding: 22px 26px 20px 28px;
+    padding-block: 22px 20px;
+    padding-inline: 28px 26px;
     color: #fff;
     scale: 0.94;
     transform-origin: 50% 20%;
@@ -208,7 +209,8 @@
 
   .di-track__fill {
     position: absolute;
-    inset: 0 auto 0 0;
+    inset-block: 0;
+    inset-inline: 0 auto;
     width: calc(var(--p) * 100%);
     border-radius: inherit;
     background: var(--di-accent);
@@ -218,7 +220,7 @@
   .di-track__rider {
     position: absolute;
     top: 50%;
-    left: calc(var(--p) * 100%);
+    inset-inline-start: calc(var(--p) * 100%);
     display: grid;
     place-items: center;
     width: 26px;
@@ -235,7 +237,7 @@
   .di-track__end {
     position: absolute;
     top: 50%;
-    right: 0;
+    inset-inline-end: 0;
     width: 14px;
     height: 14px;
     border-radius: 50%;

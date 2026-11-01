@@ -10,7 +10,8 @@ import './grid.css'
 type Draft = { tab: number; sent: 'idle' | 'busy' | 'done'; selected: boolean; gap: number }
 const INITIAL: Draft = { tab: 0, sent: 'idle', selected: false, gap: 24 }
 const POSTER: Draft = { tab: 1, sent: 'done', selected: true, gap: 25 }
-const at = (left: number, top: number, width?: number, height?: number): CSSProperties => ({ left, top, width, height })
+// Placed from the line's start, so a mirrored scene mirrors its layout
+const at = (left: number, top: number, width?: number, height?: number): CSSProperties => ({ insetInlineStart: left, top, width, height })
 
 const draft = async (a: Act<Draft>) => {
   await a.wait(650)
@@ -121,7 +122,7 @@ function keySize(w: number, h: number) {
 function Keys({ w, h }: { w: number; h: number }) {
   const { size, gap } = keySize(w, h)
   return <Stage width={w} height={h} className="hg-keys">{() => (
-    <div className="hg-keyboard" style={{ '--hg-key': `${size}px`, '--hg-key-gap': `${gap}px` } as CSSProperties} data-crop>
+    <div className="hg-keyboard" dir="ltr" style={{ '--hg-key': `${size}px`, '--hg-key-gap': `${gap}px` } as CSSProperties} data-crop>
       {KEY_ROWS.map((row, y) => <div className="hg-key-row" key={y}>{row.map(([latin, kana], x) => {
         const whole = 14 + x * (size + gap) + size <= w && 14 + y * (size + gap) + size <= h
         return <span className="hg-key" key={latin}>{whole && <><small>{latin}</small><span>{kana}</span></>}</span>
@@ -160,8 +161,8 @@ function Player({ w, h }: { w: number; h: number }) {
       <span className="hg-cover" aria-label="Graphic album artwork"><span className="hg-cover-sun" /><span className="hg-cover-sea" /></span>
       <div className="hg-player-side">
         <span className="hg-player-names"><strong>Low Tide</strong><span>Marlo</span></span>
-        <span className="hg-player-progress"><span className="hg-player-rail"><i /></span><span className="hg-player-times"><span>2:38</span><span>2:48</span></span></span>
-        <span className="hg-player-controls" aria-label="Playback paused"><svg viewBox="0 0 16 16" width="18" height="18" aria-hidden><path d="M3.2 3h1.6v10H3.2zM13 3.7v8.6a.7.7 0 0 1-1.07.6L5.6 8.6a.7.7 0 0 1 0-1.2l6.33-4.3A.7.7 0 0 1 13 3.7Z" /></svg><span className="hg-player-play"><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden><path d="M5 2.8v10.4L13 8Z" /></svg></span><svg viewBox="0 0 16 16" width="18" height="18" aria-hidden><path d="M11.2 3h1.6v10h-1.6zM3 3.7v8.6a.7.7 0 0 0 1.07.6l6.33-4.3a.7.7 0 0 0 0-1.2L4.07 3.1A.7.7 0 0 0 3 3.7Z" /></svg></span>
+        <span className="hg-player-progress" dir="ltr"><span className="hg-player-rail"><i /></span><span className="hg-player-times"><span>2:38</span><span>2:48</span></span></span>
+        {/* Playback reads left to right in every language: transport and timeline never mirror */}<span className="hg-player-controls" dir="ltr" aria-label="Playback paused"><svg viewBox="0 0 16 16" width="18" height="18" aria-hidden><path d="M3.2 3h1.6v10H3.2zM13 3.7v8.6a.7.7 0 0 1-1.07.6L5.6 8.6a.7.7 0 0 1 0-1.2l6.33-4.3A.7.7 0 0 1 13 3.7Z" /></svg><span className="hg-player-play"><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden><path d="M5 2.8v10.4L13 8Z" /></svg></span><svg viewBox="0 0 16 16" width="18" height="18" aria-hidden><path d="M11.2 3h1.6v10h-1.6zM3 3.7v8.6a.7.7 0 0 0 1.07.6l6.33-4.3a.7.7 0 0 0 0-1.2L4.07 3.1A.7.7 0 0 0 3 3.7Z" /></svg></span>
       </div>
     </div>
   )}</Stage>

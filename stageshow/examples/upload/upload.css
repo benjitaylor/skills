@@ -90,16 +90,16 @@
 
 .up-head > span,
 .up-row > * {
-  padding-left: 12px;
+  padding-inline-start: 12px;
 }
 
 .up-head > span + span {
-  border-left: 1px solid var(--ss-line);
+  border-inline-start: 1px solid var(--ss-line);
   line-height: 15px;
 }
 
 .up-row > .ss-bar {
-  margin-left: 12px;
+  margin-inline-start: 12px;
   padding: 0;
 }
 
@@ -159,7 +159,7 @@
 }
 
 .up-new > .ss-states {
-  padding-left: 12px;
+  padding-inline-start: 12px;
 }
 
 .up-track {
@@ -223,7 +223,7 @@
   content: '';
   position: absolute;
   top: 0;
-  right: 0;
+  inset-inline-end: 0;
   width: 30%;
   height: 23%;
   background: linear-gradient(225deg, transparent 50%, #e4e4e7 50%);
@@ -231,8 +231,8 @@
 
 .up-pdf__band {
   position: absolute;
-  left: 0;
-  right: 0;
+  inset-inline-start: 0;
+  inset-inline-end: 0;
   bottom: 10px;
   padding: 2px 0;
   background: #e5484d;
@@ -268,7 +268,7 @@
 .up-drag {
   position: absolute;
   top: 0;
-  left: 0;
+  left: 0; /* physical: moved by a translate from measured x */
   z-index: 30;
   pointer-events: none;
   opacity: 0;

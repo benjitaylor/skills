@@ -115,7 +115,7 @@
 .ln-window {
   position: absolute;
   top: var(--gutter);
-  left: var(--gutter);
+  inset-inline-start: var(--gutter);
   width: 860px;
   height: 500px;
   background: var(--ss-canvas);
@@ -124,7 +124,7 @@
 
 [data-layout="compact"] .ln-window {
   top: 16px;
-  left: 16px;
+  inset-inline-start: 16px;
   width: 388px;
   height: 360px;
 }
@@ -137,12 +137,13 @@
 }
 
 .ln-window .ss-window__side {
-  border-right: 0;
+  border-inline-end: 0;
 }
 
 /* Linear's content sits in an inset panel inside the frame */
 .ln-window[data-kind="sidebar"] .ss-window__main {
-  margin: 8px 8px 0 0;
+  margin-block: 8px 0;
+  margin-inline: 0 8px;
   border-radius: 10px 10px 0 0;
   /* The edge is a shadow, so the panel's own box meets the sidebar exactly */
   box-shadow: var(--ln-panel-shadow);
@@ -248,14 +249,14 @@
 }
 
 .ln-team .ln-icon {
-  margin-left: -3px;
+  margin-inline-start: -3px;
 }
 
 .ln-sub {
   display: flex;
   flex-direction: column;
   gap: 2px;
-  padding-left: 14px;
+  padding-inline-start: 14px;
 }
 
 .ln-icon--on {
@@ -268,11 +269,11 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-left: 2px;
+  margin-inline-start: 2px;
 }
 
 [data-layout="compact"] .ln-crumbs {
-  margin-left: 12px;
+  margin-inline-start: 12px;
 }
 
 .ln-crumbs__team {
@@ -286,7 +287,7 @@
   display: flex;
   align-items: center;
   gap: 4px;
-  margin-left: 10px;
+  margin-inline-start: 10px;
 }
 
 .ln-tab {
@@ -390,7 +391,8 @@
   align-items: center;
   gap: 6px;
   height: 22px;
-  padding: 0 9px 0 8px;
+  padding-block: 0;
+  padding-inline: 8px 9px;
   border-radius: 11px;
   box-shadow: inset 0 0 0 1px var(--ln-chip-line);
 }
@@ -551,7 +553,7 @@
 
 .ln-cmd {
   top: 128px;
-  left: 190px;
+  inset-inline-start: 190px;
   width: 560px;
   padding: 0;
   border-radius: 12px;
@@ -561,7 +563,7 @@
 
 [data-layout="compact"] .ln-cmd {
   top: 66px;
-  left: 30px;
+  inset-inline-start: 30px;
   width: 360px;
 }
 

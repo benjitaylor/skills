@@ -8,7 +8,7 @@
 .mo-grid {
   position: absolute;
   top: -78px;
-  left: -116px;
+  inset-inline-start: -116px;
   display: grid;
   grid-template-columns: repeat(5, 184px);
   gap: 16px;
@@ -84,5 +84,5 @@
 
 /* Narrow: the same grid, shifted so the focus tile sits in the middle */
 .mo .ss-stage[data-layout='compact'] .mo-grid {
-  left: -321px;
+  inset-inline-start: -321px;
 }

@@ -18,7 +18,7 @@
 .lk-transfer-head { display: flex; align-items: center; gap: 7px; font-weight: 550; white-space: nowrap; }
 .lk-transfer-symbol { display: grid; place-items: center; width: 24px; height: 24px; flex: none; border: 1px solid #d8e2ec; border-radius: 6px; background: linear-gradient(#fff, #f0f4f8); box-shadow: inset 0 1px 0 #fff, 0 1px 1px #2233440a; }
 .lk-transfer-symbol svg { width: 17px; height: 17px; fill: none; stroke: #60788e; stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; }
-.lk-transfer-id { margin-left: auto; color: #8794a1; font: 10px/17px var(--ss-mono); font-weight: 400; }
+.lk-transfer-id { margin-inline-start: auto; color: #8794a1; font: 10px/17px var(--ss-mono); font-weight: 400; }
 .lk-transfer-amount { display: grid; gap: 4px; margin: 24px 0 22px; color: #7c8995; }
 .lk-transfer-amount strong { font-size: 35px; line-height: 42px; font-weight: 550; letter-spacing: -1.4px; color: #233647; font-variant-numeric: tabular-nums; }
 .lk-transfer-amount strong span { color: #91a0ae; }
@@ -26,11 +26,11 @@
 .lk-transfer-details > div { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
 .lk-transfer-details dt { color: #7c8995; }
 .lk-transfer-details dd { margin: 0; font-weight: 500; }
-.lk-transfer-details dd span { margin-left: 5px; color: #8794a1; font-weight: 400; }
+.lk-transfer-details dd span { margin-inline-start: 5px; color: #8794a1; font-weight: 400; }
 .lk-transfer-status { display: flex; align-items: center; gap: 6px; padding: 12px 11px 13px; color: #557461; text-shadow: 0 1px 0 #ffffffb3; }
 .lk-transfer-check { display: grid; place-items: center; width: 16px; height: 16px; border: 1px solid #b7cdbc; border-radius: 50%; background: linear-gradient(#f0f8f1, #dceadd); box-shadow: inset 0 1px 0 #fff, 0 1px 1px #48664f0f; }
 .lk-transfer-check svg { width: 13px; height: 13px; fill: none; stroke: #62846a; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
-.lk-transfer-date { margin-left: auto; color: #8794a1; }
+.lk-transfer-date { margin-inline-start: auto; color: #8794a1; }
 .lk-pair .ss-stage[data-layout="compact"] .lk-transfer-frame { width: 256px; }
 .lk-pair .ss-stage[data-layout="compact"] .lk-transfer-paper { padding-inline: 14px; }
 .lk-pair .ss-stage[data-layout="compact"] .lk-transfer-id { display: none; }

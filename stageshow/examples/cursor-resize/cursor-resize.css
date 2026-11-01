@@ -24,8 +24,8 @@
 
 .cr-handle[data-side='n'],
 .cr-handle[data-side='s'] {
-  left: 6px;
-  right: 6px;
+  inset-inline-start: 6px;
+  inset-inline-end: 6px;
   height: 8px;
 }
 
@@ -39,8 +39,8 @@
   width: 8px;
 }
 
-.cr-handle[data-side='w'] { left: -4px; }
-.cr-handle[data-side='e'] { right: -4px; }
+.cr-handle[data-side='w'] { inset-inline-start: -4px; }
+.cr-handle[data-side='e'] { inset-inline-end: -4px; }
 
 .cr-handle:is([data-side='nw'], [data-side='ne'], [data-side='sw'], [data-side='se']) {
   z-index: 2;
@@ -51,10 +51,10 @@
   background: #fff;
 }
 
-.cr-handle[data-side='nw'] { left: -4px; top: -4px; }
-.cr-handle[data-side='ne'] { right: -4px; top: -4px; }
-.cr-handle[data-side='sw'] { left: -4px; bottom: -4px; }
-.cr-handle[data-side='se'] { right: -4px; bottom: -4px; }
+.cr-handle[data-side='nw'] { inset-inline-start: -4px; top: -4px; }
+.cr-handle[data-side='ne'] { inset-inline-end: -4px; top: -4px; }
+.cr-handle[data-side='sw'] { inset-inline-start: -4px; bottom: -4px; }
+.cr-handle[data-side='se'] { inset-inline-end: -4px; bottom: -4px; }
 
 .cr-size {
   position: absolute;
@@ -73,7 +73,7 @@
 
 .cr-rest {
   position: absolute;
-  left: 64px;
+  inset-inline-start: 64px;
   top: 252px;
   width: 1px;
   height: 1px;

@@ -61,7 +61,8 @@
 /* Narrow: a gutter each side, the window keeps its size and runs off the
    right; the commit and the status stay whole */
 .fc .ss-stage[data-layout='compact'] .fc-mask {
-  padding: 32px 0 0 16px;
+  padding-block: 32px 0;
+  padding-inline: 16px 0;
 }
 
 .fc .ss-stage[data-layout='compact'] .fc-win {

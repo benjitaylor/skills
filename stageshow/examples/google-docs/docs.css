@@ -16,7 +16,7 @@
 
 .gd-window {
   position: absolute;
-  left: 40px;
+  inset-inline-start: 40px;
   top: 40px;
   width: 860px;
   height: 700px;
@@ -25,7 +25,7 @@
 }
 
 .gd-window[data-layout="compact"] {
-  left: 20px;
+  inset-inline-start: 20px;
   top: 20px;
   width: 420px;
   height: 560px;
@@ -49,7 +49,8 @@
   align-items: center;
   gap: 10px;
   height: 64px;
-  padding: 0 16px 0 14px;
+  padding-block: 0;
+  padding-inline: 14px 16px;
   background: var(--gd-surface);
 }
 
@@ -57,7 +58,8 @@
   flex-shrink: 0;
   /* The glyph's page is narrower than its square box: trim the box's side
      air so the gap to the title stays as it was */
-  margin: 0 1px 0 -1px;
+  margin-block: 0;
+  margin-inline: -1px 1px;
 }
 
 .gd-titleblock {
@@ -87,7 +89,7 @@
 .gd-menus {
   display: flex;
   gap: 2px;
-  margin-left: -6px;
+  margin-inline-start: -6px;
   font-size: 13px;
   line-height: 22px;
   color: var(--gd-ink);
@@ -101,7 +103,7 @@
   display: flex;
   align-items: center;
   gap: 16px;
-  margin-left: auto;
+  margin-inline-start: auto;
 }
 
 .gd-share {
@@ -172,7 +174,7 @@
 }
 
 .gd-toolbar__end {
-  margin-left: auto;
+  margin-inline-start: auto;
 }
 
 /* ---- Canvas, page ---- */
@@ -186,13 +188,13 @@
 
 .gd-outline {
   position: absolute;
-  left: 22px;
+  inset-inline-start: 22px;
   top: 22px;
 }
 
 .gd-page {
   position: absolute;
-  left: 72px;
+  inset-inline-start: 72px;
   top: 16px;
   width: 500px;
   bottom: 0;
@@ -204,10 +206,11 @@
 }
 
 [data-layout="compact"] .gd-page {
-  left: 12px;
+  inset-inline-start: 12px;
   top: 12px;
   width: 396px;
-  padding: 28px 54px 0 24px;
+  padding-block: 28px 0;
+  padding-inline: 24px 54px;
 }
 
 .gd-h1 {
@@ -278,7 +281,7 @@
 
 .gd-margin {
   position: absolute;
-  left: 528px;
+  inset-inline-start: 528px;
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -294,7 +297,7 @@
 }
 
 [data-layout="compact"] .gd-margin {
-  left: 360px;
+  inset-inline-start: 360px;
 }
 
 .gd-margin[data-show] {
@@ -323,7 +326,7 @@
 
 .gd-card {
   position: absolute;
-  left: 596px;
+  inset-inline-start: 596px;
   width: 240px;
   padding: 16px 16px 14px;
   border-radius: 10px;
@@ -339,7 +342,7 @@
 }
 
 [data-layout="compact"] .gd-card {
-  left: 124px;
+  inset-inline-start: 124px;
   width: 256px;
   padding: 14px 14px 12px;
   font-size: 12.5px;
@@ -353,7 +356,8 @@
 }
 
 .gd-card[data-state="resolved"] {
-  margin: 0 -14px 0 14px;
+  margin-block: 0;
+  margin-inline: 14px -14px;
   transition: opacity 0.4s ease, margin 0.6s cubic-bezier(0.45, 0, 0.1, 1);
 }
 
@@ -391,7 +395,7 @@
 .gd-acts {
   display: flex;
   gap: 2px;
-  margin-right: -6px;
+  margin-inline-end: -6px;
   opacity: 0;
   transition: opacity 0.3s ease 0.15s;
 }
@@ -450,7 +454,8 @@
 
 .gd-field__ph {
   position: absolute;
-  inset: 0 0 auto 3px;
+  inset-block: 0 auto;
+  inset-inline: 3px 0;
   color: var(--gd-muted);
   white-space: nowrap;
   overflow: hidden;
@@ -471,7 +476,7 @@
   display: inline-block;
   width: 1.5px;
   height: 15px;
-  margin-left: 1px;
+  margin-inline-start: 1px;
   vertical-align: -3px;
   background: var(--gd-ink);
   opacity: 0;

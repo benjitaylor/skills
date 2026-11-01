@@ -1,6 +1,6 @@
 import { useLayoutEffect, useRef, type ReactNode } from 'react'
 import { ChevronLeft, ChevronRight, File, Folder, LayoutGrid, List, Search, Share } from 'lucide-react'
-import { Bar, Collapse, Count, Stage, States, Window, type Act, type Layout, type Point, Meter } from '../../kit'
+import { Bar, Collapse, Count, Stage, States, Window, type Act, type Layout, type Point, Meter, fromStart } from '../../kit'
 import './upload.css'
 
 // A file storage app, list view. A PDF sits on the desktop beside the
@@ -67,7 +67,7 @@ async function script(a: Act<S>) {
   // 2. Carry it into the window; the list lights up under it
   a.mark('drag')
   const list = a.rect('drop')
-  await a.drag({ x: list.x + list.width * 0.36, y: list.y + list.height * 0.32 }, (at) => {
+  await a.drag(fromStart(list, list.width * 0.36, list.height * 0.32, a.dir), (at) => {
     a.put({ ghost: { on: true, dropped: false, off, at } })
   }, { duration: 1300, cursor: 'preserve' })
 
@@ -113,7 +113,7 @@ export default function UploadDemo() {
         const lifted = s.ghost.on && !s.ghost.dropped
         return (
           <>
-            <div className="up-desk" data-target="desk-file" data-lifted={lifted || undefined} style={{ left: g.desk.x, top: g.desk.y }}>
+            <div className="up-desk" data-target="desk-file" data-lifted={lifted || undefined} style={{ insetInlineStart: g.desk.x, top: g.desk.y }}>
               <span data-target="desk-icon">
                 <PdfIcon />
               </span>
@@ -122,12 +122,12 @@ export default function UploadDemo() {
 
             <Window
               className="up-window"
-              style={{ left: g.win.x, top: g.win.y, width: g.win.w, height: g.win.h }}
+              style={{ insetInlineStart: g.win.x, top: g.win.y, width: g.win.w, height: g.win.h }}
               lead={
                 <span className="up-lead">
                   <span className="up-nav">
-                    <ChevronLeft size={18} strokeWidth={1.75} />
-                    <ChevronRight size={18} strokeWidth={1.75} className="up-nav-off" />
+                    <ChevronLeft data-flip size={18} strokeWidth={1.75} />
+                    <ChevronRight data-flip size={18} strokeWidth={1.75} className="up-nav-off" />
                   </span>
                   <span className="up-heading">Projects</span>
                 </span>

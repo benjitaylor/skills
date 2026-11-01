@@ -31,7 +31,7 @@
   .sb-window {
     position: absolute;
     top: var(--gutter);
-    left: 196px;
+    inset-inline-start: 196px;
     width: 560px;
     height: 440px;
     background: var(--ss-surface);
@@ -67,7 +67,7 @@
     gap: 4px;
     width: 150px;
     padding: 16px 10px;
-    border-right: 1px solid var(--ss-line);
+    border-inline-end: 1px solid var(--ss-line);
     background: var(--ss-canvas);
   }
 
@@ -112,7 +112,8 @@
     min-width: 0;
     /* The window runs 36px past the stage's right edge: the content stops a
        gutter short of what is visible, not of the window */
-    padding: 18px calc(22px + 36px) 18px 22px;
+    padding-block: 18px;
+    padding-inline: 22px calc(22px + 36px);
   }
 
   .sb-head {
@@ -239,7 +240,7 @@
   .sb-checkout {
     position: absolute;
     top: 148px;
-    left: var(--gutter);
+    inset-inline-start: var(--gutter);
     display: grid;
     gap: 14px;
     width: 236px;
@@ -248,7 +249,7 @@
     background: var(--ss-surface);
     box-shadow: var(--ss-shadow-satellite);
     opacity: 0;
-    transform: translateX(-14px);
+    transform: translateX(calc(-14px * var(--ss-x, 1)));
     will-change: transform;
     transition: opacity 0.22s ease, transform 0.4s var(--sb-travel);
   }
@@ -327,7 +328,7 @@
   }
 
   [data-layout='compact'] .sb-window {
-    left: 48px;
+    inset-inline-start: 48px;
     width: 334px;
     height: 460px;
   }
@@ -336,7 +337,8 @@
   [data-layout='compact'] .sb-head-tile { display: grid; }
 
   [data-layout='compact'] .sb-main {
-    padding: 16px calc(18px + 24px) 16px 18px;
+    padding-block: 16px;
+    padding-inline: 18px calc(18px + 24px);
   }
 
   [data-layout='compact'] .sb-checkout {

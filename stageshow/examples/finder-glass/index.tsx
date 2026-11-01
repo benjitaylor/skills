@@ -168,9 +168,9 @@ export default function FinderGlassDemo() {
                 <span className="fgl-lead">
                   <Tool label="Back/Forward">
                     <span className="fgl-cap fgl-nav" data-target={wide ? undefined : 'back'}>
-                      <ChevronLeft {...tb} />
+                      <ChevronLeft data-flip {...tb} />
                       <span className="fgl-nav__rule" />
-                      <ChevronRight {...tb} className="fgl-off" />
+                      <ChevronRight data-flip {...tb} className="fgl-off" />
                     </span>
                   </Tool>
                   <span className="fgl-heading">
@@ -323,7 +323,7 @@ function Column({ rows, sel, open = true }: { rows: Row[]; sel: Record<string, S
           <div key={i} className="fgl-row" data-sel={state} data-target={r.target}>
             <FileIcon kind={r.kind} thumb={r.target === 'file'} />
             {typeof r.name === 'string' ? <span className="fgl-row__name">{r.name}</span> : <Bar w={r.name} h={6} tone={3} />}
-            {r.kind === 'folder' && <ChevronRight size={12} strokeWidth={2} className="fgl-row__chev" />}
+            {r.kind === 'folder' && <ChevronRight data-flip size={12} strokeWidth={2} className="fgl-row__chev" />}
           </div>
         )
       })}

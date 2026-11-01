@@ -99,7 +99,7 @@
   /* The measured Stage reaches the tile edge, where the crop belongs. */
   & .kb-picture--hero,
   & .kb-picture--aligned {
-    left: 0;
+    inset-inline-start: 0;
     width: 100%;
   }
 
@@ -108,7 +108,7 @@
   & .kb-picture--small {
     left: 50%;
     width: 360px;
-    margin-left: -180px;
+    margin-inline-start: -180px;
   }
 
   & .kb-stage .ss-stage {
@@ -120,9 +120,9 @@
 
   & .kb-window {
     position: absolute;
-    /* One gutter above and to the left: a corner bleed */
+    /* One gutter above and to the inset-inline-start: a corner bleed */
     top: var(--pad);
-    left: var(--pad);
+    inset-inline-start: var(--pad);
     width: max(780px, calc(100% + var(--pad)));
     height: 380px;
     --ss-canvas: #fff;
@@ -131,7 +131,7 @@
 
   & .kb-window--compact {
     top: 24px;
-    left: 24px;
+    inset-inline-start: 24px;
     width: calc(100% + 24px);
     height: 340px;
   }
@@ -148,7 +148,8 @@
     place-items: center;
     width: 22px;
     height: 22px;
-    margin: 4px 0 12px 8px;
+    margin-block: 4px 12px;
+    margin-inline: 8px 0;
     border-radius: 7px;
     background: var(--accent);
     color: #fff;
@@ -209,7 +210,7 @@
     display: flex;
     align-items: center;
     gap: 12px;
-    padding-left: 18px;
+    padding-inline-start: 18px;
   }
 
   & .kb-window--compact .kb-row {
@@ -259,7 +260,7 @@
     background: #fff;
     box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.08), 0 2px 4px rgba(0, 0, 0, 0.06);
     opacity: 0;
-    transform: translate(46px, -54px) rotate(9deg) scale(1.5);
+    transform: translate(calc(46px * var(--ss-x, 1)), -54px) rotate(calc(9deg * var(--ss-x, 1))) scale(1.5);
     will-change: transform;
     transition: transform 0.9s cubic-bezier(0.25, 0.8, 0.25, 1), opacity 0.3s ease, box-shadow 0.9s ease;
   }
@@ -358,7 +359,7 @@
   & .kb-card {
     position: absolute;
     top: 62px;
-    left: 50px;
+    inset-inline-start: 50px;
     box-sizing: border-box;
     width: 260px;
     height: 164px;
@@ -385,12 +386,12 @@
     position: absolute;
     inset: -40%;
     background: linear-gradient(105deg, transparent 40%, rgba(255, 255, 255, 0.16) 50%, transparent 60%);
-    transform: translateX(-60%);
+    transform: translateX(calc(-60% * var(--ss-x, 1)));
     transition: transform 1.6s cubic-bezier(0.45, 0, 0.1, 1) 0.15s;
   }
 
   & .kb-card[data-on]::after {
-    transform: translateX(60%);
+    transform: translateX(calc(60% * var(--ss-x, 1)));
   }
 
   & .kb-card-mark {
@@ -416,10 +417,10 @@
     color: rgba(255, 255, 255, 0.92);
   }
 
-  & .kb-card-name { left: 20px; }
+  & .kb-card-name { inset-inline-start: 20px; }
 
   & .kb-card-last {
-    right: 20px;
+    inset-inline-end: 20px;
     font-variant-numeric: tabular-nums;
   }
 
@@ -428,7 +429,7 @@
   & .kb-request {
     position: absolute;
     top: 16px;
-    left: var(--pad);
+    inset-inline-start: var(--pad);
     box-sizing: border-box;
     width: calc(100% - 2 * var(--pad));
     height: 210px;
@@ -528,7 +529,7 @@
   & .kb-merchants {
     position: absolute;
     top: 16px;
-    left: var(--pad);
+    inset-inline-start: var(--pad);
     display: flex;
     flex-direction: column;
     gap: 14px;
@@ -543,7 +544,8 @@
     width: 112px;
     box-sizing: border-box;
     height: 36px;
-    padding: 0 12px 0 8px;
+    padding-block: 0;
+    padding-inline: 8px 12px;
     border-radius: 11px;
     background: #fff;
     box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.05), 0 2px 6px -2px rgba(0, 0, 0, 0.08);
@@ -567,7 +569,7 @@
     top: 58px;
     /* Room between the columns, so the three lines bend, merge and run level
        into the account rather than knotting at its edge */
-    right: var(--pad);
+    inset-inline-end: var(--pad);
     display: flex;
     flex-direction: column;
     justify-content: center;

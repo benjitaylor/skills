@@ -40,7 +40,7 @@ const script = async (a: Act<S>) => {
 export default function PayoutFlow() {
   return (
     <Stage<S> width={640} height={400} compact={{ below: 600, width: 358, height: 610 }} initial={START} play="once" poster={{ step: 6, sent: true }} script={script} className="sp">
-      {(s, rect, layout) => {
+      {(s, rect, layout, dir) => {
         const compact = layout === 'compact'
         const row = rect('row-0')
         const card = rect('instant')
@@ -117,14 +117,19 @@ export default function PayoutFlow() {
             {row.width > 0 && card.width > 0 && (
               <Connector
                 show={s.step >= 4}
-                from={{ x: compact ? row.x - 6 : row.x + row.width + 6, y: row.y + row.height / 2 }}
-                to={{ x: card.x, y: compact ? card.y + 24 : row.y + row.height / 2 }}
+                // From the row's end edge to the card's start edge (rects are
+                // physical: the end is the right in ltr and the left in rtl)
+                from={{ x: compact ? (dir === 'rtl' ? row.x + row.width + 6 : row.x - 6) : dir === 'rtl' ? row.x - 6 : row.x + row.width + 6, y: row.y + row.height / 2 }}
+                to={{ x: dir === 'rtl' ? card.x + card.width : card.x, y: compact ? card.y + 24 : row.y + row.height / 2 }}
                 route={compact ? 'v' : 'straight'}
               />
             )}
 
-            <div className="sp-note" data-in={s.step >= 6 || undefined} style={{ left: card.x, top: card.y + card.height + 16 }}>
-              Arrives in about 30 minutes
+            {/* A row as wide as the card, so the note starts where the card does in either direction */}
+            <div style={{ position: 'absolute', display: 'flex', left: card.x, width: card.width, top: card.y + card.height + 16 }}>
+              <div className="sp-note" data-in={s.step >= 6 || undefined} style={{ position: 'relative' }}>
+                Arrives in about 30 minutes
+              </div>
             </div>
           </>
         )

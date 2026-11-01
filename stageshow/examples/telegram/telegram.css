@@ -21,7 +21,7 @@
   .tg-phone {
     position: absolute;
     top: -225px;
-    left: 30px;
+    inset-inline-start: 30px;
   }
 
   .ss-phone__content {
@@ -62,8 +62,8 @@
   .tg-head {
     position: absolute;
     top: 66px;
-    right: 16px;
-    left: 16px;
+    inset-inline-end: 16px;
+    inset-inline-start: 16px;
     z-index: 3;
     display: flex;
     align-items: center;
@@ -127,7 +127,8 @@
 
   .ss-bubble {
     max-width: 82%;
-    padding: 6px 10px 6px 12px;
+    padding-block: 6px;
+    padding-inline: 12px 10px;
     border-radius: 18px;
     line-height: 22px;
     letter-spacing: -0.02em;
@@ -140,11 +141,11 @@
   }
 
   [data-from='me'] > .ss-bubble > .ss-bubble__tail {
-    right: -5px;
+    inset-inline-end: -5px;
   }
 
   [data-from='them'] > .ss-bubble > .ss-bubble__tail {
-    left: -5px;
+    inset-inline-start: -5px;
   }
 
   .ss-bubble-row[data-from='me'] + .ss-bubble-row[data-from='them'],
@@ -159,7 +160,7 @@
     display: inline-flex;
     align-items: center;
     gap: 3px;
-    margin-left: 10px;
+    margin-inline-start: 10px;
     color: var(--tg-in-meta);
     font-size: 12px;
     letter-spacing: 0;
@@ -173,7 +174,7 @@
 
   .tg-ticks {
     flex: none;
-    margin-right: -2px;
+    margin-inline-end: -2px;
     fill: none;
     stroke: currentColor;
     stroke-width: 1.35;
@@ -226,7 +227,7 @@
   .tg-photo__time,
   .tg-big__time {
     position: absolute;
-    right: 8px;
+    inset-inline-end: 8px;
     bottom: 8px;
     padding: 2px 7px;
     border-radius: 10px;
@@ -240,7 +241,7 @@
   /* A lone emoji is the message: big, no bubble, its time in a pill */
   .tg-big > .ss-bubble {
     --b: transparent;
-    margin-left: 6px;
+    margin-inline-start: 6px;
     padding: 0 0 4px;
   }
 
@@ -264,7 +265,7 @@
   }
 
   .tg-big__time {
-    right: -46px;
+    inset-inline-end: -46px;
     bottom: 2px;
     background: rgba(40, 70, 40, 0.3);
   }
@@ -309,7 +310,8 @@
     align-items: center;
     min-width: 0;
     height: 44px;
-    padding: 0 10px 0 16px;
+    padding-block: 0;
+    padding-inline: 16px 10px;
     border-radius: 22px;
     font-size: 17px;
     letter-spacing: -0.02em;
@@ -326,7 +328,7 @@
     display: inline-block;
     width: 2px;
     height: 21px;
-    margin-left: 1px;
+    margin-inline-start: 1px;
     border-radius: 1px;
     background: var(--tg-blue);
     vertical-align: -4px;
@@ -334,7 +336,7 @@
 
   .tg-field__ph {
     position: absolute;
-    left: 16px;
+    inset-inline-start: 16px;
     color: #a2a6ab;
     pointer-events: none;
     /* Comes back once the sent words have lifted clear of the field */

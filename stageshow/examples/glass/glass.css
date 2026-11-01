@@ -1,7 +1,7 @@
 .gl-window {
   position: absolute;
   top: 48px;
-  left: 64px;
+  inset-inline-start: 64px;
   width: 440px;
   height: 300px;
 }
@@ -46,13 +46,13 @@
 }
 
 .gl-row > :last-child {
-  margin-left: auto;
+  margin-inline-start: auto;
 }
 
 .gl-chip {
   position: absolute;
   top: 80px;
-  left: 456px;
+  inset-inline-start: 456px;
   display: flex;
   align-items: center;
   gap: 7px;
@@ -72,22 +72,22 @@
 
 .gl-menu {
   top: 230px;
-  left: 420px;
+  inset-inline-start: 420px;
   width: 168px;
 }
 
 .gl .ss-stage[data-layout="compact"] .gl-window {
   top: 32px;
-  left: 16px;
+  inset-inline-start: 16px;
   width: 318px;
 }
 
 .gl .ss-stage[data-layout="compact"] .gl-chip {
   top: 200px;
-  left: 190px;
+  inset-inline-start: 190px;
 }
 
 .gl .ss-stage[data-layout="compact"] .gl-menu {
   top: 252px;
-  left: 166px;
+  inset-inline-start: 166px;
 }

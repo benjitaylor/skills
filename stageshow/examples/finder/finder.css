@@ -141,16 +141,16 @@
 
 .fq-head > span,
 .fq-row > * {
-  padding-left: 10px;
+  padding-inline-start: 10px;
 }
 
 .fq-head > span + span {
-  border-left: 1px solid var(--ss-line);
+  border-inline-start: 1px solid var(--ss-line);
   line-height: 14px;
 }
 
 .fq-row > .ss-bar {
-  margin-left: 10px;
+  margin-inline-start: 10px;
   padding: 0;
 }
 
@@ -336,7 +336,7 @@
 .fq-drag {
   position: absolute;
   top: 0;
-  left: 0;
+  left: 0; /* physical: moved by a translate from measured x */
   z-index: 30;
   pointer-events: none;
   opacity: 0;

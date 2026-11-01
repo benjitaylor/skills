@@ -31,7 +31,7 @@
 
 .gc-window {
   position: absolute;
-  left: 36px;
+  inset-inline-start: 36px;
   top: 36px;
   width: 860px;
   height: 560px;
@@ -40,7 +40,7 @@
 }
 
 .gc-window[data-layout="compact"] {
-  left: 16px;
+  inset-inline-start: 16px;
   top: 16px;
   width: 440px;
   height: 420px;
@@ -65,7 +65,8 @@
   flex-shrink: 0;
   align-items: center;
   height: 56px;
-  padding: 0 12px 0 8px;
+  padding-block: 0;
+  padding-inline: 8px 12px;
 }
 
 .gc-window[data-layout="compact"] .gc-header {
@@ -81,7 +82,7 @@
 
 .gc-window[data-layout="compact"] .gc-brand {
   width: auto;
-  margin-right: 12px;
+  margin-inline-end: 12px;
 }
 
 .gc-brand-name {
@@ -124,7 +125,8 @@
 .gc-arrows {
   display: flex;
   gap: 2px;
-  margin: 0 10px 0 12px;
+  margin-block: 0;
+  margin-inline: 12px 10px;
 }
 
 .gc-month {
@@ -141,7 +143,7 @@
   display: flex;
   align-items: center;
   gap: 4px;
-  margin-left: auto;
+  margin-inline-start: auto;
 }
 
 .gc-view {
@@ -150,7 +152,8 @@
   gap: 4px;
   height: 34px;
   margin: 0 6px;
-  padding: 0 8px 0 16px;
+  padding-block: 0;
+  padding-inline: 16px 8px;
   border: 1px solid #747775;
   border-radius: 17px;
   font-size: 13px;
@@ -160,7 +163,7 @@
 .gc-avatar {
   width: 30px;
   height: 30px;
-  margin-left: 4px;
+  margin-inline-start: 4px;
   border-radius: 50%;
   background: #c7d7e8;
 }
@@ -214,7 +217,7 @@
   align-items: center;
   justify-content: space-between;
   height: 28px;
-  padding-left: 6px;
+  padding-inline-start: 6px;
   font-size: 13px;
   font-weight: 500;
   color: var(--gc-text);
@@ -263,7 +266,7 @@
   display: grid;
   gap: 2px;
   margin-top: 20px;
-  padding-left: 8px;
+  padding-inline-start: 8px;
 }
 
 .gc-cals-head {
@@ -291,14 +294,14 @@
   flex: 1;
   flex-direction: column;
   min-width: 0;
-  margin-right: 12px;
+  margin-inline-end: 12px;
   border-radius: 16px 16px 0 0;
   background: #fff;
   overflow: hidden;
 }
 
 .gc-window[data-layout="compact"] .gc-panel {
-  margin-left: 8px;
+  margin-inline-start: 8px;
 }
 
 .gc-dayhead,
@@ -326,7 +329,8 @@
 
 .gc-tz {
   align-self: end;
-  padding: 0 0 6px 6px;
+  padding-block: 0 6px;
+  padding-inline: 6px 0;
   font-size: 9px;
   color: var(--gc-text-3);
 }
@@ -377,7 +381,7 @@
 
 .gc-hour {
   position: absolute;
-  right: 8px;
+  inset-inline-end: 8px;
   font-size: 10px;
   color: var(--gc-text-3);
   translate: 0 -50%;
@@ -386,7 +390,7 @@
 
 .gc-col {
   position: relative;
-  border-left: 1px solid var(--gc-line);
+  border-inline-start: 1px solid var(--gc-line);
   background-image: linear-gradient(var(--gc-line) 1px, transparent 1px);
   background-size: 100% var(--hour);
   background-position: 0 calc(var(--hour) - 1px);
@@ -396,8 +400,8 @@
 
 .gc-event {
   position: absolute;
-  left: 2px;
-  right: 10px;
+  inset-inline-start: 2px;
+  inset-inline-end: 10px;
   display: flex;
   flex-direction: column;
   gap: 6px;
@@ -424,8 +428,8 @@
 
 .gc-now {
   position: absolute;
-  left: -1px;
-  right: 0;
+  inset-inline-start: -1px;
+  inset-inline-end: 0;
   z-index: 2;
   height: 2px;
   margin-top: -1px;
@@ -435,7 +439,7 @@
 .gc-now::before {
   content: "";
   position: absolute;
-  left: -6px;
+  inset-inline-start: -6px;
   top: -5px;
   width: 12px;
   height: 12px;
@@ -454,8 +458,8 @@
    into the grid once saved. */
 .gc-draft {
   position: absolute;
-  left: 2px;
-  right: 10px;
+  inset-inline-start: 2px;
+  inset-inline-end: 10px;
   z-index: 3;
   display: flex;
   flex-direction: column;
@@ -515,7 +519,8 @@
 
 .gc-pop.ss-popover {
   z-index: 30;
-  padding: 8px 12px 14px 8px;
+  padding-block: 8px 14px;
+  padding-inline: 8px 12px;
   border-radius: 24px;
   --ss-popover-bg: #f0f4f9;
   --ss-popover-shadow: 0 0 0 1px rgba(0, 0, 0, 0.04), 0 14px 32px -8px rgba(32, 40, 70, 0.3), 0 4px 10px -4px rgba(0, 0, 0, 0.12);
@@ -532,22 +537,22 @@
   justify-content: flex-end;
   gap: 4px;
   height: 26px;
-  padding-right: 0;
+  padding-inline-end: 0;
 }
 
 .gc-pop-top > .gc-icon {
-  margin-right: auto;
-  margin-left: calc(50% - 4px);
+  margin-inline-end: auto;
+  margin-inline-start: calc(50% - 4px);
   translate: -50% 0;
   color: #747775;
 }
 
 .gc-pop-indent {
-  padding-left: 48px;
+  padding-inline-start: 48px;
 }
 
 .gc-pop[data-layout="compact"] .gc-pop-indent {
-  padding-left: 36px;
+  padding-inline-start: 36px;
 }
 
 /* The title field: an underline, not a box */
@@ -642,7 +647,7 @@
 .gc-caldot {
   width: 10px;
   height: 10px;
-  margin-left: 8px;
+  margin-inline-start: 8px;
   border-radius: 50%;
   background: var(--gc-event);
 }
@@ -690,12 +695,13 @@
 .ss-toast.gc-snack {
   --ss-toast-rise: 16px;
   position: absolute;
-  left: 52px;
+  inset-inline-start: 52px;
   bottom: 36px;
   z-index: 30;
   gap: 28px;
   height: 46px;
-  padding: 0 8px 0 18px;
+  padding-block: 0;
+  padding-inline: 18px 8px;
   border-radius: 6px;
   background: #303030;
   box-shadow: 0 6px 16px -4px rgba(0, 0, 0, 0.35);
@@ -707,13 +713,13 @@
 }
 
 .ss-toast.gc-snack--compact {
-  left: auto;
-  right: 16px;
+  inset-inline-start: auto;
+  inset-inline-end: 16px;
   bottom: 16px;
 }
 
 .gc-snack .ss-toast__action {
-  margin-left: 0;
+  margin-inline-start: 0;
   color: #a8c7fa;
 }
 
@@ -736,7 +742,7 @@
 .gc-switch {
   display: flex;
   height: 34px;
-  margin-left: 4px;
+  margin-inline-start: 4px;
   border-radius: 17px;
   background: #e1e5ea;
 }

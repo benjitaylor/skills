@@ -46,8 +46,8 @@
   }
 
   /* The plan arrives from the side it straddles */
-  .st-plan { transform: translateX(18px); }
-  .st-chart { transition-delay: 0.35s; transform: translateX(18px); }
+  .st-plan { transform: translateX(calc(18px * var(--ss-x, 1))); }
+  .st-chart { transition-delay: 0.35s; transform: translateX(calc(18px * var(--ss-x, 1))); }
 
   /* Exits run in reverse: satellites leave first, the invoice last */
   .st-invoice:not([data-in]) { transition-delay: 0.5s; }
@@ -56,7 +56,7 @@
 
   .st-invoice {
     top: var(--gutter);
-    left: var(--gutter);
+    inset-inline-start: var(--gutter);
     width: 340px;
     height: 480px;
     box-shadow: var(--ss-shadow-hero);
@@ -96,7 +96,7 @@
   /* Satellites straddle the invoice's right edge */
   .st-plan,
   .st-chart {
-    left: 300px;
+    inset-inline-start: 300px;
     width: 236px;
     padding: 16px;
     border-radius: 10px;
@@ -162,7 +162,7 @@
   & .ss-stage[data-layout='compact'] .st-inv { padding: 20px; }
   & .ss-stage[data-layout='compact'] .st-inv__meta { gap: 8px; }
   & .ss-stage[data-layout='compact'] .st-plan,
-  & .ss-stage[data-layout='compact'] .st-chart { left: 40px; width: 302px; }
+  & .ss-stage[data-layout='compact'] .st-chart { inset-inline-start: 40px; width: 302px; }
   & .ss-stage[data-layout='compact'] .st-plan { top: 250px; }
   & .ss-stage[data-layout='compact'] .st-chart { top: 432px; }
 }

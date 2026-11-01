@@ -99,7 +99,7 @@
   position: absolute;
   top: 0;
   bottom: 0;
-  left: 100%;
+  inset-inline-start: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -117,7 +117,8 @@
   border-radius: 0;
   /* Mail reserves a dot column on every row: the list sits 12pt in from
      the title, read or not, so nothing moves when a message is read */
-  padding: 12px 20px 12px 32px;
+  padding-block: 12px;
+  padding-inline: 32px 20px;
   background: #fff;
   will-change: transform;
 }
@@ -125,9 +126,9 @@
 /* A hairline under each row, from the text's edge, as Mail draws it */
 .sw-row::after {
   position: absolute;
-  right: 0;
+  inset-inline-end: 0;
   bottom: 0;
-  left: 84px;
+  inset-inline-start: 84px;
   height: 0.5px;
   background: var(--sw-line);
   content: '';
@@ -167,3 +168,9 @@
 .sw-row .ss-row__subtitle > .ss-bar { display: block; margin: 5.5px 0; }
 .sw-fill { display: flex; align-items: center; height: 20px; }
 .sw-row .ss-row__meta > .ss-bar { display: block; margin: 6.5px 0; }
+
+/* Mirrored, the chevron's side bearing faces the time instead of away from
+   it, so its ink lands closer; this restores the same visual gap */
+.sw-time svg:dir(rtl) {
+  margin-inline-start: 2px;
+}

@@ -7,7 +7,7 @@
 .cc-win {
   position: absolute;
   top: 56px;
-  left: 40px;
+  inset-inline-start: 40px;
   width: 372px;
   height: 340px;
 }
@@ -24,11 +24,12 @@
 .cc-chip {
   position: absolute;
   top: 56px;
-  left: 412px;
+  inset-inline-start: 412px;
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 6px 12px 6px 6px;
+  padding-block: 6px;
+  padding-inline: 6px 12px;
   border-radius: 999px;
   background: var(--ss-raised, var(--ss-surface));
   box-shadow: var(--ss-shadow-satellite);
@@ -51,10 +52,10 @@
 
 /* Narrow: the window narrower, its corner pulled in so the chip stays whole */
 .cc .ss-stage[data-layout='compact'] .cc-win {
-  left: 16px;
+  inset-inline-start: 16px;
   width: 240px;
 }
 
 .cc .ss-stage[data-layout='compact'] .cc-chip {
-  left: 256px;
+  inset-inline-start: 256px;
 }

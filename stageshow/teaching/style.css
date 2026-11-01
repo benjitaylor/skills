@@ -67,7 +67,7 @@
 .tc-lessons .st-blob { display: grid; flex: none; place-items: center; width: 28px; height: 28px; border-radius: 9px; background: linear-gradient(135deg, #a78bfa, #6366f1); color: #fff; }
 .tc-lessons .st-blob[data-state="building"] { border-radius: 50%; background: linear-gradient(135deg, #fbbf24, #f97316); }
 .tc-lessons .st-blob[data-state="failed"] { border-radius: 6px; background: #fecdd3; color: #e11d48; }
-.tc-lessons .st-button .st-blob { width: 16px; height: 16px; margin-left: -4px; border-radius: 5px; background: linear-gradient(135deg, #34d399, #06b6d4); }
+.tc-lessons .st-button .st-blob { width: 16px; height: 16px; margin-inline-start: -4px; border-radius: 5px; background: linear-gradient(135deg, #34d399, #06b6d4); }
 .tc-lessons .st-button .st-blob svg { width: 11px; height: 11px; }
 
 /* Onion skin: translucent ink, so every crossing and join paints darker */
@@ -77,7 +77,7 @@
 
 /* The onion pair is a detail: both sides at 2x, cropped to the icons */
 .tc-lessons .st-pair[data-style="style-onion"] .tc-visual { place-items: start; overflow: hidden; }
-.tc-lessons .st-pair[data-style="style-onion"] .st-card { margin: 16px 0 0 16px; transform: scale(2); transform-origin: 0 0; }
+.tc-lessons .st-pair[data-style="style-onion"] .st-card { margin-block: 16px 0; margin-inline: 16px 0; transform: scale(2); transform-origin: 0 0; }
 
 /* AI action on the failed row */
 .tc-lessons .st-ai { display: inline-flex; flex: none; align-items: center; gap: 4px; height: 22px; margin-top: -2px; padding: 0 8px; border-radius: 6px; box-shadow: inset 0 0 0 1px #0000001a; color: #1f1f1f; font: 500 12px/1 var(--ss-font); }

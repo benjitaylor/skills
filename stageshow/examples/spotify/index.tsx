@@ -116,8 +116,8 @@ export default function SpotifyDemo() {
             lead={
               <>
                 <span className="spt-nav">
-                  <ChevronLeft size={18} strokeWidth={2} />
-                  <ChevronRight size={18} strokeWidth={2} className="spt-faint" />
+                  <ChevronLeft data-flip size={18} strokeWidth={2} />
+                  <ChevronRight data-flip size={18} strokeWidth={2} className="spt-faint" />
                 </span>
                 <span className="spt-center">
                   <span className="spt-home">

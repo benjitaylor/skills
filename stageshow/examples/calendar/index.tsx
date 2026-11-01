@@ -1,4 +1,4 @@
-import { Stage, Window, Bar, Avatar, Icon, Roll, Camera, cellOf, type Act, type Point, type Rect } from '../../kit'
+import { Stage, Window, Bar, Avatar, Icon, Roll, Camera, cellOf, type Act, type Dir, type Point, type Rect } from '../../kit'
 import './calendar.css'
 
 // Calendar hero, a week view with no sidebar so four days fit the column
@@ -43,9 +43,17 @@ const span = (c: Cell) => {
   return a < 12 === b < 12 ? `${label(a).split(' ')[0]} – ${label(b)}` : `${label(a)} – ${label(b)}`
 }
 
+// The week reads from the line's start: Monday on the left in ltr, on the
+// right in rtl. Columns are counted from that edge; x is physical, from the
+// grid's left, like every rect
+const GRID_W = COLS * COL_W
+const colX = (col: number, dir: Dir) => (dir === 'rtl' ? GRID_W - (col + 1) * COL_W : col * COL_W)
+// Where the hand holds the card, as a fraction from its start edge
+const gripX = (dir: Dir) => (dir === 'rtl' ? 1 - GRIP.x : GRIP.x)
+
 // A cell in grid pixels; offset by the grid's rect for stage pixels
-const cellRect = (grid: { x: number; y: number }, c: Cell): Rect => ({
-  x: grid.x + c.col * COL_W + 3,
+const cellRect = (grid: { x: number; y: number }, c: Cell, dir: Dir): Rect => ({
+  x: grid.x + colX(c.col, dir) + 3,
   y: grid.y + c.row * ROW_H + 2,
   width: COL_W - 6,
   height: SPAN * ROW_H - 4,
@@ -60,19 +68,20 @@ const shift = (c: Cell, o: number): Cell => ({ ...c, col: c.col - o })
 
 async function carry(a: Act<S>, from: Cell, to: Cell, o: number) {
   const grid = a.rect('grid', { layout: true })
-  const card = cellRect(grid, shift(from, o))
+  const card = cellRect(grid, shift(from, o), a.dir)
   // Hold the upper body of the meeting, leaving its attendee row clear.
-  const grab = { x: card.x + card.width * GRIP.x, y: card.y + card.height * GRIP.y }
+  const grab = { x: card.x + card.width * gripX(a.dir), y: card.y + card.height * GRIP.y }
   await a.move(grab)
   await a.wait(150)
-  const dest = cellRect(grid, shift(to, o))
+  const dest = cellRect(grid, shift(to, o), a.dir)
   let prev: Cell = from
   await a.drag(
     { x: dest.x + (grab.x - card.x), y: dest.y + (grab.y - card.y) },
     (p) => {
       const at = { x: p.x - (grab.x - card.x), y: p.y - (grab.y - card.y) }
       // The card's top-center decides the cell, with sticky borders
-      const col = cellOf(at.x + card.width / 2 - grid.x, COL_W, prev.col - o) + o
+      const fromLeft = at.x + card.width / 2 - grid.x
+      const col = cellOf(a.dir === 'rtl' ? GRID_W - fromLeft : fromLeft, COL_W, prev.col - o) + o
       const row = cellOf(at.y + ROW_H / 2 - grid.y, ROW_H, prev.row)
       prev = { col: Math.max(o, Math.min(COLS - 1, col)), row: Math.max(0, Math.min(ROWS - SPAN, row)) }
       // Lift only once drag has pressed and closed the hand. The callback
@@ -97,7 +106,7 @@ const script = async (a: Act<S>) => {
   // Push in on the meeting while its attendees are checked (wide only: the
   // compact crop is already close). The view keeps the month title in.
   const grid = a.rect('grid', { layout: true })
-  const card = cellRect(grid, shift(END, o))
+  const card = cellRect(grid, shift(END, o), a.dir)
   const wide = o === 0
   if (wide) a.set({ focus: { x: card.x + card.width / 2 - 243, y: 20, width: 486, height: 267 } })
   await a.wait(wide ? 500 : 150)
@@ -137,15 +146,15 @@ export default function Calendar() {
       keys="bottom-right"
       className="cal"
     >
-      {(s, _rect, layout) => {
+      {(s, _rect, layout, dir) => {
         const compact = layout === 'compact'
         const o = compact ? 1 : 0
         const origin = { x: 0, y: 0 }
-        const home = cellRect(origin, shift(s.cell, o))
+        const home = cellRect(origin, shift(s.cell, o), dir)
         const card = s.at ? { ...home, x: s.at.x, y: s.at.y } : home
         const shown = s.target ?? s.cell
         const slot = s.target && (s.target.col !== s.cell.col || s.target.row !== s.cell.row)
-        const slotR = cellRect(origin, shift(slot ? s.target! : s.cell, o))
+        const slotR = cellRect(origin, shift(slot ? s.target! : s.cell, o), dir)
         return (
           <Camera focus={s.focus} max={1.35} pad={0}>
             <Window
@@ -175,7 +184,7 @@ export default function Calendar() {
                 </div>
                 <div className="cal-grid" data-target="grid">
                   {BUSY.filter(([c]) => c >= o).map(([c, r, n, w], i) => (
-                    <span key={i} className="cal-busy" style={{ left: (c - o) * COL_W + 3, top: r * ROW_H + 2, width: COL_W - 6, height: n * ROW_H - 4 }}>
+                    <span key={i} className="cal-busy" style={{ left: colX(c - o, dir) + 3, top: r * ROW_H + 2, width: COL_W - 6, height: n * ROW_H - 4 }}>
                       <Bar w={w} h={5} tone={3} />
                     </span>
                   ))}
@@ -186,7 +195,7 @@ export default function Calendar() {
                     data-cursor="open"
                     data-lifted={s.lifted || undefined}
                     data-dragging={s.at ? true : undefined}
-                    style={{ translate: `${card.x}px ${card.y}px`, transformOrigin: `${GRIP.x * 100}% ${GRIP.y * 100}%`, width: card.width, height: card.height }}
+                    style={{ translate: `${card.x}px ${card.y}px`, transformOrigin: `${gripX(dir) * 100}% ${GRIP.y * 100}%`, width: card.width, height: card.height }}
                   >
                     <span className="cal-event__title">Roadmap sync</span>
                     <span className="cal-event__time">
@@ -205,8 +214,8 @@ export default function Calendar() {
               </div>
             </Window>
 
-            <span data-target="rest" style={{ position: 'absolute', left: compact ? 300 : 486, top: compact ? 296 : 312 }} />
-            <span data-target="aside" style={{ position: 'absolute', left: compact ? 314 : 446, top: compact ? 250 : 196 }} />
+            <span data-target="rest" style={{ position: 'absolute', insetInlineStart: compact ? 300 : 486, top: compact ? 296 : 312 }} />
+            <span data-target="aside" style={{ position: 'absolute', insetInlineStart: compact ? 314 : 446, top: compact ? 250 : 196 }} />
           </Camera>
         )
       }}

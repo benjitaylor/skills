@@ -7,7 +7,7 @@
 .pa-win {
   position: absolute;
   top: 32px;
-  left: 32px;
+  inset-inline-start: 32px;
   width: 340px;
   height: 460px;
 }
@@ -63,7 +63,7 @@
 .pa-panel {
   position: absolute;
   top: 84px;
-  left: 352px;
+  inset-inline-start: 352px;
   width: 248px;
   display: grid;
   gap: 2px;
@@ -102,7 +102,8 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 3px 8px 3px 4px;
+  padding-block: 3px;
+  padding-inline: 4px 8px;
   border-radius: 6px;
   box-shadow: 0 0 0 1px var(--ss-line);
   color: var(--ss-text);
@@ -138,13 +139,13 @@
    chrome covered, so the form and Pay stay whole */
 .pa .ss-stage[data-layout='compact'] .pa-win {
   top: 196px;
-  left: 16px;
+  inset-inline-start: 16px;
   width: 326px;
 }
 
 .pa .ss-stage[data-layout='compact'] .pa-panel {
   top: 16px;
-  left: 94px;
+  inset-inline-start: 94px;
 }
 
 /* The leader is annotation, not product: neutral ink, so it never reads as

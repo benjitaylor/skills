@@ -1,5 +1,5 @@
 import { Archive, ChevronLeft, ChevronRight, Ellipsis, Megaphone, MessageSquare, ShoppingCart, User } from 'lucide-react'
-import { Avatar, Bar, Collapse, Phone, Row, Stage, type Act } from '../../kit'
+import { Avatar, Bar, Collapse, Phone, Row, Stage, fromStart, sign, type Act } from '../../kit'
 import './swipe.css'
 
 // A mail app's swipe to archive, phone only. Beats: the finger presses a
@@ -43,16 +43,18 @@ const MAIL = [
 async function script(a: Act<S>) {
   await a.wait(900)
 
-  // 1. Press the message on its right side, then swipe it left
+  // 1. Press the message near its end edge, then swipe it toward the start
+  // (right side then left in ltr; mirrored in rtl)
   a.mark('swipe')
   const row = a.rect('row')
-  const y = row.y + row.height * 0.5
-  await a.move({ x: row.x + row.width * 0.8, y })
+  const press = fromStart(row, row.width * 0.8, row.height * 0.5, a.dir)
+  const y = press.y
+  await a.move(press)
   await a.wait(250)
-  const from = row.x + row.width * 0.8
+  const from = press.x
   const samples: { x: number; t: number }[] = []
   await a.drag(
-    { x: row.x + row.width * 0.22, y },
+    fromStart(row, row.width * 0.22, row.height * 0.5, a.dir),
     (at) => {
       samples.push({ x: at.x, t: performance.now() })
       a.put({ dx: at.x - from })
@@ -66,12 +68,12 @@ async function script(a: Act<S>) {
   const last = samples.slice(-4)
   const v = last.length > 1 ? Math.abs(last[last.length - 1]!.x - last[0]!.x) / Math.max(1, last[last.length - 1]!.t - last[0]!.t) : 1
   const dx = samples.length ? samples[samples.length - 1]!.x - from : 0
-  const left = row.width + dx
+  const left = row.width - Math.abs(dx)
   const ms = 300
   // A curve whose first slope is the finger's speed, easing out at the end
   const x1 = 0.25
   const y1 = Math.min(0.95, (x1 * v * ms) / left)
-  a.put({ throw: { ms, ease: `cubic-bezier(${x1}, ${y1.toFixed(3)}, 0.35, 1)` }, dx: -row.width })
+  a.put({ throw: { ms, ease: `cubic-bezier(${x1}, ${y1.toFixed(3)}, 0.35, 1)` }, dx: -row.width * sign(a.dir) })
   await a.wait(ms)
 
   // 3. The gap closes and the next message moves up
@@ -94,18 +96,19 @@ export default function SwipeDemo() {
       cursor={{ at: { x: 330, y: 470 }, style: 'touch' }}
       className="sw"
     >
-      {(s, rect, layout) => {
+      {(s, rect, layout, dir) => {
         // The row moves in screen points; the phone is drawn scaled
         const box = rect('row')
         const k = box.width ? box.width / 402 : 1
         const shift = s.dx / k
-        const open = Math.max(0, -shift)
+        // How far the row has slid toward the line's start, opening the action behind
+        const open = Math.max(0, -shift * sign(dir))
         return (
           <Phone width={layout === 'compact' ? 340 : 380} className="sw-phone">
             <div className="sw-app">
               <header className="sw-head">
                 <div className="sw-bar-top">
-                  <span className="sw-round"><ChevronLeft size={20} strokeWidth={2.25} /></span>
+                  <span className="sw-round"><ChevronLeft data-flip size={20} strokeWidth={2.25} /></span>
                   <span className="sw-round"><Ellipsis size={18} strokeWidth={2.25} /></span>
                 </div>
                 <div className="sw-title">Inbox</div>
@@ -141,7 +144,7 @@ export default function SwipeDemo() {
                           picked || i === PICK + 1 ? (
                             <span className="sw-time">
                               {m.time}
-                              <ChevronRight size={14} strokeWidth={2.25} />
+                              <ChevronRight data-flip size={14} strokeWidth={2.25} />
                             </span>
                           ) : (
                             <Bar w={34} h={9} r={4.5} tone={2} />

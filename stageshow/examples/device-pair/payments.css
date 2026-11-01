@@ -10,7 +10,7 @@
 .ps-window {
   position: absolute;
   top: var(--gutter);
-  left: var(--gutter);
+  inset-inline-start: var(--gutter);
   width: 496px;
   height: 460px;
   background: var(--ss-surface);
@@ -29,7 +29,7 @@
   gap: 4px;
   width: 112px;
   padding: 16px 10px;
-  border-right: 1px solid var(--ss-line);
+  border-inline-end: 1px solid var(--ss-line);
   background: var(--ss-canvas);
 }
 
@@ -38,7 +38,8 @@
   display: flex;
   align-items: center;
   height: 20px;
-  margin: 0 0 12px 6px;
+  margin-block: 0 12px;
+  margin-inline: 6px 0;
   color: var(--ss-text-strong);
   font-size: 13px;
   font-weight: 600;
@@ -128,7 +129,7 @@
 .ps-phone {
   position: absolute;
   top: 84px;
-  right: var(--gutter);
+  inset-inline-end: var(--gutter);
   box-shadow: var(--ss-shadow-satellite), 0 30px 50px -20px rgba(50, 50, 93, 0.35);
 }
 

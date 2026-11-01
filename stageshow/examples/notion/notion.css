@@ -36,7 +36,7 @@
 .nt-window {
   position: absolute;
   top: var(--gutter);
-  left: var(--gutter);
+  inset-inline-start: var(--gutter);
   width: 820px;
   height: 600px;
   border-radius: 10px;
@@ -139,11 +139,11 @@
 }
 
 .ss-stage[data-layout="compact"] .nt-crumb {
-  margin-left: 12px;
+  margin-inline-start: 12px;
 }
 
 .nt-crumb__toggle {
-  margin-right: 6px;
+  margin-inline-end: 6px;
 }
 
 .nt-crumb__label {
@@ -170,7 +170,8 @@
 }
 
 .ss-stage[data-layout="compact"] .nt-page {
-  padding: 26px 40px 0 52px;
+  padding-block: 26px 0;
+  padding-inline: 52px 40px;
 }
 
 .nt-title {
@@ -207,7 +208,7 @@
 .nt-handle {
   position: absolute;
   top: 3px;
-  left: -46px;
+  inset-inline-start: -46px;
   display: flex;
   gap: 2px;
   color: var(--ss-icon-faint);
@@ -253,7 +254,8 @@
   flex-shrink: 0;
   width: 1.5px;
   height: 20px;
-  margin: 0 1px 0 0;
+  margin-block: 0;
+  margin-inline: 0 1px;
   background: var(--nt-ink);
   opacity: 0;
   vertical-align: middle;
@@ -343,7 +345,7 @@
 
 .nt-menu {
   top: calc(100% + 4px);
-  left: -4px;
+  inset-inline-start: -4px;
   width: 300px;
   padding: 6px 4px;
   border-radius: 10px;
@@ -406,12 +408,12 @@
 .nt-rest {
   position: absolute;
   top: 330px;
-  left: 560px;
+  inset-inline-start: 560px;
   width: 1px;
   height: 1px;
 }
 
 .ss-stage[data-layout="compact"] .nt-rest {
   top: 300px;
-  left: 330px;
+  inset-inline-start: 330px;
 }

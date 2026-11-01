@@ -11,8 +11,8 @@
   & .cy-body { display: flex; flex-direction: column; flex: 1; min-height: 0; box-sizing: border-box; padding: 0 16px 16px; }
   & .cy-order { display: flex; align-items: center; gap: 10px; flex: none; box-sizing: border-box; height: 72px; padding: 16px; }
   & .cy-summary-heading, & .cy-form-heading, & .cy-quantity, & .cy-total > span:first-child, & .cy-notebook b { display: none; }
-  & .cy-notebook { position: relative; flex: none; display: block; width: 30px; height: 40px; border-radius: 2px 4px 4px 2px; background: #607d72; box-shadow: inset 3px 0 #3e6054, inset -1px 0 #fff4, 0 2px 3px #152f2417; }
-  & .cy-notebook i { position: absolute; top: 9px; bottom: 9px; left: 12px; right: 8px; border: 1px solid #d5d9bf88; }
+  & .cy-notebook { position: relative; flex: none; display: block; width: 30px; height: 40px; border-start-start-radius: 2px; border-start-end-radius: 4px; border-end-end-radius: 4px; border-end-start-radius: 2px; background: #607d72; box-shadow: inset 3px 0 #3e6054, inset -1px 0 #fff4, 0 2px 3px #152f2417; }
+  & .cy-notebook i { position: absolute; top: 9px; bottom: 9px; inset-inline-start: 12px; inset-inline-end: 8px; border: 1px solid #d5d9bf88; }
   & .cy-product { display: flex; flex-direction: column; gap: 3px; flex: 1; min-width: 0; }
   & .cy-product strong { font-size: 12px; line-height: 16px; font-weight: 600; white-space: nowrap; }
   & .cy-product > span { font-size: 10px; line-height: 13px; color: #848d93; }
@@ -41,7 +41,7 @@
   & .cy-field-value { display: block; box-sizing: border-box; height: 22px; margin-top: 3px; padding: 3px 7px; border: 1px solid #e1e5e8; border-radius: 4px; color: #4b555d; font-size: 11px; line-height: 14px; white-space: nowrap; }
   & .cy-footer { display: flex; flex-direction: column; gap: 6px; flex: none; margin-top: auto; }
   & .cy-pay { position: relative; display: flex; justify-content: center; align-items: center; gap: 4px; height: 38px; border-radius: 6px; background: #456c5b; color: white; font-size: 11px; font-weight: 600; }
-  & .cy-pay > .ss-icon { position: absolute; right: 12px; opacity: .7; }
+  & .cy-pay > .ss-icon { position: absolute; inset-inline-end: 12px; opacity: .7; }
   & .cy-pay-label { width: 100%; }
   & .cy-pay-label .cy-roll-row { justify-content: center; }
   & .cy-footer > span { font-size: 10px; line-height: 12px; text-align: center; color: #8a9399; }
@@ -54,11 +54,11 @@
     display: grid;
     grid-template-columns: 220px minmax(0, 1fr);
 
-    & .cy-order { height: 100%; flex-direction: column; align-items: flex-start; gap: 0; padding: 26px 24px; background: #f3f5f3; border-right: 1px solid #e9eeea; }
+    & .cy-order { height: 100%; flex-direction: column; align-items: flex-start; gap: 0; padding: 26px 24px; background: #f3f5f3; border-inline-end: 1px solid #e9eeea; }
     & .cy-summary-heading { display: block; font-size: 12px; line-height: 16px; font-weight: 600; color: #4c5851; }
-    & .cy-notebook { width: 82px; height: 112px; margin-top: 24px; margin-bottom: 20px; border-radius: 3px 6px 6px 3px; box-shadow: inset 5px 0 #3e6054, inset -1px 0 #fff4, 0 5px 10px #152f2420; }
-    & .cy-notebook i { top: 15px; bottom: 15px; left: 18px; right: 13px; border-color: #d5d9bf55; }
-    & .cy-notebook b { display: block; position: absolute; top: 37px; left: 18px; right: 13px; text-align: center; font-size: 10px; line-height: 14px; letter-spacing: .06em; font-weight: 500; color: #e2dfc7; }
+    & .cy-notebook { width: 82px; height: 112px; margin-top: 24px; margin-bottom: 20px; border-start-start-radius: 3px; border-start-end-radius: 6px; border-end-end-radius: 6px; border-end-start-radius: 3px; box-shadow: inset 5px 0 #3e6054, inset -1px 0 #fff4, 0 5px 10px #152f2420; }
+    & .cy-notebook i { top: 15px; bottom: 15px; inset-inline-start: 18px; inset-inline-end: 13px; border-color: #d5d9bf55; }
+    & .cy-notebook b { display: block; position: absolute; top: 37px; inset-inline-start: 18px; inset-inline-end: 13px; text-align: center; font-size: 10px; line-height: 14px; letter-spacing: .06em; font-weight: 500; color: #e2dfc7; }
     & .cy-product { flex: none; gap: 5px; }
     & .cy-product strong { font-size: 14px; line-height: 18px; }
     & .cy-product > span { font-size: 11px; line-height: 15px; color: #738077; }
@@ -77,5 +77,5 @@
   & .cy-pair-host { width: 100%; max-width: 704px; margin-inline: auto; }
   & .cy-pair { position: absolute; inset: 0; }
   & .cy-pair-cell { position: absolute; height: 476px; border-radius: 12px; background: #e6ebed; }
-  & .cy-pair-label { position: absolute; left: 16px; top: 12px; font-size: 11px; line-height: 15px; color: #65717a; }
+  & .cy-pair-label { position: absolute; inset-inline-start: 16px; top: 12px; font-size: 11px; line-height: 15px; color: #65717a; }
 }

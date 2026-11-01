@@ -310,7 +310,7 @@ function Day() {
             {(s) => (
               // Centered in its tile: the one device in the grid stands in
               // the middle of its card, running off the bottom
-              <Phone width={Math.min(276, width - gutter * 2)} className="sg-phone" style={{ left: (width - Math.min(276, width - gutter * 2)) / 2 }} data-on={s.on || undefined}>
+              <Phone width={Math.min(276, width - gutter * 2)} className="sg-phone" style={{ insetInlineStart: (width - Math.min(276, width - gutter * 2)) / 2 }} data-on={s.on || undefined}>
                 <div className="sg-page">
                   <div className="sg-page__head">
                     <span className="sg-page__eyebrow">Day 2 · Tuesday</span>

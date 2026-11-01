@@ -18,7 +18,7 @@ import {
   Share,
   X,
 } from 'lucide-react'
-import { Bar, Collapse, Stage, Text, Window, type Act, type Layout, type Point } from '../../kit'
+import { Bar, Collapse, Stage, Text, Window, type Act, type Layout, type Point, fromStart, mirror } from '../../kit'
 import './finder.css'
 
 // Finder, list view. The user selects a photo, presses Space and Quick Look
@@ -76,7 +76,7 @@ async function script(a: Act<S>) {
   // 1. Select the photo: click the row, clear of its name
   a.mark('select')
   const row = a.rect('row-hero')
-  await a.click({ x: row.x + 176, y: row.y + row.height * 0.6 })
+  await a.click(fromStart(row, 176, row.height * 0.6, a.dir))
   await a.set({ sel: true })
   await a.wait(650)
 
@@ -105,7 +105,7 @@ async function script(a: Act<S>) {
   // drag callback, so the image and cursor are painted together after press.
   // Drop just past the folder's name, so the drag image never hides it.
   const drop = a.rect('side-drop')
-  await a.drag({ x: drop.x + 114, y: drop.y + drop.height * 0.55 }, (at) => {
+  await a.drag(fromStart(drop, 114, drop.height * 0.55, a.dir), (at) => {
     a.put({ ghost: { on: true, dropped: false, off, at } })
   }, { duration: 1150, cursor: 'preserve' })
   a.mark('drop')
@@ -136,28 +136,31 @@ export default function FinderDemo() {
       cursor={{ at: { at: 'blank', x: 0.56, y: 0.5 } }}
       className="fq"
     >
-      {(s, rect, layout) => {
+      {(s, rect, layout, dir) => {
         const g = GEO[layout]
+        const W = layout === 'compact' ? 400 : 820
         const qh = qlHeight(g.ql.w)
         // Quick Look closed sits on the thumbnail, shrunk to its width. It
         // zooms by layout, not transform, so its text lands without a hop
         const t = rect('thumb')
         const k = t.width ? t.width / g.ql.w : 0.05
         const box = s.ql
-          ? { left: g.ql.x, top: g.ql.y, width: g.ql.w, height: qh, borderRadius: 12 }
+          ? // Open at its designed place, measured from the line's start; closed
+            // on the thumbnail, which is measured, so already where it is
+            { left: mirror({ x: g.ql.x + (dir === 'rtl' ? g.ql.w : 0), y: 0 }, W, dir).x, top: g.ql.y, width: g.ql.w, height: qh, borderRadius: 12 }
           : { left: t.x, top: t.y + t.height / 2 - (qh * k) / 2, width: g.ql.w * k, height: qh * k, borderRadius: 12 * k }
         return (
           <>
             <Window
               className="fq-window"
-              style={{ left: g.win.x, top: g.win.y, width: g.win.w, height: g.win.h }}
+              style={{ insetInlineStart: g.win.x, top: g.win.y, width: g.win.w, height: g.win.h }}
               sidebarWidth={g.side}
               sidebar={<Sidebar />}
               lead={
                 <span className="fq-lead">
                   <span className="fq-nav">
-                    <ChevronLeft size={17} strokeWidth={1.75} />
-                    <ChevronRight size={17} strokeWidth={1.75} className="fq-nav-off" />
+                    <ChevronLeft data-flip size={17} strokeWidth={1.75} />
+                    <ChevronRight data-flip size={17} strokeWidth={1.75} className="fq-nav-off" />
                   </span>
                   <span className="fq-heading">Downloads</span>
                 </span>

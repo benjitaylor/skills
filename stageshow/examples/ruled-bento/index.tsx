@@ -277,7 +277,7 @@ function Restore() {
                     </span>
                     <span className="rb-handle" />
                   </div>
-                  <div className="rb-axis" style={{ ['--n' as string]: bars.length }}>
+                  <div className="rb-axis" dir="ltr" style={{ ['--n' as string]: bars.length }}>
                     {(wide ? [['13:00', 0], ['13:30', 15], ['14:00', 30]] : [['13:50', 3], ['14:10', 13]]).map(([t, at]) => (
                       <span key={t} style={{ ['--at' as string]: at }}>{t}</span>
                     ))}

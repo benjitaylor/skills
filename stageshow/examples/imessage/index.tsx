@@ -106,7 +106,7 @@ export default function IMessage() {
               <div className="im-app">
                 <header className="im-head">
                   <span className="im-back">
-                    <ChevronLeft size={30} strokeWidth={2.4} />
+                    <ChevronLeft data-flip size={30} strokeWidth={2.4} />
                   </span>
                   <span className="im-contact">
                     <Avatar name="Maya" tone="ios" size={46} className="im-avatar" />

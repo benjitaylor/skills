@@ -1,5 +1,5 @@
 import type { CSSProperties } from 'react'
-import { Bar, Facepile, Stage, Window, type Act, type Rect } from '../../kit'
+import { Bar, Facepile, Stage, Window, sign, type Act, type Dir, type Rect } from '../../kit'
 import './presence.css'
 
 // Presence: two teammates working in the same doc. Beats: Maya's cursor
@@ -54,30 +54,35 @@ async function script(a: Act<S>) {
   await a.wait(900)
 }
 
-function spot(who: 'maya' | 'jon', at: Spot, sel: Rect, ins: Rect, doc: Rect): { x: number; y: number } {
-  // A name flag never leaves the doc: about 60px from its right edge at most
-  const right = doc.x + doc.width - 64
+function spot(who: 'maya' | 'jon', at: Spot, sel: Rect, ins: Rect, doc: Rect, dir: Dir): { x: number; y: number } {
+  // Rects are physical; the selection starts on its left in ltr text and on
+  // its right in rtl, and "on" (k) points toward the end of the line
+  const k = sign(dir)
+  const start = dir === 'rtl' ? sel.x + sel.width : sel.x
+  const end = dir === 'rtl' ? sel.x : sel.x + sel.width
+  // A name flag never leaves the doc: about 60px from its end edge at most
+  const limit = (x: number) => (dir === 'rtl' ? Math.max(doc.x + 64, x) : Math.min(doc.x + doc.width - 64, x))
   if (!sel.width) return { x: -100, y: -100 }
   if (who === 'maya') {
-    if (at === 'start') return { x: sel.x, y: sel.y + sel.height * 0.6 }
-    if (at === 'end') return { x: sel.x + sel.width, y: sel.y + sel.height * 0.6 }
-    if (at === 'away') return { x: sel.x - 60, y: sel.y - 70 }
-    return { x: sel.x + 40, y: sel.y - 50 }
+    if (at === 'start') return { x: start, y: sel.y + sel.height * 0.6 }
+    if (at === 'end') return { x: end, y: sel.y + sel.height * 0.6 }
+    if (at === 'away') return { x: start - 60 * k, y: sel.y - 70 }
+    return { x: start + 40 * k, y: sel.y - 50 }
   }
-  if (at === 'ins') return { x: Math.min(right, ins.x + 2), y: ins.y + ins.height * 0.75 }
-  if (at === 'away') return { x: Math.min(right, ins.x + 120), y: ins.y + 100 }
-  return { x: Math.min(right, ins.x + 70), y: ins.y + 74 }
+  if (at === 'ins') return { x: limit(ins.x + 2 * k), y: ins.y + ins.height * 0.75 }
+  if (at === 'away') return { x: limit(ins.x + 120 * k), y: ins.y + 100 }
+  return { x: limit(ins.x + 70 * k), y: ins.y + 74 }
 }
 
 export default function Presence() {
   return (
     <Stage<S> width={660} height={420} compact={{ below: 660, width: 358, height: 420 }} initial={initial} poster={{ maya: 'end', jon: 'ins', sel: 1, jonText: ' and EU', caret: true }} script={script} className="pr">
-      {(s, rect) => {
+      {(s, rect, _layout, dir) => {
         const sel = rect('sel')
         const ins = rect('ins')
         const doc = rect('doc')
-        const m = spot('maya', s.maya, sel, ins, doc)
-        const j = spot('jon', s.jon, sel, ins, doc)
+        const m = spot('maya', s.maya, sel, ins, doc, dir)
+        const j = spot('jon', s.jon, sel, ins, doc, dir)
         return (
           <>
             <Window title="Docs" className="pr-win" toolbar={<Facepile names={['Maya Chen', 'Jon Park', 'Ana Ruiz']} size={22} className="pr-pile" />}>

@@ -59,7 +59,7 @@
   top: 0;
   bottom: 0;
   width: 1px;
-  margin-left: -0.5px;
+  margin-inline-start: -0.5px;
   background: var(--ss-line);
   opacity: 0;
   transition: opacity 0.15s ease;
@@ -69,7 +69,8 @@
   position: absolute;
   width: 9px;
   height: 9px;
-  margin: -4.5px 0 0 -4.5px;
+  margin-block: -4.5px 0;
+  margin-inline: -4.5px 0;
   border: 2px solid var(--ss-surface);
   border-radius: 50%;
   background: var(--ss-accent);

@@ -23,7 +23,7 @@
   .fx-phone {
     position: absolute;
     top: 48px;
-    left: 50px;
+    inset-inline-start: 50px;
   }
 
   .fx-phone .ss-phone__status {
@@ -51,8 +51,8 @@
   .fx-head {
     position: absolute;
     top: 66px;
-    right: 20px;
-    left: 20px;
+    inset-inline-end: 20px;
+    inset-inline-start: 20px;
     display: grid;
     gap: 10px;
   }
@@ -74,7 +74,7 @@
   .fx-card,
   .fx-slot {
     position: absolute;
-    left: 16px;
+    inset-inline-start: 16px;
     width: calc(100% - 32px);
     height: 132px;
     border-radius: 22px;
@@ -88,7 +88,7 @@
   .fx-hero__text {
     position: absolute;
     bottom: 18px;
-    left: 20px;
+    inset-inline-start: 20px;
     display: grid;
     gap: 7px;
     justify-items: start;
@@ -128,9 +128,9 @@
 
   .fx-tabs {
     position: absolute;
-    right: 0;
+    inset-inline-end: 0;
     bottom: 0;
-    left: 0;
+    inset-inline-start: 0;
     display: flex;
     justify-content: space-around;
     height: 83px;
@@ -250,7 +250,7 @@
   .fx-close {
     position: absolute;
     top: 62px;
-    right: 20px;
+    inset-inline-end: 20px;
     display: grid;
     place-items: center;
     width: 32px;
@@ -421,7 +421,7 @@
     background: var(--ss-accent);
   }
 
-  & .ss-stage[data-layout='compact'] .fx-phone { top: 16px; left: 16px; }
+  & .ss-stage[data-layout='compact'] .fx-phone { top: 16px; inset-inline-start: 16px; }
 
   .fx-card__title {
     display: block;

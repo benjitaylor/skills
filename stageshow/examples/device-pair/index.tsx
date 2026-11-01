@@ -49,7 +49,7 @@ export default function PaymentsStatic() {
                   </div>
                   <Bar w={72} h={5} tone={2} />
                   <Chart data={REVENUE} width={224} height={88} className="ps-chart" />
-                  <div className="ps-axis">
+                  <div className="ps-axis" dir="ltr">
                     <Bar w={22} h={4} tone={1} />
                     <Bar w={22} h={4} tone={1} />
                   </div>

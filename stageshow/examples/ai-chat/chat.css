@@ -7,7 +7,7 @@
 .ac-win {
   position: absolute;
   top: 28px;
-  left: 56px;
+  inset-inline-start: 56px;
   width: 528px;
   height: 420px;
 }
@@ -105,7 +105,7 @@
 
 /* Narrow: a gutter each side, the window full width of the stage */
 .ac .ss-stage[data-layout='compact'] .ac-win {
-  left: 16px;
+  inset-inline-start: 16px;
   width: 326px;
   height: 520px;
 }

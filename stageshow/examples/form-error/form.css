@@ -7,7 +7,7 @@
 .fe-win {
   position: absolute;
   top: 28px;
-  left: 60px;
+  inset-inline-start: 60px;
   width: 440px;
   height: 420px;
 }
@@ -111,7 +111,7 @@
 
 /* Narrow: a gutter each side */
 .fe .ss-stage[data-layout='compact'] .fe-win {
-  left: 16px;
+  inset-inline-start: 16px;
   width: 326px;
 }
 

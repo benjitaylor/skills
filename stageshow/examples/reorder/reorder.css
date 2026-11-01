@@ -7,7 +7,7 @@
 .ro-win {
   position: absolute;
   top: 28px;
-  left: 60px;
+  inset-inline-start: 60px;
   width: 400px;
   height: 360px;
 }
@@ -21,8 +21,8 @@
 .ro-slot {
   position: absolute;
   top: 0;
-  right: 0;
-  left: 0;
+  inset-inline-end: 0;
+  inset-inline-start: 0;
   height: 48px;
   will-change: transform;
   transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
@@ -61,7 +61,7 @@
   /* The dots' ink sits as far from the row's right edge as the ring's
      ink does from its left */
   width: 16px;
-  margin-right: -4px;
+  margin-inline-end: -4px;
   /* No taller than the row's content box, or the grid track grows and
      everything in the row sits low */
   height: 24px;
@@ -71,6 +71,6 @@
 
 /* Narrow: a gutter each side */
 .ro .ss-stage[data-layout='compact'] .ro-win {
-  left: 16px;
+  inset-inline-start: 16px;
   width: 326px;
 }

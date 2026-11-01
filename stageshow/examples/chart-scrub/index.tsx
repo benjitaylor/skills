@@ -120,7 +120,7 @@ export default function ChartScrub() {
                 <span className="cs-hair" data-on={p && on ? '' : undefined} style={p ? { left: p.x } : undefined} />
                 <span className="cs-dot" data-on={p && on ? '' : undefined} style={p ? { left: p.x, top: p.y } : undefined} />
               </div>
-              <div className="cs-axis" style={{ width: w }}>
+              <div className="cs-axis" dir="ltr" style={{ width: w }}>
                 <span>Oct 15</span>
                 <span>Oct 28</span>
               </div>
