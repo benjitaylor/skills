@@ -28,7 +28,10 @@ This count is a coverage guard, not a declaration of visual equivalence.
 
 All `Act` operations are implemented: `set`, `put`, `wait`, `rect`, `caret`,
 `center`, `move`, `click`, `scroll`, `cursor`, `snap`, `key`, `stagger`, `mark`,
-`type`, `drag`, `place`, and `enter`, plus `signal` and `layout`.
+`type`, `drag`, `place`, and `enter`, plus `signal` and `layout`. The web kit's
+development warnings are ported too: missing targets, loop seams (state or cursor
+not back at the start), and selection drags that overshoot or never read the caret.
+The export check does not cover these, because `checkSeam` and `warn` are internal.
 
 ## Platform adaptations
 
@@ -43,6 +46,13 @@ See the native contract in [README.md](README.md). In particular:
 - Native hit testing uses registered target rectangles and parent clip bounds.
   It is not the browser's arbitrary transformed DOM stacking algorithm. Register
   overlay targets and explicitly hide inactive surfaces.
+- Targets are measured with one shared stage-root reading per pass. A
+  measurement that gets no native reply within 250 ms keeps the last rect.
+  Hover and press changes update their own targets without re-rendering the
+  stage. Rect changes still re-render it, so a per-frame `a.put()` during a drag
+  re-measures every target on each frame. Profile dense drag scenes on device.
+- The web kit leaves stage content readable by screen readers. The native stage
+  is one labelled image (or a play button) and hides its faux UI.
 - `easeCss` remains available for shared authoring data; native animation uses
   `bezier` and Animated values. Browser CSS strings are not native styles.
 - Animated SVG geometry is driven on the JS thread to share a deterministic

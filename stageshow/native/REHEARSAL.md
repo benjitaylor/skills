@@ -145,3 +145,25 @@ AGENTS.md routing. Its check verifies those files, guide links and refusal to
 overwrite an existing destination. The web example sources are comparison
 material; native examples are the runnable starting points. Browser filming
 commands in the original references still belong to the contribution checkout.
+
+## Review fixes — 2026-11-01
+
+A code review against the web kit found four gaps; each now has a test that fails
+on the previous code.
+
+- Accessibility: the stage's `accessibilityLabel` was ignored on iOS because the
+  view was not `accessible`, and VoiceOver read the faux UI as real controls. The
+  stage is now one labelled image (or a play button) with its contents hidden.
+- Authoring warnings: missing-target, loop-seam and selection-drift warnings from
+  the web kit were absent. They now run in development builds.
+- Stalled measurement: a native measurement that timed out became a 0×0 rect,
+  moving the cursor's aim and hit testing. A timeout now keeps the last rect.
+- Measurement cost: each target measured the stage root separately, measured
+  twice on mount and repeated its layout measurement on unchanged passes. Hover
+  and press changes re-rendered and re-measured the whole stage. Targets now
+  share one root reading, layout is re-read only when the rect changes, and
+  interactions update only their own targets. Device frame times are still unmeasured.
+
+Validation: native TypeScript and the Jest suites (41 tests). Device, Android and
+browser comparison runs were not repeated for these changes; CI covers the
+browser comparisons.

@@ -1,4 +1,4 @@
-import { createAct, Stopped, type ActEnv } from '../kit/act'
+import { checkSeam, createAct, Stopped, type ActEnv } from '../kit/act'
 import { clock, installVirtualClock } from '../kit/clock'
 import { Registry, type Entry } from '../kit/registry'
 
@@ -148,4 +148,46 @@ it('preserves a scripted cursor when the scene has no automatic cursor targets',
   await f.clock.step(5)
   await move
   expect(f.env.setKind).toHaveBeenLastCalledWith('wait')
+})
+
+describe('authoring warnings', () => {
+  let warnings: jest.SpyInstance
+  beforeEach(() => {
+    warnings = jest.spyOn(console, 'warn').mockImplementation(() => {})
+  })
+  afterEach(() => warnings.mockRestore())
+  const warned = () => warnings.mock.calls.map(([message]) => String(message))
+
+  it('names a missing target instead of measuring nothing silently', () => {
+    const f = fixture()
+    expect(f.act.rect('missing')).toEqual({ x: 0, y: 0, width: 0, height: 0 })
+    expect(warned()).toEqual(['[stageshow-native] no target named "missing"'])
+  })
+
+  it('flags a selection drag that never reads the caret', async () => {
+    const f = fixture()
+    f.act.place('one')
+    f.env.kind.current = 'ibeam'
+    const drifting = f.act.drag('two', () => {}, { duration: 50 })
+    await f.clock.step(30)
+    await drifting
+    expect(warned().some((m) => m.includes('selection drift'))).toBe(true)
+
+    warnings.mockClear()
+    f.act.place('one')
+    const following = f.act.drag('two', (at) => void f.act.caret('two', at), { duration: 50 })
+    await f.clock.step(30)
+    await following
+    expect(warned().some((m) => m.includes('selection drift'))).toBe(false)
+  })
+
+  it('reports a loop that ends away from its opening state or cursor', () => {
+    checkSeam({ text: '', count: 0 }, { text: '', count: 0 }, { x: 5, y: 5 }, { x: 5, y: 5 })
+    expect(warned()).toEqual([])
+    checkSeam({ text: 'hi', count: 0 }, { text: '', count: 0 }, { x: 40, y: 5 }, { x: 5, y: 5 })
+    expect(warned()).toEqual([
+      '[stageshow-native] loop seam: state still differs from initial at the end of the script (text)',
+      '[stageshow-native] loop seam: cursor does not end where it starts',
+    ])
+  })
 })

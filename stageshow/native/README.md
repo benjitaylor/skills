@@ -125,6 +125,14 @@ changes scene state. They do not operate real app controls.
   shows the poster until tapped, then plays once; another tap replays it.
 - The OS Reduce Motion preference always wins. `reducedMotion` and `specimen`
   can force a still for previews. Always supply a meaningful `poster`.
+- Screen readers see a stage as one element. `accessibilityLabel` describes the
+  illustration as an image; the faux UI inside is hidden so its fake controls
+  are never announced as real ones. A tap-to-play stage is a button. Without a
+  label or tap-to-play, the stage is decorative and skipped.
+- Development builds warn, as the web kit does, about missing targets, loops
+  whose state or cursor does not return to the start, and selection drags that
+  never read `a.caret()`. Release builds stay silent. A missing move target
+  still throws to `onError`.
 - `Phone` rasterizes its displayed bounds on iOS to keep text sharp through
   nested scaling. Set `shouldRasterizeIOS={false}` to opt out. This trades an
   offscreen bitmap and memory for rendering quality; it is not a performance
@@ -163,7 +171,9 @@ npm run export
 `check:parity` compares the upstream public exports and explicitly consumed
 component props. It guards API coverage; it does not certify behavior or pixels.
 Tests exercise clock isolation, cancellation, native targets, scrolling, Unicode
-typing, interrupted tweens, hidden targets and retained transition layers. The
+typing, interrupted tweens, hidden targets and retained transition layers. They
+also cover authoring warnings, screen reader grouping, shared root measurement,
+stalled measurements and hover updates that skip a full stage render. The
 playground render test mounts every page and all nine phone frame variants.
 
 Also run `npm run typecheck` and `npm run check:css` in the parent Stageshow folder.

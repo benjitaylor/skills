@@ -4,11 +4,12 @@ import { Animated, AppState, Platform, View, type StyleProp, type ViewStyle } fr
 import Svg, { Defs, Pattern, Path, Stop, Rect as SvgRect } from 'react-native-svg'
 import { BlurTargetView } from 'expo-blur'
 import { BlurBackground } from './glass'
-import { createAct, Stopped, type Script } from './act'
+import { checkSeam, createAct, Stopped, type Script } from './act'
 import { clock } from './clock'
+import { isDev } from './dev'
 import { Cursor, Ripple, Keycaps } from './cursor'
 import type { CursorKind, CursorStyle, Keys, KeysAt } from './cursor-types'
-import type { Rect, Target } from './geometry'
+import type { Point, Rect, Target } from './geometry'
 import {
   LookContext,
   resolveTokens,
@@ -122,6 +123,8 @@ export function Stage<S extends object>({
   const active = visible && appActive
   const [state, setState] = useState(poster ?? initial),
     [kind, setKind] = useState<CursorKind>(cursor?.kind ?? 'pointer')
+  // The script's view of state, current before React commits, for the loop seam check.
+  const scripted = useRef(state)
   const position = useRef({ x: 0, y: 0 }),
     animatedPosition = useRef(new Animated.ValueXY()).current
   const kindRef = useRef(kind)
@@ -166,6 +169,7 @@ export function Stage<S extends object>({
     const timers = new Set<number>()
     setRunning(true)
     kindRef.current = values.cursor?.kind ?? 'pointer'
+    scripted.current = values.initial
     setState(values.initial)
     registry.reset()
     setKind(values.cursor?.kind ?? 'pointer')
@@ -185,8 +189,11 @@ export function Stage<S extends object>({
       height: designH,
       position,
       kind: kindRef,
-      setState: (patch: Partial<S> | ((s: S) => Partial<S>)) =>
-        setState((s) => ({ ...s, ...(typeof patch === 'function' ? patch(s) : patch) })),
+      setState: (patch: Partial<S> | ((s: S) => Partial<S>)) => {
+        const s = scripted.current
+        scripted.current = { ...s, ...(typeof patch === 'function' ? patch(s) : patch) }
+        setState(scripted.current)
+      },
       place,
       setKind,
       press: setPressed,
@@ -229,6 +236,13 @@ export function Stage<S extends object>({
             completed.current = true
             setRunning(false)
             break
+          }
+          if (isDev()) {
+            let rest: Point | null = null
+            try {
+              rest = values.cursor ? registry.resolve(values.cursor.at, layout) : null
+            } catch {}
+            checkSeam(scripted.current, values.initial, position.current, rest)
           }
           // Prevent an empty script from creating an unbounded microtask loop.
           await act.wait(16)
@@ -294,11 +308,15 @@ export function Stage<S extends object>({
     : theme === 'glass'
       ? [look.tokens.accent, '#8b5cf6', '#ffa878']
       : ['#d5c9f4', '#f8d3b5', '#d2e8f5']
+  // One element for assistive tech: the label describes the illustration, and the faux UI
+  // inside is never read as real controls. Without a label or tap-to-play it is decorative.
+  const tappable = play === 'hover' && Platform.OS !== 'web'
   return (
     <View
-      accessibilityLabel={accessibilityLabel}
-      accessibilityRole={play === 'hover' ? 'button' : undefined}
-      accessibilityActions={play === 'hover' ? [{ name: 'activate', label: 'Play illustration' }] : undefined}
+      accessible={!!accessibilityLabel || tappable}
+      accessibilityLabel={accessibilityLabel ?? (tappable ? 'Play illustration' : undefined)}
+      accessibilityRole={tappable ? 'button' : accessibilityLabel ? 'image' : undefined}
+      accessibilityActions={tappable ? [{ name: 'activate', label: 'Play illustration' }] : undefined}
       onAccessibilityAction={(event) => {
         if (event.nativeEvent.actionName === 'activate') setActivation((n) => n + 1)
       }}
@@ -314,6 +332,8 @@ export function Stage<S extends object>({
       <View
         ref={root}
         collapsable={false}
+        accessibilityElementsHidden
+        importantForAccessibility="no-hide-descendants"
         style={{
           position: 'absolute',
           left: Math.max(0, (available - designW * scale) / 2),

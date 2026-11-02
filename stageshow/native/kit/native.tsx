@@ -60,15 +60,26 @@ export function useInteraction(name?: string) {
     () => scene?.registry.interaction(name),
   )
 }
-function measured(node: View): Promise<Rect> {
+function measured(node: View): Promise<Rect | null> {
   return new Promise((resolve) => {
-    // A detached native ref may never call its callback. Bound the wait.
-    const timeout = setTimeout(() => resolve({ x: 0, y: 0, width: 0, height: 0 }), 250)
+    // A detached native ref may never call its callback. Bound the wait, and report no
+    // measurement rather than a zero rect: a slow reply must not move a live target.
+    const timeout = setTimeout(() => resolve(null), 250)
     node.measureInWindow((x, y, width, height) => {
       clearTimeout(timeout)
       resolve({ x, y, width, height })
     })
   })
+}
+// Targets measured together share one measurement of the stage root.
+const origins = new WeakMap<View, Promise<Rect | null>>()
+function originOf(root: View) {
+  let origin = origins.get(root)
+  if (!origin) {
+    origin = measured(root).finally(() => origins.delete(root))
+    origins.set(root, origin)
+  }
+  return origin
 }
 export const SceneView = forwardRef<View, NativeProps>(function SceneView(
   {
@@ -102,6 +113,7 @@ export const SceneView = forwardRef<View, NativeProps>(function SceneView(
     layout: { x: 0, y: 0, width: 0, height: 0 },
     order: ++order,
   }).current
+  const laidOut = useRef(false)
   const current = useRef({ scene, hidden, cursor: cursor ?? cursorAlias, parent })
   current.current = { scene, hidden, cursor: cursor ?? cursorAlias, parent }
   useImperativeHandle(forwarded, () => node.current!, [])
@@ -114,8 +126,8 @@ export const SceneView = forwardRef<View, NativeProps>(function SceneView(
       element = node.current,
       root = context?.root.current
     if (!context || !element || !root) return
-    const [r, origin] = await Promise.all([measured(element), measured(root)])
-    if (element !== node.current) return
+    const [r, origin] = await Promise.all([measured(element), originOf(root)])
+    if (element !== node.current || !r || !origin) return
     const scale = origin.width / context.width || context.scale || 1
     const next = {
       x: (r.x - origin.x) / scale,
@@ -125,6 +137,8 @@ export const SceneView = forwardRef<View, NativeProps>(function SceneView(
     }
     const changed = (Object.keys(next) as (keyof Rect)[]).some((key) => Math.abs(next[key] - entry.rect[key]) > 0.1)
     entry.rect = next
+    if (!changed && laidOut.current) return
+    laidOut.current = true
     // measureLayout reports layout positions without a target's own press scale.
     element.measureLayout(
       root,
@@ -140,8 +154,8 @@ export const SceneView = forwardRef<View, NativeProps>(function SceneView(
   useLayoutEffect(() => {
     if (!name || !scene) return
     if (scene.registry.entries.has(name)) throw new Error(`Duplicate Stageshow target: ${name}`)
+    // The effect below measures it in this same commit.
     scene.registry.entries.set(name, entry)
-    void entry.measure?.()
     return () => {
       if (scene.registry.entries.get(name) === entry) {
         scene.registry.entries.delete(name)

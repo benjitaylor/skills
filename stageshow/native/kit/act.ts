@@ -4,6 +4,7 @@ import type { Layout } from './look'
 import { capsOf, type CursorKind, type Keys } from './cursor-types'
 import type { Registry } from './registry'
 import { bezier } from './ease'
+import { warn } from './dev'
 
 type Patch<S> = Partial<S> | ((state: S) => Partial<S>)
 type MoveOptions = {
@@ -135,7 +136,8 @@ export function createAct<S>(signal: AbortSignal, env: ActEnv<S>): Act<S> {
       }
     }
   }
-  let keyId = 0
+  let keyId = 0,
+    carets = 0
   const a: Act<S> = {
     signal,
     layout: env.layout,
@@ -152,9 +154,15 @@ export function createAct<S>(signal: AbortSignal, env: ActEnv<S>): Act<S> {
       place(env.position.current)
     },
     wait,
-    rect: (name, opts) => env.registry.rect(name, opts?.layout),
+    rect: (name, opts) => {
+      if (!env.registry.entries.has(name)) warn(`no target named "${name}"`)
+      return env.registry.rect(name, opts?.layout)
+    },
     center: (name) => env.registry.resolve(name, env.layout),
-    caret: (name, at) => env.registry.caret(name, at),
+    caret: (name, at) => {
+      carets++
+      return env.registry.caret(name, at)
+    },
     async move(to, opts) {
       check()
       await env.registry.measure()
@@ -313,7 +321,14 @@ export function createAct<S>(signal: AbortSignal, env: ActEnv<S>): Act<S> {
         if (name) env.registry.update(name, { pressed: 'primary' })
         await wait(160)
         check()
-        if (opts?.cursor !== 'preserve' && kind !== 'ibeam' && kind !== 'crosshair') env.setKind('grab')
+        // Over text (I-beam) or a canvas (crosshair) a drag selects, so it keeps its kind.
+        const selects = kind === 'ibeam' || kind === 'crosshair'
+        if (opts?.cursor !== 'preserve' && !selects) env.setKind('grab')
+        if (selects && Math.abs(end.y - from.y) > 6 && end.y > from.y && end.x < from.x - 2)
+          warn(
+            'a text selection that ends left of where it starts overshoots and shrinks back; select text that starts a line, or fits on one',
+          )
+        const caretsBefore = carets
         const distance = Math.hypot(end.x - from.x, end.y - from.y) || 1
         await tween(opts?.duration ?? clamp(650 + distance * 0.6, 700, 1400), (t) => {
           const progress = ease(t),
@@ -325,6 +340,11 @@ export function createAct<S>(signal: AbortSignal, env: ActEnv<S>): Act<S> {
           place(p, false)
           onMove?.(p, from, t)
         })
+        // A selection grown by time or a word count drifts off the I-beam.
+        if (selects && onMove && carets === caretsBefore)
+          warn(
+            'selection drift: a text selection drag never read a.caret(), so the highlight is not under the I-beam; set it from a.caret(name, at) in onMove',
+          )
         await wait(120)
       } finally {
         release()
@@ -355,4 +375,15 @@ export function createAct<S>(signal: AbortSignal, env: ActEnv<S>): Act<S> {
     },
   }
   return a
+}
+
+// A loop that doesn't end where it began jumps on every repeat.
+export function checkSeam(end: object, initial: object, at: Point, rest: Point | null) {
+  const changed = Object.keys(initial).filter(
+    (k) =>
+      JSON.stringify((end as Record<string, unknown>)[k]) !== JSON.stringify((initial as Record<string, unknown>)[k]),
+  )
+  if (changed.length)
+    warn(`loop seam: state still differs from initial at the end of the script (${changed.join(', ')})`)
+  if (rest && Math.hypot(at.x - rest.x, at.y - rest.y) > 1) warn('loop seam: cursor does not end where it starts')
 }

@@ -33,6 +33,7 @@ export class Registry {
   entries = new Map<string, Entry>()
   private interactions = new Map<string, Interaction>()
   private listeners = new Set<() => void>()
+  /** Bumps when measured rects or mounted targets change. The stage re-renders on it. */
   version = 0
   subscribe = (fn: () => void) => {
     this.listeners.add(fn)
@@ -40,8 +41,9 @@ export class Registry {
       this.listeners.delete(fn)
     }
   }
-  notify = () => {
-    this.version++
+  // Hover and press reach their own targets through useInteraction, not a stage re-render.
+  notify = (moved = true) => {
+    if (moved) this.version++
     this.listeners.forEach((fn) => fn())
   }
   interaction = (name?: string) => (name ? (this.interactions.get(name) ?? IDLE) : IDLE)
@@ -50,7 +52,7 @@ export class Registry {
       next = { ...before, ...patch }
     if (before.hover === next.hover && before.pressed === next.pressed && before.scrolling === next.scrolling) return
     this.interactions.set(name, next)
-    this.notify()
+    this.notify(false)
   }
   rect(name: string, layout = false): Rect {
     return this.entries.get(name)?.[layout ? 'layout' : 'rect'] ?? EMPTY

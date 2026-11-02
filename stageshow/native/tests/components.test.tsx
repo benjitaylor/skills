@@ -144,6 +144,134 @@ it('holds a hover scene as a poster until native touch activation', async () => 
   expect(script).toHaveBeenCalledTimes(1)
 })
 
+it('exposes a stage as one labelled element and hides its faux UI from assistive tech', async () => {
+  const stageView = (renderer: ReactTestRenderer) =>
+    renderer.root.findAll((node) => node.type === View && typeof node.props.onLayout === 'function')[0]
+  const renderer = await render(
+    <Stage width={100} height={100} accessibilityLabel="A document is saved">
+      {() => <View testID="faux" />}
+    </Stage>,
+  )
+  const labelled = stageView(renderer)
+  expect(labelled.props).toMatchObject({
+    accessible: true,
+    accessibilityRole: 'image',
+    accessibilityLabel: 'A document is saved',
+  })
+  const hidden = labelled.findAll(
+    (node) => node.type === View && node.props.importantForAccessibility === 'no-hide-descendants',
+  )[0]
+  expect(hidden.props.accessibilityElementsHidden).toBe(true)
+  expect(hidden.findAllByProps({ testID: 'faux' }).length).toBeGreaterThan(0)
+
+  await act(async () =>
+    renderer.update(
+      <Stage width={100} height={100} script={async () => {}} play="hover">
+        {() => <View />}
+      </Stage>,
+    ),
+  )
+  expect(stageView(renderer).props).toMatchObject({ accessible: true, accessibilityRole: 'button' })
+  await act(async () =>
+    renderer.update(
+      <Stage width={100} height={100}>
+        {() => <View />}
+      </Stage>,
+    ),
+  )
+  expect(stageView(renderer).props.accessible).toBe(false)
+})
+
+it('warns when a looping script does not return to its opening state', async () => {
+  jest.spyOn(AccessibilityInfo, 'isReduceMotionEnabled').mockResolvedValue(false)
+  const warnings = jest.spyOn(console, 'warn').mockImplementation(() => {})
+  const c = installVirtualClock()
+  const script = async (a: Act<{ done: boolean }>) => {
+    await a.set({ done: true })
+    await a.wait(100)
+  }
+  await render(
+    <Stage width={100} height={100} initial={{ done: false }} script={script}>
+      {() => <View />}
+    </Stage>,
+  )
+  await act(async () => c.step(20))
+  expect(warnings).toHaveBeenCalledWith(
+    '[stageshow-native] loop seam: state still differs from initial at the end of the script (done)',
+  )
+})
+
+it('measures targets against one root reading and keeps the last rect when measurement stalls', async () => {
+  const registry = new Registry()
+  type Reply = (...rect: number[]) => void
+  const root = { measureInWindow: jest.fn((reply: Reply) => reply(0, 0, 360, 640)) }
+  const scene = { registry, root: { current: root as unknown as View }, width: 360, height: 640, scale: 1 }
+  // The jest preset's native views never answer a measurement; give each target real replies.
+  type Native = { measureInWindow: jest.Mock; measureLayout: jest.Mock }
+  const refs = { a: React.createRef<View>(), b: React.createRef<View>(), c: React.createRef<View>() }
+  await render(
+    <SceneContext.Provider value={scene}>
+      <SceneView ref={refs.a} target="a" />
+      <SceneView ref={refs.b} target="b" />
+      <SceneView ref={refs.c} target="c" />
+    </SceneContext.Provider>,
+  )
+  const native = (name: keyof typeof refs) => refs[name].current as unknown as Native
+  for (const [name, x] of [
+    ['a', 10],
+    ['b', 80],
+    ['c', 150],
+  ] as const)
+    Object.assign(native(name), {
+      measureInWindow: jest.fn((reply: Reply) => reply(x, 20, 50, 30)),
+      measureLayout: jest.fn((_root: unknown, reply: Reply) => reply(x, 20, 50, 30)),
+    })
+  root.measureInWindow.mockClear()
+  await registry.measure()
+  expect(registry.rect('b')).toEqual({ x: 80, y: 20, width: 50, height: 30 })
+  expect(root.measureInWindow).toHaveBeenCalledTimes(1)
+  expect(native('a').measureLayout).toHaveBeenCalledTimes(1)
+
+  // An unchanged pass: one root reading, and no layout re-measurement.
+  await registry.measure()
+  expect(root.measureInWindow).toHaveBeenCalledTimes(2)
+  expect(native('a').measureLayout).toHaveBeenCalledTimes(1)
+
+  // A native reply that never arrives keeps the target where it was.
+  native('a').measureInWindow.mockImplementation(() => {})
+  await registry.measure()
+  expect(registry.rect('a')).toEqual({ x: 10, y: 20, width: 50, height: 30 })
+})
+
+it('updates hovered targets without re-rendering the whole stage', async () => {
+  let renders = 0,
+    registry: Registry | undefined
+  function Grab() {
+    registry = React.useContext(SceneContext)?.registry
+    return null
+  }
+  await render(
+    <Stage width={100} height={100}>
+      {() => {
+        renders++
+        return (
+          <SceneView target="row" hoverStyle={{ opacity: 0.5 }}>
+            <Grab />
+          </SceneView>
+        )
+      }}
+    </Stage>,
+  )
+  const before = renders
+  await act(async () => registry!.update('row', { hover: true }))
+  expect(renders).toBe(before)
+  expect(
+    tree!.root.findAll((node) => node.type === Animated.View && node.props.testID === 'row')[0].props.style,
+  ).toContainEqual({ opacity: 0.5 })
+  await act(async () => registry!.notify())
+  expect(renders).toBe(before + 1)
+})
+
 it('hides launched-screen content and targets behind the closed Expand face', async () => {
   const registry = new Registry()
   const scene = { registry, root: { current: null }, width: 360, height: 640, scale: 1 }
