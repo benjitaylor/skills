@@ -1,0 +1,7 @@
+/* The viewer's own page, outside every stage. */
+body {
+  margin: 0;
+  font: 14px/1.5 system-ui, sans-serif;
+  color: #262628;
+  background: #fff;
+}

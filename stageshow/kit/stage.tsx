@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react'
+import { flushSync } from 'react-dom'
 import './stage.css'
 import { checkSeam, createAct, Stopped, type Script } from './act'
 import { Cursor, ripple as spawnRipple, type CursorKind, type CursorStyle } from './cursor'
@@ -400,7 +401,7 @@ export function Stage<S extends object>({
     () => (signal: AbortSignal) =>
       createAct<S>(signal, {
         rootRef, cursorRef, pos, hovered, kindRef, keysRef, dragging, autoUsed, autoRef, scaleRef,
-        speed, layout, cursor, resolve, place, remeasure, ripple, setState, setKind, setKeys, setLastKeys,
+        speed, layout, cursor, resolve, place, remeasure, ripple, setState, setKind, setKeys, setLastKeys, sync: flushSync,
       }),
     [resolve, place, speed, layout], // eslint-disable-line react-hooks/exhaustive-deps
   )

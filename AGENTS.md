@@ -18,7 +18,9 @@ Open the local URL Vite prints. The skill's README has the rest.
 ## Stack and checks
 
 Stageshow uses React, TypeScript and CSS. Run `npm run typecheck` and
-`npm run check:css` in its folder after changing code. Follow its rehearsal
+`npm run check:css` in its folder after changing code. After changing
+`kit/act.ts`, `kit/core.ts` or anything in `kit-angular/`, also run
+`npm run build` in `stageshow/playground-angular`; keep the shared core free of React. Follow its rehearsal
 guidance when changing examples or motion. Do not run a production build while
 the same workspace's development server is running.
 

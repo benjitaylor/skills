@@ -1,5 +1,5 @@
 import type { CSSProperties, ReactNode } from 'react'
-import type { CursorKind } from '../cursor'
+import type { CursorKind } from '../core'
 import './Segmented.css'
 
 /**

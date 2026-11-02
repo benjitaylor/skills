@@ -42,7 +42,9 @@ Real-product studies (Figma, Linear, Slack, Raycast and others) are included in
 different project, keep its local assets and install that icon dependency or
 adapt the icons.
 
-The kit supports React 18 and later. It needs no third-party animation runtime. The
+The kit supports React 18 and later. For Angular 20 and later, `kit-angular/`
+binds the stage and window chrome to the same script API and CSS; see
+`references/angular.md`. It needs no third-party animation runtime. The
 playground uses Vite; filming uses `playwright-core` and locally installed
 Chrome (or `CHROME_PATH`). Those tools are not runtime dependencies of a demo.
 
@@ -63,7 +65,10 @@ review. No automated clean result replaces watching the motion.
 
 ## Contents
 
-- `kit/`: portable React source and styles.
+- `kit/`: portable React source and styles; its framework-free core (`act.ts`,
+  `core.ts`, `clock.ts`, `ease.ts`, `measure.ts`, `util.ts`) is shared.
+- `kit-angular/`, `examples-angular/`, `playground-angular/`: the Angular 20+
+  binding, ported examples and their viewer.
 - `examples/`: gold scenes and reference specimens.
 - `teaching/`: explicitly flawed/corrected pairs, separate from gold.
 - `references/`: design judgment, APIs, and verification guidance.

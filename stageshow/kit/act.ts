@@ -1,8 +1,4 @@
-import { flushSync } from 'react-dom'
-import type { Dispatch, SetStateAction } from 'react'
-import type { CursorKind } from './cursor'
-import { capsOf, type Keys } from './keys'
-import type { Layout } from './looks'
+import { capsOf, type CursorKind, type Keys, type Layout } from './core'
 import { EMPTY, drawnScale, nameOf, layoutRectOf, rectOf, thumb, type Point, type Rect, type Target } from './measure'
 import { bezier } from './ease'
 import { clamp, easeInOutCubic, hash, warn } from './util'
@@ -108,6 +104,8 @@ export type Script<S> = (act: Act<S>) => Promise<void>
 export class Stopped extends Error {}
 
 type Ref<T> = { current: T }
+/** A state setter: a value, or a function of the previous one. React's useState setter is one. */
+export type Setter<T> = (next: T | ((prev: T) => T)) => void
 
 /** What an act works with: the stage's elements, refs and setters, read when the act is made. */
 export interface ActEnv<S> {
@@ -128,16 +126,22 @@ export interface ActEnv<S> {
   place: (p: Point) => void
   remeasure: () => void
   ripple: (at: Point) => void
-  setState: Dispatch<SetStateAction<S>>
-  setKind: Dispatch<SetStateAction<CursorKind>>
-  setKeys: Dispatch<SetStateAction<Keys>>
-  setLastKeys: Dispatch<SetStateAction<Keys | null>>
+  setState: Setter<S>
+  setKind: Setter<CursorKind>
+  setKeys: Setter<Keys>
+  setLastKeys: Setter<Keys | null>
+  /**
+   * Render now, inside fn: a drag's onMove paints in the same frame as the
+   * cursor. React passes flushSync; another binding runs fn and then its own
+   * synchronous change detection.
+   */
+  sync: (fn: () => void) => void
 }
 
 // Each run gets its own act, bound to its own signal, so a canceled run can
 // never pick up the next run's signal and keep going.
 export function createAct<S>(signal: AbortSignal, env: ActEnv<S>): Act<S> {
-  const { rootRef, cursorRef, pos, hovered, kindRef, keysRef, dragging, autoUsed, autoRef, scaleRef, speed, layout, cursor, resolve, place, remeasure, ripple, setState, setKind, setKeys, setLastKeys } = env
+  const { rootRef, cursorRef, pos, hovered, kindRef, keysRef, dragging, autoUsed, autoRef, scaleRef, speed, layout, cursor, resolve, place, remeasure, ripple, setState, setKind, setKeys, setLastKeys, sync } = env
   const entering = bezier('enter')
   const check = () => {
     if (signal.aborted) throw new Stopped()
@@ -370,7 +374,7 @@ export function createAct<S>(signal: AbortSignal, env: ActEnv<S>): Act<S> {
         const p = opts?.path ? opts.path(e, from, end) : { x: from.x + (end.x - from.x) * e + nx * lift, y: from.y + (end.y - from.y) * e + ny * lift }
         place(p)
         auto(p)
-        if (opts?.onMove) flushSync(() => opts.onMove!(p, from, t))
+        if (opts?.onMove) sync(() => opts.onMove!(p, from, t))
       })
       check()
       hover(targetEl(to))
@@ -623,7 +627,7 @@ export function createAct<S>(signal: AbortSignal, env: ActEnv<S>): Act<S> {
           const at = opts?.path?.(e, from, end) ?? { x: from.x + (end.x - from.x) * ex + nx * lift, y: from.y + (end.y - from.y) * ey + ny * lift }
           // The cursor and whatever follows it (a card, a selection) paint in
           // the same frame: render the scene now, not a frame behind
-          flushSync(() => onMove?.(at, from, t))
+          sync(() => onMove?.(at, from, t))
           place(at)
           if (finger) drawTrail(at)
         })

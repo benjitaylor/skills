@@ -1,0 +1,26 @@
+{
+  "name": "stageshow-playground-angular",
+  "version": "0.1.0",
+  "private": true,
+  "description": "A local viewer for kit-angular and examples-angular, on Angular 20 (the oldest release kit-angular supports).",
+  "license": "MIT",
+  "scripts": {
+    "dev": "ng serve --port 4300",
+    "build": "ng build",
+    "typecheck": "ngc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@angular/common": "~20.3.0",
+    "@angular/compiler": "~20.3.0",
+    "@angular/core": "~20.3.0",
+    "@angular/platform-browser": "~20.3.0",
+    "rxjs": "~7.8.0",
+    "tslib": "^2.8.0"
+  },
+  "devDependencies": {
+    "@angular/build": "~20.3.0",
+    "@angular/cli": "~20.3.0",
+    "@angular/compiler-cli": "~20.3.0",
+    "typescript": "~5.9.0"
+  }
+}
