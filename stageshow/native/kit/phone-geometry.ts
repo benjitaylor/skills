@@ -19,3 +19,13 @@ export function superellipsePath(w: number, h: number, a: number, n: number) {
   })
   return `M${pts.join('L')}Z`
 }
+
+/** The gradient line CSS draws for `linear-gradient(<angle>deg, …)` over a w × h box, in that
+ * box's coordinates: through the centre, long enough that the corners land on 0% and 100%. */
+export function gradientLine(angle: number, w: number, h: number) {
+  const a = (angle * Math.PI) / 180,
+    dx = Math.sin(a),
+    dy = -Math.cos(a)
+  const half = (Math.abs(w * dx) + Math.abs(h * dy)) / 2
+  return { x1: w / 2 - dx * half, y1: h / 2 - dy * half, x2: w / 2 + dx * half, y2: h / 2 + dy * half }
+}

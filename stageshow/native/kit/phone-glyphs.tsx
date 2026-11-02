@@ -1,4 +1,4 @@
-import Svg, { Path, Circle, Ellipse, Rect, G } from 'react-native-svg'
+import Svg, { Path, Rect } from 'react-native-svg'
 export function Signal({ color }: { color: string }) {
   // Four bars 3.33 wide on a 5.67 pitch, fully rounded, 6.33 to 13.67 tall
   return (
@@ -35,6 +35,32 @@ export function Battery({ color }: { color: string }) {
         fill={color}
         transform="translate(27.33 4.33)"
         d="M0 0L0 5C0.601505 4.8625 2 3.75 2 2.5C2 1.25 0.601505 0.1375 0 0Z"
+      />
+    </Svg>
+  )
+}
+
+// The lock screen's buttons, drawn after SF Symbols flashlight.off.fill and
+// camera.fill: solid glyphs with cut-outs, not outlines
+export function Flashlight({ color }: { color: string }) {
+  return (
+    <Svg viewBox="0 0 24 24" width={22} height={22}>
+      <Path
+        fill={color}
+        fillRule="evenodd"
+        d="M7.6 1.6h8.8a1.6 1.6 0 0 1 1.6 1.6v1.9H6V3.2a1.6 1.6 0 0 1 1.6-1.6ZM6 6h12l-2.6 4v10.4a2 2 0 0 1-2 2h-2.8a2 2 0 0 1-2-2V10ZM10.6 14a1.4 1.4 0 1 0 2.8 0 1.4 1.4 0 1 0-2.8 0Z"
+      />
+    </Svg>
+  )
+}
+
+export function CameraGlyph({ color }: { color: string }) {
+  return (
+    <Svg viewBox="0 0 24 24" width={24} height={24}>
+      <Path
+        fill={color}
+        fillRule="evenodd"
+        d="M4.6 6.6h3.3l1.2-1.8a1.3 1.3 0 0 1 1.1-.6h3.6a1.3 1.3 0 0 1 1.1.6l1.2 1.8h3.3A2.6 2.6 0 0 1 22 9.2v8.6a2.6 2.6 0 0 1-2.6 2.6H4.6A2.6 2.6 0 0 1 2 17.8V9.2a2.6 2.6 0 0 1 2.6-2.6ZM7.5 13.4a4.5 4.5 0 1 0 9 0 4.5 4.5 0 1 0-9 0ZM9 13.4a3 3 0 1 0 6 0 3 3 0 1 0-6 0Z"
       />
     </Svg>
   )

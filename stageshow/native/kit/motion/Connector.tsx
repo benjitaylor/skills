@@ -1,9 +1,9 @@
 import { useId, useState, type ReactNode } from 'react'
-import { View } from 'react-native'
+import { Animated } from 'react-native'
 import Svg, { Path, Circle, Defs, Mask } from 'react-native-svg'
 import { corners, along, elbow, type Route } from '../connector-geometry'
 import type { Point } from '../geometry'
-import { useTween, useNumber } from '../animate'
+import { useTween, useNumber, curves } from '../animate'
 import { useLook } from '../look'
 import { SceneView, Label, useScene, type NativeProps } from '../native'
 
@@ -19,6 +19,7 @@ export interface ConnectorProps extends NativeProps {
   labelAt?: number
   dashed?: boolean
 }
+const pop = [0.22, 1, 0.36, 1] as const
 export function Connector({
   from,
   to,
@@ -37,8 +38,9 @@ export function Connector({
     scene = useScene(),
     id = useId().replace(/:/g, ''),
     [labelSize, setLabelSize] = useState({ width: 0, height: 0 })
-  const draw = useNumber(useTween(show ? 1 : 0, 650)),
-    alpha = useNumber(useTween(show ? 1 : 0, 180))
+  // Draws on over a second. Hidden, the line fades intact, then resets undrawn out of sight (Connector.css)
+  const draw = useNumber(useTween(show ? 1 : 0, show ? 1000 : 0, { delay: show ? 0 : 250, ease: [0.65, 0, 0.35, 1] }))
+  const line = useNumber(useTween(show ? 1 : 0, 250, { ease: curves.ease }))
   const tip =
     arrow && route === 'curve'
       ? { x: to.x - Math.sign(to.x - from.x) * Math.min(8, Math.abs(to.x - from.x) / 3), y: to.y }
@@ -60,8 +62,15 @@ export function Connector({
   const ends = dots ?? (arrow ? 'none' : 'end'),
     at = along(points, labelAt),
     arrived = show && draw >= 0.999
+  // The end dot, arrow and label arrive as the line reaches them; a start dot pops as it begins
+  const arrival = useTween(arrived ? 1 : 0, 200, { ease: curves.ease })
+  const shown = useNumber(arrival),
+    grown = useNumber(useTween(arrived ? 1 : 0.4, 300, { ease: pop }))
+  const started = useNumber(useTween(show ? 1 : 0, 200, { ease: curves.ease })),
+    startGrown = useNumber(useTween(show ? 1 : 0.4, 300, { ease: pop }))
   const dashes = Math.max(1, Math.round((length + 4) / 8)),
     dash = length / (dashes * 2 - 1)
+  const step = typeof label === 'number'
   return (
     <SceneView
       {...rest}
@@ -77,7 +86,7 @@ export function Connector({
         style,
       ]}
     >
-      <Svg width="100%" height="100%" opacity={alpha}>
+      <Svg width="100%" height="100%">
         <Defs>
           <Mask id={id} maskUnits="userSpaceOnUse">
             <Path
@@ -86,44 +95,93 @@ export function Connector({
               stroke="#fff"
               strokeWidth={8}
               strokeDasharray={[length, length]}
-              strokeDashoffset={show ? length * (1 - draw) : 0}
+              strokeDashoffset={length * (1 - draw)}
             />
           </Mask>
         </Defs>
         <Path
           d={path}
           fill="none"
-          stroke={tokens.ink[4]}
+          stroke={tokens.accent}
           strokeWidth={1.5}
-          strokeLinecap="round"
-          strokeLinejoin="round"
+          opacity={line}
           mask={`url(#${id})`}
           strokeDasharray={dashed ? [dash, dash] : undefined}
         />
         {arrow && distance > 0.001 && (
-          <Path d={head} fill="none" stroke={tokens.ink[4]} strokeWidth={1.5} opacity={arrived ? 1 : 0} />
+          <Path
+            d={head}
+            fill="none"
+            stroke={tokens.accent}
+            strokeWidth={1.5}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            opacity={shown}
+          />
         )}
-        {ends === 'both' && <Circle cx={from.x} cy={from.y} r={3} fill={tokens.ink[4]} />}
-        {ends !== 'none' && <Circle cx={to.x} cy={to.y} r={3} fill={tokens.ink[4]} opacity={arrived ? 1 : 0} />}
+        {ends === 'both' && (
+          <Circle
+            cx={from.x}
+            cy={from.y}
+            r={3 * startGrown}
+            fill={tokens.accent}
+            stroke="#fff"
+            strokeWidth={2 * startGrown}
+            opacity={started}
+          />
+        )}
+        {ends !== 'none' && (
+          <Circle
+            cx={to.x}
+            cy={to.y}
+            r={3 * grown}
+            fill={tokens.accent}
+            stroke="#fff"
+            strokeWidth={2 * grown}
+            opacity={shown}
+          />
+        )}
       </Svg>
       {label !== undefined && (
-        <View
+        <Animated.View
           onLayout={(event) => setLabelSize(event.nativeEvent.layout)}
-          style={{
-            position: 'absolute',
-            left: at.x - labelSize.width / 2,
-            top: at.y - labelSize.height / 2,
-            opacity: arrived ? 1 : 0,
-            borderRadius: 99,
-            paddingHorizontal: 6,
-            paddingVertical: 3,
-            backgroundColor: tokens.surface,
-            borderWidth: 0.5,
-            borderColor: tokens.border,
-          }}
+          style={[
+            {
+              position: 'absolute',
+              left: at.x - labelSize.width / 2,
+              top: at.y - labelSize.height / 2,
+              opacity: arrival,
+              borderRadius: 999,
+              paddingHorizontal: 7,
+              paddingVertical: 2,
+              backgroundColor: tokens.raised,
+              boxShadow: `0 0 0 1px ${tokens.border}, ${tokens.shadow.card}`,
+            },
+            // A step number is a small circle on the line
+            step && {
+              width: 18,
+              height: 18,
+              padding: 0,
+              paddingHorizontal: 0,
+              paddingVertical: 0,
+              alignItems: 'center',
+              justifyContent: 'center',
+            },
+          ]}
         >
-          <Label style={{ fontSize: 10 }}>{label}</Label>
-        </View>
+          <Label
+            lines={1}
+            style={{
+              fontSize: 10.5,
+              fontWeight: '500',
+              lineHeight: 14,
+              color: tokens.text,
+              fontVariant: step ? ['tabular-nums'] : undefined,
+            }}
+          >
+            {label}
+          </Label>
+        </Animated.View>
       )}
     </SceneView>
   )

@@ -126,22 +126,28 @@ it('aborts an offscreen native run and restarts it on return', async () => {
   expect(script).toHaveBeenCalledTimes(2)
 })
 
-it('holds a hover scene as a poster until native touch activation', async () => {
+it('plays a hover scene once on a native screen, from its opening, and replays it on tap', async () => {
   jest.spyOn(AccessibilityInfo, 'isReduceMotionEnabled').mockResolvedValue(false)
   const c = installVirtualClock(),
-    script = jest.fn(async () => {})
+    script = jest.fn(async (a: Act<{ done: boolean }>) => {
+      await a.wait(100)
+      await a.set({ done: true })
+    })
   const renderer = await render(
     <Stage width={100} height={100} initial={{ done: false }} poster={{ done: true }} script={script} play="hover">
-      {(s) => <View testID={s.done ? 'poster' : 'opening'} />}
+      {(s) => <View testID={s.done ? 'ending' : 'opening'} />}
     </Stage>,
   )
+  // A phone has no hover: as on web's (hover: none), it plays once when seen
+  expect(script).toHaveBeenCalledTimes(1)
+  expect(renderer.root.findAllByProps({ testID: 'opening' }).length).toBeGreaterThan(0)
   await act(async () => c.advance(1000))
-  expect(script).not.toHaveBeenCalled()
-  expect(renderer.root.findAllByProps({ testID: 'poster' }).length).toBeGreaterThan(0)
+  expect(script).toHaveBeenCalledTimes(1)
+  expect(renderer.root.findAllByProps({ testID: 'ending' }).length).toBeGreaterThan(0)
   const target = renderer.root.findAll((node) => typeof node.props.onTouchEnd === 'function')[0]
   await act(async () => target.props.onTouchEnd())
   await act(async () => c.advance(50))
-  expect(script).toHaveBeenCalledTimes(1)
+  expect(script).toHaveBeenCalledTimes(2)
 })
 
 it('exposes a stage as one labelled element and hides its faux UI from assistive tech', async () => {

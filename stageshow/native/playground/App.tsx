@@ -166,6 +166,8 @@ export default function App() {
 
   const settings = {
     theme,
+    // The host is the ground in light and dark, as on web: these cards paint the theme's canvas.
+    tokens: theme === 'light' ? { background: '#f6f5f4' } : theme === 'dark' ? { background: '#111113' } : undefined,
     fidelity,
     replay,
     reducedMotion: poster,
@@ -430,7 +432,7 @@ export default function App() {
                         ]}
                       />
                     </Window>
-                    <Toast show={s.on} icon={<Icon name="check" color="#fff" />}>
+                    <Toast show={s.on} icon={<Icon name="check" />} style={{ alignSelf: 'center' }}>
                       Workspace updated
                     </Toast>
                   </View>

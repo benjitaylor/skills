@@ -1,13 +1,37 @@
-import { useContext, useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react'
-import { Animated, StyleSheet, View, type ViewStyle, type LayoutRectangle } from 'react-native'
-import { SceneView, Label, absolute, useScene, SuppressTargets, HiddenTargets, type NativeProps } from '../native'
-import { useTween, useNumber } from '../animate'
-import { useReducedMotion, MotionContext } from '../reduced-motion'
+import {
+  Children,
+  Fragment,
+  isValidElement,
+  useContext,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type ReactNode,
+} from 'react'
+import { Animated, StyleSheet, View, type StyleProp, type ViewStyle, type LayoutRectangle } from 'react-native'
+import {
+  SceneView,
+  Label,
+  absolute,
+  row,
+  useScene,
+  SuppressTargets,
+  HiddenTargets,
+  type NativeProps,
+  type NativeStyle,
+} from '../native'
+import { useTween, useNumber, curves } from '../animate'
+import { useEntranceReduced, useReducedMotion, MotionContext } from '../reduced-motion'
 import { clock } from '../clock'
 import { Mask, edgeMask } from '../mask'
 import { useLook } from '../look'
+import { PhoneContext } from '../phone'
+import { bezier, type EaseName, type Bezier } from '../ease'
 import type { Rect } from '../geometry'
-import type { EaseName, Bezier } from '../ease'
+
+/** Sideways room for layers that must lay out at their own width inside a narrower box. */
+const SPILL = 1000
 
 export function Collapse({
   open,
@@ -18,10 +42,46 @@ export function Collapse({
   style,
   ...rest
 }: NativeProps & { open: boolean; reveal?: 'clip' | 'drop'; from?: 'above' | 'below'; solid?: boolean }) {
+  const reduced = useReducedMotion(),
+    { speed } = useContext(MotionContext)
   const [height, setHeight] = useState(0),
-    p = useTween(open ? 1 : 0, 500)
+    drop = reveal === 'drop',
+    // Taller than a row, a clip reveal opens from the top and fades in late
+    tall = height > 44
+  // The space and the fade each run their own curve, and differ by direction (Collapse.css)
+  const space = useTween(open ? 1 : 0, open ? (drop ? 500 : 460) : 420, {
+    delay: open ? 0 : 50,
+    ease: open && drop ? [0.45, 0, 0.2, 1] : [0.4, 0, 0.2, 1],
+  })
+  const fade = useTween(open ? 1 : 0, open ? (drop ? 300 : 240) : 420, {
+    delay: open ? (drop ? 240 : tall ? 300 : 150) : 0,
+    ease: open ? (drop ? curves.ease : curves.easeOut) : [0, 0.8, 0.5, 1],
+  })
+  const glide = useTween(open ? 0 : from === 'below' ? 10 : -10, open ? 600 : 300, {
+    delay: open ? 200 : 0,
+    ease: open ? [0.22, 1, 0.36, 1] : curves.ease,
+  })
+  // Clipped while the height moves; settled open, a toolbar or popover can hang off it
+  const [shown, setShown] = useState(open),
+    [moving, setMoving] = useState(false)
+  if (shown !== open) {
+    setShown(open)
+    setMoving(!reduced)
+  }
+  useEffect(() => {
+    if (!moving) return
+    const id = clock.timeout(() => setMoving(false), (open ? (drop ? 500 : 460) : 470) / speed)
+    return () => clock.clearTimeout(id)
+  }, [moving, open, drop, speed])
   return (
-    <SceneView {...rest} hidden={!open} style={[{ height: Animated.multiply(p, height), overflow: 'hidden' }, style]}>
+    <SceneView
+      {...rest}
+      hidden={!open}
+      style={[
+        { height: Animated.multiply(space, height), overflow: drop || (open && !moving) ? 'visible' : 'hidden' },
+        style,
+      ]}
+    >
       <Animated.View
         onLayout={(event) => {
           const h = event.nativeEvent.layout.height
@@ -32,11 +92,13 @@ export function Collapse({
           left: 0,
           right: 0,
           top: 0,
-          opacity: solid ? 1 : p,
-          transform:
-            reveal === 'drop'
-              ? [{ translateY: p.interpolate({ inputRange: [0, 1], outputRange: [from === 'above' ? -12 : 12, 0] }) }]
-              : [],
+          opacity: solid ? 1 : fade,
+          // A row unfolds from its middle line, clipped equally above and below
+          transform: drop
+            ? [{ translateY: glide }]
+            : tall
+              ? []
+              : [{ translateY: space.interpolate({ inputRange: [0, 1], outputRange: [-height / 2, 0] }) }],
         }}
       >
         {children}
@@ -44,13 +106,18 @@ export function Collapse({
     </SceneView>
   )
 }
-/** Measures intrinsic content separately so outgoing text never wraps during a resize. */
+/**
+ * Measures intrinsic content separately so outgoing text never wraps during a resize. Sizes are
+ * rounded up a pixel unless `exact`, for callers that give the text its own room.
+ */
 export function Probe({
   children,
   onSize,
   maxWidth,
+  exact = false,
 }: {
   maxWidth?: number
+  exact?: boolean
   children: ReactNode
   onSize(size: { width: number; height: number }): void
 }) {
@@ -69,7 +136,7 @@ export function Probe({
             style={{ alignSelf: 'flex-start', maxWidth: '100%' }}
             onLayout={(event) => {
               const { width, height } = event.nativeEvent.layout
-              onSize({ width: Math.ceil(width) + 1, height: Math.ceil(height) })
+              onSize(exact ? { width, height } : { width: Math.ceil(width) + 1, height: Math.ceil(height) })
             }}
           >
             <Label>{children}</Label>
@@ -79,29 +146,33 @@ export function Probe({
     </SuppressTargets.Provider>
   )
 }
+/** A text layer's width for an exact measured width: never narrower, so it can't rewrap. */
+const room = (width: number) => Math.ceil(width) + 1
 function SwapLayer({
   children,
   outgoing,
   duration,
   width,
-  initial,
 }: {
   children: ReactNode
   outgoing?: boolean
   duration: number
   width?: number
-  initial?: boolean
 }) {
-  const opacity = useTween(outgoing ? 0 : 1, duration * 0.6, {
-    from: outgoing || initial ? 1 : 0,
+  // The fade on first mount is an entrance: it plays through settling, as Swap.css's animation does
+  const reduced = useEntranceReduced()
+  // Out fades over half the swap; in holds clear for 30%, then rises (Swap.css), from its first mount
+  const opacity = useTween(outgoing ? 0 : 1, outgoing ? duration * 0.5 : duration * 0.7, {
+    from: outgoing || reduced ? 1 : 0,
     delay: outgoing ? 0 : duration * 0.3,
+    ease: outgoing ? curves.ease : [0.25, 0.8, 0.25, 1],
   })
   return (
     <SuppressTargets.Provider value={!!outgoing}>
       <Animated.View
         pointerEvents={outgoing ? 'none' : undefined}
         accessibilityElementsHidden={outgoing}
-        style={{ position: outgoing ? 'absolute' : 'relative', width: width || undefined, opacity }}
+        style={{ position: outgoing ? 'absolute' : 'relative', width: width ? room(width) : undefined, opacity }}
       >
         <Label>{children}</Label>
       </Animated.View>
@@ -117,12 +188,16 @@ export function Swap({
 }: Omit<NativeProps, 'id'> & { id: string | number; duration?: number }) {
   const reduced = useReducedMotion(),
     { speed } = useContext(MotionContext)
-  const last = useRef({ id, children, width: 0 }),
-    first = useRef(id)
+  const last = useRef({ id, children, width: 0 })
   const [outgoing, setOutgoing] = useState<{ id: string | number; children: ReactNode; width: number } | null>(null)
+  // The box's width as the last swap began. It outlives the fading copy, so a shrink keeps its delay to the end
+  const [resize, setResize] = useState<{ from: number } | null>(null)
   const [size, setSize] = useState({ width: 0, height: 0 })
   useLayoutEffect(() => {
-    if (last.current.id !== id) setOutgoing(reduced ? null : last.current)
+    if (last.current.id !== id) {
+      setOutgoing(reduced ? null : last.current)
+      setResize(reduced ? null : { from: last.current.width })
+    }
     last.current = { id, children, width: size.width }
   }, [id, children, reduced, size.width])
   useEffect(() => {
@@ -134,9 +209,21 @@ export function Swap({
     const timer = clock.timeout(() => setOutgoing(null), duration / speed)
     return () => clock.clearTimeout(timer)
   }, [outgoing, duration, speed, reduced])
+  useEffect(() => {
+    if (!resize) return
+    // A shrink ends at 1.5x the swap, plus a little for the new size to be measured
+    const timer = clock.timeout(() => setResize(null), (duration * 1.5 + 100) / speed)
+    return () => clock.clearTimeout(timer)
+  }, [resize, duration, speed])
   const maxWidth = (StyleSheet.flatten(style) as ViewStyle | undefined)?.maxWidth
-  const w = useTween(size.width, duration, { delay: outgoing && size.width < outgoing.width ? duration / 2 : 0 }),
-    h = useTween(size.height, duration)
+  // Only a swap eases the box; a first measure or a late font takes its size at once. Narrowing
+  // waits while the old words fade, so they are never cut mid-word
+  const shrink = !!resize && resize.from > 0 && size.width < resize.from
+  const w = useTween(size.width, resize ? duration : 0, {
+      delay: shrink ? duration / 2 : 0,
+      ease: [0.25, 0.8, 0.25, 1],
+    }),
+    h = useTween(size.height, resize ? duration : 0, { ease: [0.25, 0.8, 0.25, 1] })
   return (
     <SceneView
       {...rest}
@@ -151,6 +238,7 @@ export function Swap({
       ]}
     >
       <Probe
+        exact
         maxWidth={typeof maxWidth === 'number' ? maxWidth : undefined}
         key={id}
         onSize={(value) => setSize((old) => (old.width === value.width && old.height === value.height ? old : value))}
@@ -162,11 +250,34 @@ export function Swap({
           {outgoing.children}
         </SwapLayer>
       )}
-      <SwapLayer key={`in-${id}`} initial={id === first.current} duration={duration} width={size.width}>
+      <SwapLayer key={`in-${id}`} duration={duration} width={size.width}>
         {children}
       </SwapLayer>
     </SceneView>
   )
+}
+/** A state's content as the web lays it out: one row, 6pt gaps, runs of bare text in the kit's text style. */
+function Inline({ children }: { children: ReactNode }) {
+  const items: ReactNode[] = []
+  let text = ''
+  const flush = () => {
+    const run = text.trim()
+    if (run) items.push(<Label key={`t${items.length}`}>{run}</Label>)
+    text = ''
+  }
+  const walk = (node: ReactNode) => {
+    for (const child of Children.toArray(node)) {
+      if (typeof child === 'string' || typeof child === 'number') text += child
+      else if (isValidElement<{ children?: ReactNode }>(child) && child.type === Fragment) walk(child.props.children)
+      else {
+        flush()
+        items.push(<Fragment key={`e${items.length}`}>{child}</Fragment>)
+      }
+    }
+  }
+  walk(children)
+  flush()
+  return <View style={[row, { gap: 6 }]}>{items}</View>
 }
 function StateItem({
   active,
@@ -179,26 +290,37 @@ function StateItem({
   align: 'start' | 'center' | 'end'
   onSize: (size: { width: number; height: number }) => void
 }) {
-  const p = useTween(active ? 1 : 0, 240, { delay: active ? 120 : 0 })
+  // Out fades fast and drops back 4pt once gone; in rises 4pt as it fades in (States.css)
+  const opacity = useTween(active ? 1 : 0, active ? 250 : 150, {
+    delay: active ? 70 : 0,
+    ease: active ? curves.easeOut : curves.ease,
+  })
+  const lift = useTween(active ? 0 : 4, active ? 300 : 0, { delay: active ? 70 : 150, ease: [0.22, 1, 0.36, 1] })
+  const content = <Inline>{children}</Inline>
   return (
     <>
-      <Probe onSize={onSize}>{children}</Probe>
+      <Probe exact onSize={onSize}>
+        {content}
+      </Probe>
       <HiddenTargets.Provider value={!active}>
         <Animated.View
+          pointerEvents="box-none"
           accessibilityElementsHidden={!active}
           importantForAccessibility={active ? 'auto' : 'no-hide-descendants'}
           style={{
             position: 'absolute',
-            left: 0,
-            right: 0,
             top: 0,
             bottom: 0,
+            // Wider than the box it's measured to, so a state never wraps in it
+            left: align === 'start' ? 0 : -SPILL,
+            right: align === 'end' ? 0 : -SPILL,
             alignItems: align === 'start' ? 'flex-start' : align === 'end' ? 'flex-end' : 'center',
             justifyContent: 'center',
-            opacity: p,
+            opacity,
+            transform: [{ translateY: lift }],
           }}
         >
-          <Label>{children}</Label>
+          {content}
         </Animated.View>
       </HiddenTargets.Provider>
     </>
@@ -270,7 +392,17 @@ export function Popover({
     return () => clock.clearTimeout(id)
   }, [show])
   const displayed = show || released ? { children, style, origin } : held.current,
-    p = useTween(show ? 1 : 0, show ? 300 : 200)
+    closing = !show && !released
+  // Opening, only the surface scales, under text that only fades. Closing, the whole popover
+  // shrinks as it fades; once gone, the surface takes its opening scale again (Popover.css)
+  const opacity = useTween(show ? 1 : 0, show ? 180 : 240, { ease: curves.ease })
+  const whole = useTween(closing ? 0.96 : 1, closing ? 240 : 0, { ease: [0.4, 0, 1, 1] })
+  const surface = useTween(show || closing ? 1 : 0.96, show ? 240 : closing ? 0 : 300, {
+    ease: show ? [0.22, 1, 0.36, 1] : curves.ease,
+  })
+  // A background or shadow given in style paints the scaling surface, as --ss-popover-bg does
+  const { backgroundColor, boxShadow, ...own } = (StyleSheet.flatten(displayed.style as StyleProp<ViewStyle>) ??
+    {}) as ViewStyle
   return (
     <SceneView
       {...rest}
@@ -278,19 +410,29 @@ export function Popover({
       style={[
         {
           position: 'absolute',
-          opacity: p,
+          opacity,
           zIndex: 100,
-          borderRadius: 10,
-          backgroundColor: tokens.surface,
-          borderColor: tokens.border,
-          borderWidth: 0.5,
-          boxShadow: '0 8px 25px rgba(0,0,0,.14)',
+          padding: 4,
+          borderRadius: tokens.radii.lg,
           transformOrigin: displayed.origin,
-          transform: [{ scale: p.interpolate({ inputRange: [0, 1], outputRange: [0.94, 1] }) }],
+          transform: [{ scale: whole }],
         },
-        displayed.style,
+        own as NativeStyle,
       ]}
     >
+      <Animated.View
+        pointerEvents="none"
+        style={[
+          absolute,
+          {
+            borderRadius: own.borderRadius ?? tokens.radii.lg,
+            backgroundColor: backgroundColor ?? tokens.raised,
+            boxShadow: boxShadow ?? tokens.shadow.float,
+            transformOrigin: displayed.origin,
+            transform: [{ scale: surface }],
+          },
+        ]}
+      />
       {displayed.children}
     </SceneView>
   )
@@ -302,8 +444,8 @@ export interface FollowProps extends NativeProps {
 export function Follow({ to, stiffness = 0.25, children, style, ...rest }: FollowProps) {
   const reduced = useReducedMotion(),
     { speed } = useContext(MotionContext)
-  const current = useRef<Rect | null>(to),
-    velocity = useRef({ x: 0, y: 0, width: 0, height: 0 })
+  const current = useRef<Rect | null>(to ? { ...to } : null),
+    velocity = useRef<Rect>({ x: 0, y: 0, width: 0, height: 0 })
   const target = useRef(to)
   target.current = to
   const values = useRef({
@@ -312,44 +454,66 @@ export function Follow({ to, stiffness = 0.25, children, style, ...rest }: Follo
     width: new Animated.Value(to?.width ?? 0),
     height: new Animated.Value(to?.height ?? 0),
   }).current
+  const opacity = useTween(to ? 1 : 0, 180, { ease: curves.ease })
   useEffect(() => {
-    let frame = 0,
+    const keys = ['x', 'y', 'width', 'height'] as const,
+      frame = 1000 / 60,
+      damp = 2 * Math.sqrt(stiffness) * 0.95
+    const integrate = (c: Rect, v: Rect, t: Rect) => {
+      for (const key of keys) {
+        v[key] += (t[key] - c[key]) * stiffness - v[key] * damp
+        c[key] += v[key]
+      }
+    }
+    // A new target springs on from the rendered position and velocity, so an interruption can't rewind
+    let id = 0,
       previous = clock.now(),
-      remainder = 0
-    const keys = ['x', 'y', 'width', 'height'] as const
+      remainder = 0,
+      simulation = current.current ? { ...current.current } : null,
+      simulated = { ...velocity.current }
     const step = (time: number) => {
-      if (!target.current) {
-        current.current = null
-        velocity.current = { x: 0, y: 0, width: 0, height: 0 }
-        return
-      }
-      if (!current.current || reduced) {
-        current.current = { ...target.current }
-        velocity.current = { x: 0, y: 0, width: 0, height: 0 }
-      }
-      remainder += Math.min(100, (time - previous) * speed)
+      const elapsed = Math.min(100, Math.max(0, time - previous) * speed)
       previous = time
-      while (remainder >= 1000 / 60) {
-        for (const key of keys) {
-          velocity.current[key] +=
-            (target.current[key] - current.current[key]) * stiffness -
-            velocity.current[key] * 2 * Math.sqrt(stiffness) * 0.95
-          current.current[key] += velocity.current[key]
-        }
-        remainder -= 1000 / 60
+      const t = target.current
+      // Hidden, it forgets where it was, so it next appears on its target rather than sliding in
+      if (!t || reduced) {
+        current.current = t ? { ...t } : null
+        velocity.current = { x: 0, y: 0, width: 0, height: 0 }
+        simulation = current.current ? { ...current.current } : null
+        simulated = { ...velocity.current }
+        remainder = 0
       }
+      if (!t) return
+      if (!current.current || !simulation) {
+        current.current = { ...t }
+        simulation = { ...t }
+      }
+      const c = current.current,
+        v = velocity.current
+      // The spring keeps its 60Hz trajectory; between steps it is interpolated, not stepped faster
+      remainder += elapsed
+      while (remainder >= frame - 1e-6) {
+        integrate(simulation, simulated, t)
+        remainder = Math.max(0, remainder - frame)
+      }
+      const next = { ...simulation },
+        nextVelocity = { ...simulated },
+        part = remainder / frame
+      integrate(next, nextVelocity, t)
       let settled = true
       for (const key of keys) {
-        if (Math.abs(target.current[key] - current.current[key]) < 0.05 && Math.abs(velocity.current[key]) < 0.05) {
-          current.current[key] = target.current[key]
-          velocity.current[key] = 0
+        c[key] = simulation[key] + (next[key] - simulation[key]) * part
+        v[key] = simulated[key] + (nextVelocity[key] - simulated[key]) * part
+        if (Math.abs(t[key] - c[key]) < 0.05 && Math.abs(v[key]) < 0.05) {
+          c[key] = t[key]
+          v[key] = 0
         } else settled = false
-        values[key].setValue(current.current[key])
+        values[key].setValue(c[key])
       }
-      if (!settled && !reduced) frame = clock.raf(step)
+      if (!settled) id = clock.raf(step)
     }
     step(clock.now())
-    return () => clock.cancelRaf(frame)
+    return () => clock.cancelRaf(id)
   }, [to?.x, to?.y, to?.width, to?.height, !!to, stiffness, reduced, speed, values])
   return (
     <SceneView
@@ -362,7 +526,7 @@ export function Follow({ to, stiffness = 0.25, children, style, ...rest }: Follo
           top: 0,
           width: values.width,
           height: values.height,
-          opacity: to ? 1 : 0,
+          opacity,
           transform: [{ translateX: values.x }, { translateY: values.y }],
         },
         style,
@@ -440,6 +604,8 @@ export interface FlyProps extends NativeProps {
   held?: boolean
   duration?: number
 }
+// The lift's keyframes are eased one segment at a time, as CSS eases a keyframe animation
+const lifting = bezier([0.33, 1, 0.68, 1])
 export function Fly({ from, to, go, held = false, duration = 750, children, style, ...rest }: FlyProps) {
   const flight = useRef<{ from: Rect; to: Rect } | null>(null)
   if (!go) flight.current = null
@@ -448,11 +614,14 @@ export function Fly({ from, to, go, held = false, duration = 750, children, styl
     start = endpoints.from.width
       ? endpoints.from
       : { ...endpoints.from, width: endpoints.to.width || 1, height: endpoints.to.height || 1 }
-  const x = useTween(go ? endpoints.to.x - start.x : 0, duration, { ease: [0.35, 0, 0.2, 1] })
-  const y = useTween(go ? endpoints.to.y - start.y : 0, duration, { ease: [0.3, 0.6, 0.15, 1] })
-  const lift = useTween(go ? 1 : 0, duration),
-    bud = useTween(go || held ? 1 : 0, 200, { from: 0 })
-  const scale = useTween(go ? endpoints.to.width / start.width : 1, duration, { ease: [0.3, 0.6, 0.15, 1] })
+  // Shown whole the instant it takes off and hidden the instant it stops, so going back is a jump
+  const ms = go ? duration : 0
+  const x = useTween(go ? endpoints.to.x - start.x : 0, ms, { ease: [0.35, 0, 0.2, 1] })
+  const y = useTween(go ? endpoints.to.y - start.y : 0, ms, { ease: [0.3, 0.6, 0.15, 1] })
+  const scale = useTween(go ? endpoints.to.width / start.width : 1, ms, { ease: [0.3, 0.6, 0.15, 1] })
+  const lift = useTween(go ? 1 : 0, ms, { ease: curves.linear })
+  // Held at rest, it buds in where it sits (Fly.css ss-fly-bud)
+  const bud = useTween(held && !go ? 1 : 0, held && !go ? 200 : 0, { from: 0, ease: curves.easeOut })
   return (
     <SceneView
       {...rest}
@@ -464,7 +633,7 @@ export function Fly({ from, to, go, held = false, duration = 750, children, styl
           top: start.y,
           width: start.width,
           height: start.height,
-          opacity: bud,
+          opacity: go ? 1 : bud,
           transform: [{ translateX: x }],
           zIndex: 150,
         },
@@ -482,7 +651,15 @@ export function Fly({ from, to, go, held = false, duration = 750, children, styl
         <Animated.View
           style={{
             flex: 1,
-            transform: [{ scale: lift.interpolate({ inputRange: [0, 0.3, 0.85, 1], outputRange: [1, 1.12, 1, 1] }) }],
+            transform: [
+              {
+                scale: lift.interpolate({
+                  inputRange: [0, 0.3, 0.85, 1],
+                  outputRange: [1, 1.12, 1, 1],
+                  easing: lifting,
+                }),
+              },
+            ],
           }}
         >
           {children}
@@ -497,14 +674,34 @@ export function Expand({
   radius = 16,
   duration,
   face,
+  background,
   children,
   style,
   ...rest
-}: NativeProps & { open: boolean; from: Rect; radius?: number; duration?: number; face?: ReactNode }) {
-  const inheritedHidden = useContext(HiddenTargets)
+}: NativeProps & {
+  open: boolean
+  from: Rect
+  radius?: number
+  duration?: number
+  face?: ReactNode
+  /** The launched app's ground, which the window takes as it leaves the face (`--ss-expand-bg`). */
+  background?: string
+}) {
+  const { tokens } = useLook(),
+    inheritedHidden = useContext(HiddenTargets)
+  // Inside a Phone it opens to the display's own corner, as the web reads --ss-screen-r
+  const opened = useContext(PhoneContext)?.radius ?? 0
   const ms = duration ?? (face ? 640 : 520)
-  const contentOpacity = useTween(open ? 1 : 0, ms * (open ? 0.4 : 0.25), { delay: ms * (open ? 0.3 : 0.6) })
-  const faceOpacity = useTween(open ? 0 : 1, ms * (open ? 0.4 : 0.3), { delay: open ? 0 : ms * 0.65 })
+  const p = useTween(open ? 1 : 0, ms, { ease: face ? [0.25, 0.6, 0.2, 1] : [0.3, 0.75, 0.1, 1] })
+  const contentOpacity = useTween(open ? 1 : 0, ms * (open ? 0.4 : 0.25), {
+    delay: ms * (open ? 0.3 : 0.6),
+    ease: curves.ease,
+  })
+  const faceOpacity = useTween(open ? 0 : 1, ms * (open ? 0.4 : 0.3), {
+    delay: open ? 0 : ms * 0.65,
+    ease: curves.ease,
+  })
+  const ground = useTween(open ? 1 : 0, ms * (open ? 0.4 : 0.25), { delay: open ? 0 : ms * 0.7, ease: curves.ease })
   const scene = useScene(),
     node = useRef<View>(null),
     [parent, setParent] = useState({ x: 0, y: 0, width: scene?.width ?? 0, height: scene?.height ?? 0, scale: 1 })
@@ -524,17 +721,85 @@ export function Expand({
       }),
     )
   }
-  const p = useTween(open ? 1 : 0, duration ?? (face ? 640 : 520), {
-    ease: face ? [0.25, 0.6, 0.2, 1] : [0.3, 0.75, 0.1, 1],
-  })
   const x = (from.x - parent.x) / parent.scale,
     y = (from.y - parent.y) / parent.scale,
     w = from.width / parent.scale,
     h = from.height / parent.scale
-  const left = p.interpolate({ inputRange: [0, 1], outputRange: [x, 0] }),
-    top = p.interpolate({ inputRange: [0, 1], outputRange: [y, 0] })
-  const width = p.interpolate({ inputRange: [0, 1], outputRange: [w, parent.width] }),
-    height = p.interpolate({ inputRange: [0, 1], outputRange: [h, parent.height] })
+  const between = (a: number, b: number) => p.interpolate({ inputRange: [0, 1], outputRange: [a, b] })
+  const content = (
+    <HiddenTargets.Provider value={inheritedHidden || (!!face && !open)}>{children}</HiddenTargets.Provider>
+  )
+  if (face) {
+    // The whole app, laid out full size, is scaled by the card's width onto the card and clipped
+    // to its height in its own pixels; the face rides that scale, blown up to the app's width
+    const s = parent.width && w ? w / parent.width : 1
+    return (
+      <View
+        ref={node}
+        collapsable={false}
+        onLayout={(event) => measure(event.nativeEvent.layout)}
+        style={absolute}
+        pointerEvents="box-none"
+      >
+        <SceneView
+          {...rest}
+          hidden={!open && (!w || !h)}
+          style={[
+            {
+              position: 'absolute',
+              left: 0,
+              top: 0,
+              width: parent.width,
+              height: parent.height,
+              transformOrigin: 'top left',
+              transform: [{ translateX: between(x, 0) }, { translateY: between(y, 0) }, { scale: between(s, 1) }],
+            },
+            style,
+          ]}
+        >
+          <Animated.View
+            style={{
+              position: 'absolute',
+              left: 0,
+              right: 0,
+              top: 0,
+              height: between(Math.min(parent.height, h / s), parent.height),
+              borderRadius: between(radius / s, opened),
+              overflow: 'hidden',
+            }}
+          >
+            <Animated.View
+              pointerEvents="none"
+              style={[absolute, { backgroundColor: background ?? tokens.surface, opacity: ground }]}
+            />
+            <Animated.View
+              pointerEvents={!open ? 'none' : undefined}
+              accessibilityElementsHidden={!open}
+              importantForAccessibility={!open ? 'no-hide-descendants' : undefined}
+              style={{ width: parent.width, height: parent.height, opacity: contentOpacity }}
+            >
+              {content}
+            </Animated.View>
+            <Animated.View
+              pointerEvents="none"
+              style={{
+                position: 'absolute',
+                left: 0,
+                top: 0,
+                width: w,
+                height: h,
+                opacity: faceOpacity,
+                transformOrigin: 'top left',
+                transform: [{ scale: 1 / s }],
+              }}
+            >
+              {face}
+            </Animated.View>
+          </Animated.View>
+        </SceneView>
+      </View>
+    )
+  }
   return (
     <View
       ref={node}
@@ -549,50 +814,22 @@ export function Expand({
         style={[
           {
             position: 'absolute',
-            left,
-            top,
-            width,
-            height,
-            borderRadius: p.interpolate({ inputRange: [0, 1], outputRange: [radius, 0] }),
+            left: between(x, 0),
+            top: between(y, 0),
+            width: between(w, parent.width),
+            height: between(h, parent.height),
+            borderRadius: between(radius, opened),
             overflow: 'hidden',
-            backgroundColor: '#fff',
           },
           style,
         ]}
       >
+        {/* The content rides the card down and up only; sideways it stays where the open screen has it */}
         <Animated.View
-          pointerEvents={face && !open ? 'none' : undefined}
-          accessibilityElementsHidden={!!face && !open}
-          importantForAccessibility={face && !open ? 'no-hide-descendants' : undefined}
-          style={{
-            width: parent.width,
-            height: parent.height,
-            opacity: face ? contentOpacity : 1,
-            transformOrigin: 'top left',
-            transform: face
-              ? [{ scale: p.interpolate({ inputRange: [0, 1], outputRange: [w / (parent.width || 1), 1] }) }]
-              : [],
-          }}
+          style={{ width: parent.width, height: parent.height, transform: [{ translateX: between(-x, 0) }] }}
         >
-          <HiddenTargets.Provider value={inheritedHidden || (!!face && !open)}>{children}</HiddenTargets.Provider>
+          {content}
         </Animated.View>
-        {face && (
-          <Animated.View
-            pointerEvents="none"
-            style={{
-              position: 'absolute',
-              left: 0,
-              top: 0,
-              width: w,
-              height: h,
-              opacity: faceOpacity,
-              transformOrigin: 'top left',
-              transform: [{ scale: p.interpolate({ inputRange: [0, 1], outputRange: [1, parent.width / (w || 1)] }) }],
-            }}
-          >
-            {face}
-          </Animated.View>
-        )}
       </SceneView>
     </View>
   )

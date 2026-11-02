@@ -43,20 +43,10 @@ export function smooth(p: { x: number; y: number }[]) {
  */
 const SAMPLES = 48
 
-/** The draw-in's timing: the same curve the rest of the kit's travel uses. */
-const DRAW_MS = 1200
-function ease(t: number) {
-  // cubic-bezier(0.45, 0, 0.2, 1), solved for x by bisection
-  const b = (a: number, c: number, u: number) => 3 * a * u * (1 - u) ** 2 + 3 * c * u * u * (1 - u) + u ** 3
-  let lo = 0
-  let hi = 1
-  for (let i = 0; i < 20; i++) {
-    const m = (lo + hi) / 2
-    if (b(0.45, 0.2, m) < t) lo = m
-    else hi = m
-  }
-  return b(0, 1, (lo + hi) / 2)
-}
+/** The draw-in's timing: the same curve the rest of the kit's travel uses, and the one a data change eases on (chart.css). */
+export const DRAW_MS = 1200
+export const CHANGE_MS = 800
+export const DRAW_EASE = [0.45, 0, 0.2, 1] as const
 
 /** The curve's height at x, from its sampled points. */
 export function yAt(p: { x: number; y: number }[], x: number) {

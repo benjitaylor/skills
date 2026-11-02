@@ -46,8 +46,12 @@ export interface ReviewSceneProps {
 const row = { flexDirection: 'row' as const, alignItems: 'center' as const }
 export function ReviewScene({ scene, theme, phase, reduced = false, replay = 0, onMark, onError }: ReviewSceneProps) {
   const dark = theme === 'dark' || theme === 'blueprint'
+  // The page is the ground in light and dark, as on web; parity.css paints the canvas on the stage there too.
+  const ground = theme === 'light' ? '#f6f5f4' : theme === 'dark' ? '#111113' : undefined
   return (
     <Stage<ReviewState>
+      // Remount on replay, as the web fixture does, so mount motion (chart draw-in, fades) replays too.
+      key={replay}
       width={scene === 'phone' ? 390 : 720}
       height={scene === 'phone' ? 490 : 300}
       compact={scene === 'controls' ? { below: 600, width: 358, height: 480 } : undefined}
@@ -57,6 +61,7 @@ export function ReviewScene({ scene, theme, phase, reduced = false, replay = 0, 
       play="once"
       theme={theme}
       fidelity="realistic"
+      tokens={ground ? { background: ground } : undefined}
       reducedMotion={reduced}
       replay={replay}
       onMark={onMark}

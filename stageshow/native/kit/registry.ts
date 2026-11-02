@@ -14,6 +14,8 @@ export interface CaretLine {
 export interface Entry {
   rect: Rect
   layout: Rect
+  /** The drawn rect without the target's own scale (a press, a hover lift): what the scene places from. */
+  target?: Rect
   parent?: string
   cursor?: CursorKind
   hidden?: boolean
@@ -56,6 +58,11 @@ export class Registry {
   }
   rect(name: string, layout = false): Rect {
     return this.entries.get(name)?.[layout ? 'layout' : 'rect'] ?? EMPTY
+  }
+  /** The rect a stage's render function hands the scene, as web's rect() does. */
+  targetRect(name: string): Rect {
+    const entry = this.entries.get(name)
+    return entry?.target ?? entry?.rect ?? EMPTY
   }
   resolve(target: Target, layout: Layout): Point {
     if (typeof target !== 'string' && 'wide' in target) return this.resolve(target[layout], layout)

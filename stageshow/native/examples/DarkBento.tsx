@@ -45,9 +45,9 @@ export default function DarkBento(_props: ExampleProps) {
               left: 88,
               width: 400,
               height: 300,
-              borderRadius: 12,
-              borderWidth: 0,
-              boxShadow: '0 0 0 1px rgba(255,255,255,.08), 0 30px 60px -12px rgba(0,0,0,.5)',
+              // .db-window: surface fill and the dark hero shadow, over the window's canvas default
+              backgroundColor: '#1a1a1d',
+              boxShadow: '0 0 0 1px rgba(255,255,255,0.08), 0 30px 60px -12px rgba(0,0,0,0.6)',
             }}
             body={{ style: { flexDirection: 'row' } }}
           >

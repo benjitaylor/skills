@@ -4,7 +4,7 @@ import { Animated, View } from 'react-native'
 import Svg, { Defs, Rect, Stop } from 'react-native-svg'
 import { Check as CheckIcon } from 'lucide-react-native'
 import { Avatar, Bar, Chart, Collapse, Count, Fly, Roll, Spinner, Stage, States, Window, SceneView } from '../kit'
-import { useTween } from '../kit/animate'
+import { curves, useTween } from '../kit/animate'
 import { SCENES, START, POSTER, script, money, type S } from './subscriptions-model'
 import { Copy, row, heroShadow, satelliteShadow, type ExampleProps } from './shared'
 const line = 'rgba(0,0,0,.06)'
@@ -30,9 +30,24 @@ function Tile({ sc }: { sc: number }) {
     </View>
   )
 }
-function Pill({ amount }: { amount: number }) {
+function Pill({ amount, chip, go = false }: { amount: number; chip?: boolean; go?: boolean }) {
+  // .sb-pill--chip: in flight it lifts off the page as a white chip, then over the last of its flight
+  // lowers into the row's tint (fill and lift fade 0.35s ease after 0.5s), so the handover is invisible.
+  const lift = useTween(chip && !go ? 1 : 0, chip && go ? 350 : 0, { delay: chip && go ? 500 : 0, ease: curves.ease })
   return (
     <View style={{ paddingHorizontal: 8, paddingVertical: 3, borderRadius: 99, backgroundColor: '#efeffb' }}>
+      {chip && (
+        <Animated.View
+          style={{
+            position: 'absolute',
+            inset: 0,
+            borderRadius: 99,
+            backgroundColor: '#fff',
+            boxShadow: '0 0 0 1px rgba(91,91,214,0.18), 0 6px 16px -4px rgba(50,50,93,0.3)',
+            opacity: lift,
+          }}
+        />
+      )}
       <Copy style={{ color: '#5b5bd6', fontSize: 11.5, lineHeight: 16.1, fontWeight: '600' }}>+${amount}</Copy>
     </View>
   )
@@ -41,8 +56,13 @@ function Checkout({ sc, s, compact }: { sc: number; s: S; compact: boolean }) {
   const scene = SCENES[sc],
     p = scene.pulses[s.k[sc]],
     active = s.scene === sc
-  const opacity = useTween(active ? 1 : 0, active ? 600 : 220, { delay: active ? 280 : 0 })
-  const x = useTween(active ? 0 : -14, active ? 900 : 400, { delay: active ? 280 : 0 })
+  // .sb-checkout: arrives on --sb-arrive after 0.28s, leaves on --sb-travel
+  const opacity = useTween(active ? 1 : 0, active ? 600 : 220, { delay: active ? 280 : 0, ease: curves.ease })
+  const x = useTween(active ? 0 : -14, active ? 900 : 400, {
+    delay: active ? 280 : 0,
+    ease: active ? [0.25, 0.8, 0.25, 1] : [0.45, 0, 0.1, 1],
+  })
+  const paid = useTween(['paid', 'done'].includes(s.pay[sc]) ? 1 : 0, 200, { ease: curves.ease })
   return (
     <SceneView
       hidden={!active}
@@ -90,7 +110,7 @@ function Checkout({ sc, s, compact }: { sc: number; s: S; compact: boolean }) {
         style={{
           height: 36,
           borderRadius: 8,
-          backgroundColor: ['paid', 'done'].includes(s.pay[sc]) ? '#1f9d55' : '#5b5bd6',
+          backgroundColor: paid.interpolate({ inputRange: [0, 1], outputRange: ['#5b5bd6', '#1f9d55'] }),
           alignItems: 'center',
           justifyContent: 'center',
         }}
@@ -116,7 +136,7 @@ function Checkout({ sc, s, compact }: { sc: number; s: S; compact: boolean }) {
 function Subscriber({ sc, i, s }: { sc: number; i: number; s: S }) {
   const p = SCENES[sc].pulses[i],
     landed = s.landed[sc] > i
-  const opacity = useTween(landed ? 1 : 0, landed ? 450 : 200, { delay: landed ? 50 : 0 })
+  const opacity = useTween(landed ? 1 : 0, landed ? 450 : 200, { delay: landed ? 50 : 0, ease: curves.ease })
   return (
     <Collapse open={s.open[sc] > i} reveal="clip">
       <SceneView
@@ -152,7 +172,7 @@ function Dashboard({ sc, s, compact }: { sc: number; s: S; compact: boolean }) {
   const [amountWidth, setAmountWidth] = useState(0)
   const scene = SCENES[sc],
     active = s.scene === sc
-  const opacity = useTween(active ? 1 : 0, 450, { delay: active ? 0 : 100 })
+  const opacity = useTween(active ? 1 : 0, 450, { delay: active ? 0 : 100, ease: curves.ease })
   const mrr = scene.mrr + scene.pulses.slice(0, s.landed[sc]).reduce((t, p) => t + p.price, 0)
   return (
     <SceneView hidden={!active} style={{ position: 'absolute', inset: 0, flexDirection: 'row', opacity }}>
@@ -302,8 +322,9 @@ export default function Subscriptions({ poster, ...props }: ExampleProps) {
                 left: compact ? 48 : 196,
                 width: compact ? 334 : 560,
                 height: compact ? 460 : 440,
+                // .sb-window: surface fill, radius 10 and the hero shadow
+                backgroundColor: '#fff',
                 borderRadius: 10,
-                borderWidth: 0,
                 boxShadow: heroShadow,
               }}
             >
@@ -314,7 +335,7 @@ export default function Subscriptions({ poster, ...props }: ExampleProps) {
             <Checkout sc={1} s={s} compact={compact} />
             {s.fly && (
               <Fly from={s.fly.from} to={s.fly.to} go={s.fly.go} held duration={900}>
-                <Pill amount={SCENES[s.fly.scene].pulses[s.fly.i].price} />
+                <Pill amount={SCENES[s.fly.scene].pulses[s.fly.i].price} chip go={s.fly.go} />
               </Fly>
             )}
           </>

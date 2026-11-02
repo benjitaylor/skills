@@ -1,12 +1,16 @@
 import { Animated, View } from 'react-native'
 import Svg, { Path } from 'react-native-svg'
 import { Stage, Phone, Thread, Bubble, Stamp, Receipt, Avatar, SceneView, Text } from '../kit'
-import { useTween } from '../kit/animate'
+import { useInteraction } from '../kit/native'
+import { curves, useTween } from '../kit/animate'
 import { initial, poster, script, MINE, type S } from './messages-model'
 import { Copy, row, type ExampleProps } from './shared'
 
 function Composer({ draft }: { draft: string }) {
-  const show = useTween(draft ? 1 : 0, 250)
+  // .ms-send: opacity 0.18s ease, scale from 0.5 over 0.25s, and a 0.9 dip while pressed (0.12s ease)
+  const fade = useTween(draft ? 1 : 0, 180, { ease: curves.ease })
+  const grow = useTween(draft ? 1 : 0.5, 250, { ease: [0.3, 0.75, 0.1, 1] })
+  const dip = useTween(useInteraction('send')?.pressed ? 0.9 : 1, 120, { ease: curves.ease })
   return (
     <View style={[row, { gap: 10, marginHorizontal: 14, marginBottom: 36 }]}>
       <View
@@ -58,8 +62,8 @@ function Composer({ draft }: { draft: string }) {
             alignItems: 'center',
             justifyContent: 'center',
             backgroundColor: '#0a84ff',
-            opacity: show,
-            transform: [{ scale: show.interpolate({ inputRange: [0, 1], outputRange: [0.5, 1] }) }],
+            opacity: fade,
+            transform: [{ scale: Animated.multiply(grow, dip) }],
           }}
         >
           <Svg width={16} height={16} viewBox="0 0 16 16">
@@ -107,7 +111,7 @@ export default function Messages({ poster: still, ...props }: ExampleProps) {
             }}
           >
             <Avatar name="Maya" tone="ios" size={52} />
-            <Copy style={{ fontSize: 12 }}>Maya</Copy>
+            <Copy style={{ fontSize: 12, color: '#262628' }}>Maya</Copy>
           </View>
           <Thread style={{ flex: 1, paddingHorizontal: 16, paddingBottom: 10 }}>
             <Stamp>Today 9:38</Stamp>

@@ -112,19 +112,49 @@ changes scene state. They do not operate real app controls.
 - `style` uses React Native values. Replace DOM tags with native views and text;
   replace CSS selectors with `hoverStyle` and `pressedStyle`. Text styles belong
   on `Text` or the relevant text prop. Native styles do not cascade.
-- `useLook().tokens` exposes native colors, radius, font size and font family.
-  `Stage tokens` accepts those token keys, rather than CSS custom properties.
+- `useLook().tokens` carries the web kit's `--ss-*` tokens with the same values
+  per theme and palette: canvas, surface, chrome, raised, well, fill, the ink
+  ramp, line, text (strong), muted, faint, icon, accent, accent-2, accent text,
+  status colors with their soft and text variants, the shadow set
+  (`shadow.window`, `.hero`, `.float`, `.satellite`, `.lift`, `.card`,
+  `.ground`), the radius scale, control and row heights, and `mono`.
+  `Stage tokens` accepts those keys, rather than CSS custom properties.
+- The stage paints no ground in light and dark, as on web: the host view is the
+  ground. Blueprint paints its grid and glass its color field, `unframed` or not.
+  `specimen` and `unframed` are markers only, as on web.
 - Measurements and cursor targets use stage design coordinates. The stage
   accounts for host scaling; phone contents lay out at native point sizes.
-  `rect(name, { layout: true })` ignores the target's own transform. Call
+  `rect(name, { layout: true })` ignores the target's own transform, and the
+  render function's `rect()` leaves out the target's own scale, as on web. Call
   `await a.set(...)` before measuring new content.
-- Set `visible` from navigation focus / list viewability. Backgrounding the app
-  cancels the current script. A visible return restarts an interrupted run;
-  a completed `once` scene remains complete until `replay` changes.
-- `play="hover"` starts on pointer entry in the web preview. On iOS/Android it
-  shows the poster until tapped, then plays once; another tap replays it.
-- The OS Reduce Motion preference always wins. `reducedMotion` and `specimen`
-  can force a still for previews. Always supply a meaningful `poster`.
+- Set `visible` from navigation focus / list viewability. Moving the app to the
+  background cancels the current script; `inactive` (Control Center, a banner)
+  keeps playing. A visible return restarts an interrupted run, snapping back to
+  the opening with motion off; a completed `once` scene remains complete until
+  `replay` changes.
+- `play="hover"` plays once when first visible on iOS/Android, as web does on
+  screens without hover, and a tap replays it. In the web preview it plays while
+  the pointer is over it, shows the opening with the cursor at rest before that,
+  and on leave settles back with the cursor gliding home.
+- The OS Reduce Motion preference always wins. `reducedMotion` forces a still for
+  previews. Always supply a meaningful `poster`.
+- Hover follows the web kit: it changes at the start and end of a move and when
+  a drag or entrance begins. `set` and `place` never hover, and
+  `a.click({ x, y })` presses nothing, so aim at a named target to show press
+  feedback. `cursor.base` sets the kind over unmarked areas (`pointer` by
+  default). Drags, keycaps, typing cadence and cursor glyph cross-fades use the
+  web timings.
+- Inside a `Phone`, tokens switch to the screen's type: 15-point text in the
+  screen's ink (black, or white on a dark phone). `PhoneContext` gives children
+  `{ width, height, radius, dark }`. Banner notifications render at phone level,
+  over the status bar and under the island. `LockScreen` fills the screen.
+- CSS hooks become props: `Thread`/`Bubble` `me`, `meText`, `them`, `themText`,
+  `ground` and `Thread size` (`--ss-me`, `--ss-them`, `--ss-thread-*`);
+  `Keyboard colors` (`--ss-kb-*`); `Phone islandWidth`, `islandTop` and
+  `bezel={{ light, dark }}`; `Field chipBg` / `chipText`; `Avatar ringBg`;
+  `Expand background` (`--ss-expand-bg`). `InkContext` stands in for
+  `currentColor`: Icon and Spinner read it before falling back to the text
+  token. `termColors` holds the terminal's `ok`, `err` and `dim` output colors.
 - Screen readers see a stage as one element. `accessibilityLabel` describes the
   illustration as an image; the faux UI inside is hidden so its fake controls
   are never announced as real ones. A tap-to-play stage is a button. Without a
@@ -173,8 +203,11 @@ component props. It guards API coverage; it does not certify behavior or pixels.
 Tests exercise clock isolation, cancellation, native targets, scrolling, Unicode
 typing, interrupted tweens, hidden targets and retained transition layers. They
 also cover authoring warnings, screen reader grouping, shared root measurement,
-stalled measurements and hover updates that skip a full stage render. The
-playground render test mounts every page and all nine phone frame variants.
+stalled measurements and hover updates that skip a full stage render. Parity
+suites step the virtual clock and assert the web kit's durations, delays,
+curves and geometry for the stage, cursor, motion parts, windows, phones,
+messages, parts and controls. The playground render test mounts every page and
+all nine phone frame variants.
 
 Also run `npm run typecheck` and `npm run check:css` in the parent Stageshow folder.
 For native visual review, use the simulator/device plus Step mode. The web
@@ -212,6 +245,21 @@ It embeds the original SVG XML and copies source/license notices. Device,
 keyboard, cursor and geometry changes should be compared with their upstream
 counterparts during review; those native adaptations are intentionally readable
 source files, not a runtime dependency on the DOM kit.
+
+## Frame-locked motion
+
+`npm run check:motion` steps the web original and the native port on their own
+virtual clocks by the same milliseconds and compares every sample. A curve,
+delay or beat that differs shows at the frame where it starts, not as capture
+jitter. The report in `motion-results/` charts each renderer's motion over time
+and lays out paired frames. Use the same servers as the matching-scene check;
+`MOTION_SCENES`, `MOTION_EVERY`, `MOTION_OUTPUT`, `WEB_MOTION_URL` and
+`NATIVE_MOTION_URL` narrow or redirect it. The native web build installs its
+kit clock for the recorder when the URL has `clock=virtual`.
+
+Fonts and blur differ by renderer, so a difference that holds still across
+frames is layout or styling, not motion. This is a React Native Web comparison;
+device frame time is separate.
 
 ## Gold reference comparisons
 

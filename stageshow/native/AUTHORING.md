@@ -34,8 +34,9 @@ CSS declarations into React Native styles and hope they inherit.
    Set text styles on Text or the component's text prop: native views do not
    cascade fonts. Avatar accepts `textStyle`; view `style` controls its fill. Its `background`
    slot accepts clipped native artwork; Facepile accepts custom `avatars` while
-   retaining the kit’s overlap masks. Spinner accepts `color` for contrast on
-   filled controls; its default uses the accent token.
+   retaining the kit’s overlap masks. Spinner and Icon take their ink from
+   `color`, then `InkContext`, then the text token, where web uses
+   `currentColor`; set `color` or provide `InkContext` on filled controls.
 3. **Story.** Write three to five beats, each caused by a gesture or a visible
    system event. Read [motion](../references/motion.md) and
    [choreography](../references/choreography.md). Keep the original timing while
@@ -53,7 +54,9 @@ CSS declarations into React Native styles and hope they inherit.
    [kit](../references/kit.md). That kit reference describes the web API;
    native prop differences are in the native API contract.
 6. **Choreograph.** Register custom targets with SceneView. Await `a.set()` before
-   measuring; use `a.rect()` rather than guessed coordinates. Retain incoming and
+   measuring; use `a.rect()` rather than guessed coordinates. Aim clicks at named
+   targets: hover and press follow the web rules, so a click on a bare point
+   presses nothing. Retain incoming and
    outgoing surfaces so changes animate. Keep words at their real size during
    a resize. Cancel on replay/unmount. Hide inactive targets. A loop resets out
    of sight or through a visible cause; a once-only conversation can hold its
@@ -61,7 +64,9 @@ CSS declarations into React Native styles and hope they inherit.
 7. **Rehearse.** Supply the meaningful poster first. Record the actual native
    simulator/device at real speed, then inspect the press, departure, arrival,
    receipt, reply and loop boundary. Test replay mid-transition, navigation away
-   and back, and reduced motion during playback. Use
+   and back, and reduced motion during playback. When porting a web example,
+   run `npm run check:motion` against the original first and fix any beat that
+   starts late, runs short or snaps before judging the recording. Use
    [verify](../references/verify.md), [teaching](../references/teaching.md),
    [rehearse](../references/rehearse.md) and a fresh reviewer following
    [review](../references/review.md). Record what was and was not checked.
@@ -95,7 +100,9 @@ CSS declarations into React Native styles and hope they inherit.
 
 `npm run check:gold` compares the three native compositions with the unmodified
 web gold components, including compact and wide posters and live sequences.
-`npm run check:scenes` covers the broader theme/state regression matrix. Browser
+`npm run check:scenes` covers the broader theme/state regression matrix.
+`npm run check:motion` steps both renderers on one virtual clock and compares
+them frame by frame, so timing and easing differences show where they start. Browser
 captures compare DOM with React Native Web. They do not prove native iOS or
 Android pixels, frame time, or accessibility behavior.
 

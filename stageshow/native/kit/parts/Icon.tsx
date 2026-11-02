@@ -1,4 +1,5 @@
-import { StyleSheet, type StyleProp, type TextStyle } from 'react-native'
+import { createContext, useContext } from 'react'
+import { StyleSheet, type StyleProp, type TextStyle, type ViewStyle } from 'react-native'
 import Svg, { Path } from 'react-native-svg'
 import { useLook } from '../look'
 import {
@@ -102,6 +103,13 @@ const FILLED: Partial<Record<IconName, string>> = {
   mail: 'M2.5 3h11A1.5 1.5 0 0 1 15 4.4L8 8.9 1 4.4A1.5 1.5 0 0 1 2.5 3ZM1 6.1v5.4A1.5 1.5 0 0 0 2.5 13h11a1.5 1.5 0 0 0 1.5-1.5V6.1l-6.6 4.2a.8.8 0 0 1-.8 0Z',
 }
 
+/**
+ * The colour an icon takes when none is given: the web's currentColor, which
+ * native views do not inherit. Parts set it where their text has a colour of
+ * its own (a toast's white, a chip's ×).
+ */
+export const InkContext = createContext<string | undefined>(undefined)
+
 export function Icon({
   name,
   size = 16,
@@ -117,15 +125,18 @@ export function Icon({
   color?: string
   style?: StyleProp<TextStyle>
 }) {
-  const { tokens } = useLook()
-  const ink = color ?? StyleSheet.flatten(style)?.color ?? tokens.text
+  const { tokens } = useLook(),
+    inherited = useContext(InkContext)
+  // Margins, opacity and transforms apply to the glyph's box; the colour goes to its strokes.
+  const { color: styleColor, ...box } = StyleSheet.flatten(style) ?? {}
+  const ink = color ?? (styleColor as string | undefined) ?? inherited ?? tokens.text
   const solid = filled ? FILLED[name] : undefined
   if (!solid && name in LUCIDE) {
     const Glyph = LUCIDE[name as LucideName]
-    return <Glyph size={size} strokeWidth={stroke} absoluteStrokeWidth color={ink as string} />
+    return <Glyph size={size} strokeWidth={stroke} absoluteStrokeWidth color={ink} style={box as ViewStyle} />
   }
   return (
-    <Svg viewBox="0 0 16 16" width={size} height={size}>
+    <Svg viewBox="0 0 16 16" width={size} height={size} style={box as ViewStyle}>
       {solid ? (
         <Path d={solid} fill={ink} fillRule="evenodd" />
       ) : (

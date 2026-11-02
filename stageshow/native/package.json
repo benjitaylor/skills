@@ -18,7 +18,8 @@
     "create:demo": "node scripts/create-demo.mjs",
     "check:scenes": "node scripts/check-scenes.mjs",
     "check:gold": "node scripts/check-gold.mjs",
-    "check:demo": "node scripts/check-demo.mjs"
+    "check:demo": "node scripts/check-demo.mjs",
+    "check:motion": "node scripts/check-motion.mjs"
   },
   "dependencies": {
     "@react-native-masked-view/masked-view": "0.3.2",

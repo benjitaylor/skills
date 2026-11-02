@@ -167,3 +167,47 @@ on the previous code.
 Validation: native TypeScript and the Jest suites (41 tests). Device, Android and
 browser comparison runs were not repeated for these changes; CI covers the
 browser comparisons.
+
+## Visual and motion parity pass — 2026-11-02
+
+Every native family was audited line by line against the web kit (stage, Act and
+cursor; motion parts; windows, code and charts; phones, keyboard and messages;
+parts and controls). Tokens, durations, delays, curves and geometry now use the
+web values; the parity suites assert them on the virtual clock (156 tests).
+
+Root causes found on the way, each with a regression test:
+
+- Every unnamed `SceneView` passed an instant motion context to its subtree, so
+  most tweens snapped instead of animating.
+- `useTween` defaulted to a front-loaded curve where the web uses CSS `ease`,
+  `ease-out` or a named curve; parts now pass the web curve explicitly.
+- Resets animated back from the poster; they now commit with motion off, as
+  web's `data-placing` does, while entrances (draw-ins, mount fades) still play.
+- Count digits rolled one stagger late, and their window drifted on React
+  Native Web because a measured line height is rounded there.
+- Thread rows glided on every layout pass rather than on commits only, so rows
+  dipped while a receipt or reply was still opening.
+
+Evidence:
+
+- `npm run check:motion` (new) steps the web original and the native port on one
+  virtual clock. Subscriptions: 13 of 13 beats within one 50 ms sample, 77 and 78
+  moving frames. Messages: 37 and 38 moving frames. Phone fixture: 2 of 2 beats.
+  Controls: all beats except a one-line Swap fade on the compact fixture's first
+  mount after its layout switch, which native does not play yet.
+- Poster differences (pixels differing by more than 24 levels): Subscriptions
+  0.7% / 0.3%, Dark Bento 0.1% / 0.1%, Messages 3.8% / 3.3%. Messages sits about
+  one point lower inside the phone on native, a rounding of the phone's scale
+  that predates this pass. Comparison scenes: controls 0.7–0.9% (was 1.3–4.8%),
+  phone 4.4–6.5% (was 6.3–12.5%); the remainder is text rasterization.
+- iOS Simulator (iPhone 17 Pro, iOS 26.5, Expo Go): Messages, Subscriptions and
+  Dark Bento played through; Inbox and Kit checked in light and dark; Devices
+  lock screen inspected. The thread no longer dips when the typing bubble or
+  reply arrives.
+- Type check, Jest, API parity, formatting, standalone demo check, Expo
+  dependency check, iOS/Android export, and the parent web kit's type and CSS
+  checks pass.
+
+Not covered: Android device or emulator runs, physical iOS frame times, the full
+theme × fidelity × chrome × cursor matrix, and text blur, which React Native
+cannot draw portably (see PARITY.md).

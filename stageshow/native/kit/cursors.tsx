@@ -1,6 +1,11 @@
-import Svg, { Path, G, Circle, Rect, Ellipse } from 'react-native-svg'
-// macOS system cursors. Hotspots are listed in HOTSPOT in stage.tsx.
+import Svg, { Path, G, Circle } from 'react-native-svg'
+// macOS system cursors. Hotspots are listed with the glyphs in cursor.tsx.
 // The hands draw a little larger than the arrow, as they do on macOS.
+
+/** The line cursors' two tones. They invert on a dark surface, as macOS's do. */
+export type Ink = { line?: string; edge?: string }
+// The I-beam's caps and the resize tips reach past their boxes, as on web.
+const spill = { overflow: 'visible' } as const
 
 export function MacPointer() {
   return (
@@ -16,21 +21,21 @@ export function MacPointer() {
   )
 }
 
-export function MacIbeam() {
+export function MacIbeam({ line = '#000', edge = '#fff' }: Ink = {}) {
   return (
-    <Svg width="10" height="16" viewBox="0 0 10 16" fill="none">
+    <Svg width="10" height="16" viewBox="0 0 10 16" fill="none" style={spill}>
       {/* A thin edge in the opposite tone, as macOS draws it, so it reads on any surface */}
-      <Path d="M3 1H7M3 15H7M5 1V15" stroke="#fff" strokeWidth="2.6" strokeLinecap="round" />
-      <Path d="M3 1H7M3 15H7M5 1V15" stroke="#000" strokeWidth="1" strokeLinecap="round" />
+      <Path d="M3 1H7M3 15H7M5 1V15" stroke={edge} strokeWidth="2.6" strokeLinecap="round" />
+      <Path d="M3 1H7M3 15H7M5 1V15" stroke={line} strokeWidth="1" strokeLinecap="round" />
     </Svg>
   )
 }
 
-export function MacCrosshair() {
+export function MacCrosshair({ line = '#000', edge = '#fff' }: Ink = {}) {
   return (
-    <Svg width="17" height="17" viewBox="0 0 17 17" fill="none">
-      <Path d="M8.5 0V17M0 8.5H17" stroke="#fff" strokeWidth="2.6" />
-      <Path d="M8.5 0V17M0 8.5H17" stroke="#000" strokeWidth="1" />
+    <Svg width="17" height="17" viewBox="0 0 17 17" fill="none" style={spill}>
+      <Path d="M8.5 0V17M0 8.5H17" stroke={edge} strokeWidth="2.6" />
+      <Path d="M8.5 0V17M0 8.5H17" stroke={line} strokeWidth="1" />
     </Svg>
   )
 }
@@ -106,17 +111,17 @@ export function MacWait() {
 // points north-south, and turns for east-west and the two diagonals. Drawn
 // at the pointer's scale (a 28pt box at 21px), hotspot at the center.
 const RESIZE_TIP = 'M0-8.4 2.55-3.65H-2.55ZM0 8.4 2.55 3.65H-2.55Z'
-function MacResize({ turn }: { turn: number }) {
+function MacResize({ turn, line = '#000', edge = '#fff' }: Ink & { turn: number }) {
   return (
-    <Svg width="21" height="21" viewBox="-14 -14 28 28">
+    <Svg width="21" height="21" viewBox="-14 -14 28 28" style={spill}>
       <G transform={`rotate(${turn})`} strokeLinejoin="round">
-        <Path d={RESIZE_TIP} fill="#fff" stroke="#fff" strokeWidth="3.2" />
-        <Path d={RESIZE_TIP} fill="#000" stroke="#000" strokeWidth="1.2" />
+        <Path d={RESIZE_TIP} fill={edge} stroke={edge} strokeWidth="3.2" />
+        <Path d={RESIZE_TIP} fill={line} stroke={line} strokeWidth="1.2" />
       </G>
     </Svg>
   )
 }
-export const MacResizeNS = () => <MacResize turn={0} />
-export const MacResizeEW = () => <MacResize turn={90} />
-export const MacResizeNWSE = () => <MacResize turn={-45} />
-export const MacResizeNESW = () => <MacResize turn={45} />
+export const MacResizeNS = (ink: Ink) => <MacResize {...ink} turn={0} />
+export const MacResizeEW = (ink: Ink) => <MacResize {...ink} turn={90} />
+export const MacResizeNWSE = (ink: Ink) => <MacResize {...ink} turn={-45} />
+export const MacResizeNESW = (ink: Ink) => <MacResize {...ink} turn={45} />

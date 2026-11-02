@@ -54,6 +54,7 @@ jobs:
           done
           npm run check:scenes
           npm run check:gold
+          npm run check:motion
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -61,4 +62,5 @@ jobs:
           path: |
             stageshow/native/scene-results
             stageshow/native/gold-results
+            stageshow/native/motion-results
           if-no-files-found: ignore

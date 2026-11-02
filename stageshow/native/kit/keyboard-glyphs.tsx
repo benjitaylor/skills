@@ -2,12 +2,16 @@ import Svg, { Path, Circle, Ellipse, Rect } from 'react-native-svg'
 export function KeyboardGlyph({
   name,
   dark = false,
+  color = dark ? '#fff' : '#000',
+  sheet = dark ? '#2a2a2c' : '#e3e4e9',
 }: {
   dark?: boolean
   name: 'shift' | 'shift-on' | 'delete' | 'return' | 'emoji' | 'mic'
+  /** The glyph's ink: the keys' ink, or the faint ink below the keys. */
+  color?: string
+  /** The sheet's colour, which the emoji's face is cut out in. */
+  sheet?: string
 }) {
-  const color = dark ? '#fff' : '#121317',
-    sheet = dark ? '#303238' : '#dce0e7'
   const common = {
     fill: 'none',
     stroke: color,
@@ -55,8 +59,3 @@ export function KeyboardGlyph({
       )
   }
 }
-
-/**
- * The iOS keyboard. Put it at the bottom of a Phone's screen, under the
- * composer; pass `typed` and it pops each key as the text grows.
- */

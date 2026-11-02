@@ -66,7 +66,7 @@ export function ReviewScene({ scene, theme, phase, reduced = false, replay = 0, 
             <View style={{ flexDirection: layout === 'compact' ? 'column' : 'row', gap: 28 }}>
               <View style={{ flex: layout === 'compact' ? undefined : 1, gap: 18 }}>
                 <View style={{ ...row, justifyContent: 'space-between' }}>
-                  <View style={{ gap: 6 }}><Text style={{ fontSize: 12 }}>Weekly activity</Text><Count value={s.count} style={{ fontSize: 32, fontWeight: '600' }} /></View>
+                  <View style={{ gap: 6 }}><Text style={{ fontSize: 12 }}>Weekly activity</Text><Count value={s.count} style={{ fontSize: 32, fontWeight: '600', color: 'var(--ss-text-strong)' }} /></View>
                   <Chart width={128} height={64} data={chart} />
                 </View>
                 <Row lead={<Avatar name="Maya Chen" />} title="Maya Chen" subtitle="Design team"><Check on={s.saved} pending={!s.saved} /></Row>

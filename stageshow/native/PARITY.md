@@ -9,18 +9,18 @@ is outside component parity.
 
 ## Implemented surface
 
-| Family            | Native implementation                                                                                                                 | Exercise                                                      |
-| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
-| Stage             | `Stage`, `useLook`, `useReducedMotion`; looks, compact design dimensions, poster, loop/once/tap playback, cursor, keys, app lifecycle | All preview pages; clock/act/component tests                  |
-| Frames            | `Window`, `Bar`, `Text`, `Prompt`, `Caret`                                                                                            | Kit terminal, Motion terminal; native source variants         |
-| Devices           | `Phone` (all 9 frames), `LockScreen`, `Notification`, `WALLPAPER`, `Keyboard`                                                         | Inbox and Devices; 9-frame render test                        |
-| Messaging         | `Thread`, `Bubble`, `Stamp`, `Receipt`                                                                                                | Inbox: compose, send, typing, reply, reaction                 |
-| Motion            | `Connector`, `Count`, `Roll`, `Swap`, `Collapse`, `Fly`, `Follow`, `States`, `Stream`, `Popover`, `Camera`, `Scroll`, `Expand`        | Kit and Motion; interrupted tween / hidden sizing probe tests |
-| Parts             | `Avatar`, `Check`, `Icon`, `Spinner`, `Toast`, `Tooltip`, `Meter`, `Menu`, `Facepile`, `Chip`, `BrandMark`, `Pin`, `Row`              | Kit, Motion and Inbox                                         |
-| Controls          | `Field`, `Segmented`, `Toggle`, `Tabs`, `Badge`, `Slot`                                                                               | Kit and Motion                                                |
-| Data              | `Code`, `Chart`, `chartPoints`                                                                                                        | Kit and Motion; chart marker geometry test                    |
-| Geometry / timing | `inset`, `box`, `between`, `contains`, `cellOf`, `EASE`, `bezier`, `easeCss`, `clock`, `installVirtualClock`                          | Pure helpers, act tests and Step mode                         |
-| Artwork           | Complete `brandMarks`, native cursor shapes, keyboard/status glyphs, superellipse phone outline                                       | Bundled original SVG data; source/license notices retained    |
+| Family            | Native implementation                                                                                                                   | Exercise                                                      |
+| ----------------- | --------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
+| Stage             | `Stage`, `useLook`, `useReducedMotion`; looks, compact design dimensions, poster, loop/once/hover playback, cursor, keys, app lifecycle | All preview pages; clock/act/component tests                  |
+| Frames            | `Window`, `Bar`, `Text`, `Prompt`, `Caret`                                                                                              | Kit terminal, Motion terminal; native source variants         |
+| Devices           | `Phone` (all 9 frames), `LockScreen`, `Notification`, `WALLPAPER`, `Keyboard`                                                           | Inbox and Devices; 9-frame render test                        |
+| Messaging         | `Thread`, `Bubble`, `Stamp`, `Receipt`                                                                                                  | Inbox: compose, send, typing, reply, reaction                 |
+| Motion            | `Connector`, `Count`, `Roll`, `Swap`, `Collapse`, `Fly`, `Follow`, `States`, `Stream`, `Popover`, `Camera`, `Scroll`, `Expand`          | Kit and Motion; interrupted tween / hidden sizing probe tests |
+| Parts             | `Avatar`, `Check`, `Icon`, `Spinner`, `Toast`, `Tooltip`, `Meter`, `Menu`, `Facepile`, `Chip`, `BrandMark`, `Pin`, `Row`                | Kit, Motion and Inbox                                         |
+| Controls          | `Field`, `Segmented`, `Toggle`, `Tabs`, `Badge`, `Slot`                                                                                 | Kit and Motion                                                |
+| Data              | `Code`, `Chart`, `chartPoints`                                                                                                          | Kit and Motion; chart marker geometry test                    |
+| Geometry / timing | `inset`, `box`, `between`, `contains`, `cellOf`, `EASE`, `bezier`, `easeCss`, `clock`, `installVirtualClock`                            | Pure helpers, act tests and Step mode                         |
+| Artwork           | Complete `brandMarks`, native cursor shapes, keyboard/status glyphs, superellipse phone outline                                         | Bundled original SVG data; source/license notices retained    |
 
 The API check currently covers 63 runtime exports and 44 type exports. It also
 compares explicitly destructured component props, excluding browser `className`.
@@ -53,6 +53,30 @@ See the native contract in [README.md](README.md). In particular:
   re-measures every target on each frame. Profile dense drag scenes on device.
 - The web kit leaves stage content readable by screen readers. The native stage
   is one labelled image (or a play button) and hides its faux UI.
+- Tokens, durations, delays, curves and geometry are the web kit's values. The
+  parity suites assert them on the virtual clock for each family. Beat timing
+  matches web in virtual time, except that a beat aimed at a named target waits
+  for native measurement (asynchronous on React Native Web) and the first beat
+  waits for the reset to commit. Resets snap back with motion off, and the
+  first frame stays hidden until the container width is known.
+- Entrances (a part's mount animation, such as the chart's draw-in or Swap's
+  first fade) play through settling and resets, as they do on web, where
+  `data-placing` turns off transitions only. Thread rows glide only when a commit
+  moves them, as the web kit's FLIP compares tops across a commit. React Native
+  Web reports layout only when a size changes, so there the rows read their tops
+  just before and after each commit.
+- Not reproduced: text blur in Roll, Swap, States, Stream, the receipt and
+  fade-ins (React Native has no portable text blur); `saturate()` on frosted
+  surfaces; Swap's 8-point resize edge fade; rounded Stream highlight runs;
+  Roll's automatic alignment (pass `align`); the shortening of a transition
+  reversed mid-flight; the typing dots' first-cycle delays; and the reply morph
+  for JSX children that change size (typing and string changes morph).
+- Backdrop blur intensities are calibrated on the web build and approximate on
+  iOS and Android. Cursor glyph shadows use a layer shadow on iOS and a
+  drop-shadow filter elsewhere. SF Pro's 590 weight renders as 600, and the
+  phone screen's −0.015em tracking is not inherited by arbitrary text.
+- Mono greyscale recolors bundled SVG marks; raster images use the grayscale
+  view filter.
 - `easeCss` remains available for shared authoring data; native animation uses
   `bezier` and Animated values. Browser CSS strings are not native styles.
 - Animated SVG geometry is driven on the JS thread to share a deterministic

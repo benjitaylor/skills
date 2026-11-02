@@ -2,7 +2,8 @@ import { useEffect, useRef, useState } from 'react'
 import { Animated, ScrollView, View } from 'react-native'
 import { SceneView, useInteraction, useScene, type NativeProps } from '../native'
 import { Mask, edgeMask } from '../mask'
-import { useTween } from '../animate'
+import { useTween, curves } from '../animate'
+import { useLook } from '../look'
 
 export function Scroll({
   name,
@@ -17,8 +18,11 @@ export function Scroll({
     [width, setWidth] = useState(0),
     [total, setTotal] = useState(0),
     [offset, setOffset] = useState(0)
-  const interaction = useInteraction(name),
-    opacity = useTween(bar === 'always' || interaction?.scrolling ? 1 : 0, 250)
+  const { theme, tokens } = useLook(),
+    interaction = useInteraction(name),
+    visible = bar === 'always' || !!interaction?.scrolling
+  // macOS's overlay bar: quick to show, and it lingers before fading once the content rests (Scroll.css)
+  const opacity = useTween(visible ? 1 : 0, visible ? 150 : 500, { delay: visible ? 0 : 600, ease: curves.ease })
   const scrolling = useRef({
     offset: 0,
     max: 0,
@@ -69,12 +73,12 @@ export function Scroll({
           pointerEvents="none"
           style={{
             position: 'absolute',
-            right: 3,
+            right: 2,
             top: 0,
-            width: 4,
+            width: 6,
             height: thumb,
-            borderRadius: 2,
-            backgroundColor: '#9b9b9b',
+            borderRadius: 3,
+            backgroundColor: theme === 'dark' ? 'rgba(255,255,255,0.28)' : tokens.ink[4],
             opacity,
             transform: [{ translateY: total > height ? (offset / (total - height)) * (height - thumb) : 0 }],
           }}

@@ -1,6 +1,9 @@
 import {
+  Children,
   createContext,
   forwardRef,
+  Fragment,
+  isValidElement,
   useContext,
   useImperativeHandle,
   useId,
@@ -12,6 +15,7 @@ import {
 } from 'react'
 import {
   Animated,
+  StyleSheet,
   Text as RNText,
   View,
   type StyleProp,
@@ -81,6 +85,38 @@ function originOf(root: View) {
   }
   return origin
 }
+const read = (v: unknown) => (typeof v === 'number' ? v : (v as { __getValue?: () => unknown } | null)?.__getValue?.())
+// A target's box as rect() hands it to the scene: where it is drawn, without a scale of its
+// own (a press, a hover lift), as on web. Anything placed from it would otherwise shift with
+// every press. Only a plain scale about a known origin is taken off; anything else stays drawn.
+function unscaled(r: Rect, style: unknown): Rect {
+  const flat = StyleSheet.flatten(style as StyleProp<ViewStyle>) as ViewStyle | undefined
+  if (!Array.isArray(flat?.transform)) return r
+  let sx = 1,
+    sy = 1
+  for (const step of flat.transform as Record<string, unknown>[]) {
+    const [key, raw] = Object.entries(step)[0] ?? []
+    const v = read(raw)
+    if (typeof v === 'number' && (key === 'scale' || key === 'scaleX')) sx *= v
+    if (typeof v === 'number' && (key === 'scale' || key === 'scaleY')) sy *= v
+    // A slide or turn moves it in a way a scale alone can't undo: keep the drawn box.
+    if (!key?.startsWith('scale') && v !== 0 && !(typeof v === 'string' && parseFloat(v) === 0)) return r
+  }
+  if ((sx === 1 && sy === 1) || !sx || !sy) return r
+  const origin = flat.transformOrigin ?? 'center',
+    w = r.width / sx,
+    h = r.height / sy
+  const [ox, oy] =
+    origin === 'center' || origin === 'center center'
+      ? [w / 2, h / 2]
+      : origin === 'top left' || origin === 'left top'
+        ? [0, 0]
+        : Array.isArray(origin) && typeof origin[0] === 'number' && typeof origin[1] === 'number'
+          ? [origin[0], origin[1]]
+          : [NaN, NaN]
+  if (Number.isNaN(ox)) return r
+  return { x: r.x - ox * (1 - sx), y: r.y - oy * (1 - sy), width: w, height: h }
+}
 export const SceneView = forwardRef<View, NativeProps>(function SceneView(
   {
     target,
@@ -114,10 +150,11 @@ export const SceneView = forwardRef<View, NativeProps>(function SceneView(
     order: ++order,
   }).current
   const laidOut = useRef(false)
-  const current = useRef({ scene, hidden, cursor: cursor ?? cursorAlias, parent })
-  current.current = { scene, hidden, cursor: cursor ?? cursorAlias, parent }
-  useImperativeHandle(forwarded, () => node.current!, [])
   const interaction = useInteraction(name)
+  const drawn = [style, interaction?.hover && hoverStyle, interaction?.pressed && pressedStyle]
+  const current = useRef({ scene, hidden, cursor: cursor ?? cursorAlias, parent, drawn })
+  current.current = { scene, hidden, cursor: cursor ?? cursorAlias, parent, drawn }
+  useImperativeHandle(forwarded, () => node.current!, [])
   entry.cursor = cursor ?? cursorAlias
   entry.hidden = hidden
   entry.parent = parent
@@ -137,6 +174,7 @@ export const SceneView = forwardRef<View, NativeProps>(function SceneView(
     }
     const changed = (Object.keys(next) as (keyof Rect)[]).some((key) => Math.abs(next[key] - entry.rect[key]) > 0.1)
     entry.rect = next
+    entry.target = unscaled(next, current.current.drawn)
     if (!changed && laidOut.current) return
     laidOut.current = true
     // measureLayout reports layout positions without a target's own press scale.
@@ -166,7 +204,8 @@ export const SceneView = forwardRef<View, NativeProps>(function SceneView(
   useLayoutEffect(() => {
     if (name) void entry.measure?.()
   })
-  const scoped = scene?.instantScope === name
+  // Unnamed views never match: undefined === undefined would snap every tween beneath them.
+  const scoped = !!name && scene?.instantScope === name
   return (
     <HiddenTargets.Provider value={!!hidden}>
       <ParentTarget.Provider value={name ?? parent}>
@@ -183,7 +222,7 @@ export const SceneView = forwardRef<View, NativeProps>(function SceneView(
               onLayout?.(event)
               if (name) void entry.measure?.()
             }}
-            style={[style, interaction?.hover && hoverStyle, interaction?.pressed && pressedStyle]}
+            style={drawn}
           >
             {children}
           </Animated.View>
@@ -202,18 +241,34 @@ export function Label({
   lines?: number
 }) {
   const { tokens } = useLook()
-  if (typeof children !== 'string' && typeof children !== 'number') return <>{children}</>
-  return (
+  const text = (value: ReactNode, key?: number) => (
     <RNText
+      key={key}
       numberOfLines={lines}
       style={[
         { fontSize: tokens.fontSize, color: tokens.text, fontFamily: tokens.fontFamily, includeFontPadding: false },
         style,
       ]}
     >
-      {children}
+      {value}
     </RNText>
   )
+  if (typeof children === 'string' || typeof children === 'number') return text(children)
+  // Mixed content (`<><Spinner /> Deploying</>`, `{n} items`) reads inline, as it does in a
+  // web label: runs of text are styled, elements sit beside them in one centered row.
+  const items = Children.toArray(
+    isValidElement<{ children?: ReactNode }>(children) && children.type === Fragment
+      ? children.props.children
+      : children,
+  )
+  const words = (n: ReactNode) => typeof n === 'string' || typeof n === 'number'
+  if (!items.some(words)) return <>{children}</>
+  if (items.every(words)) return text(items.join(''))
+  const runs: ReactNode[] = []
+  for (const item of items)
+    if (words(item) && words(runs[runs.length - 1])) runs[runs.length - 1] = `${runs[runs.length - 1]}${item}`
+    else runs.push(item)
+  return <View style={row}>{runs.map((run, i) => (words(run) ? text(run, i) : run))}</View>
 }
 export const row: ViewStyle = { flexDirection: 'row', alignItems: 'center' }
 export const absolute = { position: 'absolute' as const, left: 0, right: 0, top: 0, bottom: 0 }

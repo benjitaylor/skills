@@ -14,7 +14,7 @@ export { clock, installVirtualClock } from './clock'
 export type { ClockControl } from './clock'
 
 // Frames: windows, devices and system surfaces, from real geometry
-export { Window, Bar, Text, Prompt, Caret } from './window'
+export { Window, Bar, Text, Prompt, Caret, termColors } from './window'
 export type { WindowProps, BarProps, TextProps, PromptProps } from './window'
 export { Phone, LockScreen, Notification, WALLPAPER } from './phone'
 export type { PhoneProps, PhoneFrame, LockScreenProps, NotificationProps } from './phone'
@@ -59,3 +59,5 @@ export type { ChartProps } from './chart'
 // Native targets replace DOM attributes; styles use React Native values.
 export { SceneView } from './native'
 export type { NativeProps, NativeStyle } from './native'
+// Inherited icon and spinner ink, in place of CSS currentColor.
+export { InkContext } from './parts/Icon'
